@@ -389,7 +389,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 					     event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
 					},
 				};
-				var ctx = document.getElementById("count_wise_customer_sale_order").getContext('2d');
+				var ctx = document.getElementById("count_wise_customer_sale_order");
 				var myCharts = new Chart(ctx, {
 					type: "bar",
 					data: data,
@@ -478,7 +478,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 					     event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
 					},
 				};
-				var ctx = document.getElementById("amount_wise_sale_order_ac_to_customer").getContext('2d');
+				var ctx = document.getElementById("amount_wise_sale_order_ac_to_customer");
 				var myCharts = new Chart(ctx, {
 					type: "bar",
 					data: data,
@@ -577,7 +577,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 				var options = {
 					responsive: true
 				};
-				var ctx = document.getElementById("recent_customer").getContext('2d');
+				var ctx = document.getElementById("recent_customer");
 				var myCharts = new Chart(ctx, {
 					type: 'doughnut',
 					tooltipFillColor: "rgba(51, 51, 51, 0.55)",
@@ -707,7 +707,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 					     event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
 					},
 				};
-				var ctx = document.getElementById("montly_sale_orders").getContext('2d');
+				var ctx = document.getElementById("montly_sale_orders");
 				var myCharts = new Chart(ctx, {
 					type: "bar",
 					data: data,
@@ -729,7 +729,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 				var options = {
 					responsive: true
 				};
-                var ctx = document.getElementById("recent_5_sale_order").getContext('2d');
+                var ctx = document.getElementById("recent_5_sale_order");
 				var myCharts = new Chart(ctx, {
 					type: 'doughnut',
 					tooltipFillColor: "rgba(51, 51, 51, 0.55)",

@@ -198,7 +198,7 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
 				};
 				// if (window.donut != undefined)
 				//     window.donut.destroy();
-				var ctx = document.getElementById("top_10_purchase_order_graph").getContext('2d');
+				var ctx = document.getElementById("top_10_purchase_order_graph");
 				var myCharts = new Chart(ctx, {
 					type: 'doughnut',
 					tooltipFillColor: "rgba(51, 51, 51, 0.55)",
@@ -253,7 +253,7 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
 				};
 				// if (window.donut != undefined)
 				//     window.donut.destroy();
-				var ctx = document.getElementById("recent_vendors_graph").getContext('2d');
+				var ctx = document.getElementById("recent_vendors_graph");
 				var myCharts = new Chart(ctx, {
 					type: 'doughnut',
 					tooltipFillColor: "rgba(51, 51, 51, 0.55)",
