@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+	<t t-name="purchase_header_template">
+		<div class="text-center font-weight-bold text-primary">Purchase Dashboard</div><br/><br/>
+		<div class="row">
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#ffeecc;border-color:#ffeecc">
+					<div class="card shadow p-3 my-card" style="color:orange;border-color:orange"><i class="fa fa-comment"/></div>
+					<div class="text-center mt-3"><h4 style="color:orange">RFQs</h4></div>
+					<div class="text-center mt-2"><h1 style="color:orange" id="rfqs_count"/></div>
+					<div class="btn btn-sm rfqs-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#b2ebf2;border-color:#b2ebf2">
+					<div class="card shadow p-3 my-card" style="color:dodgerblue;border-color:dodgerblue"><i class="fa fa-shopping-cart"/></div>
+					<div class="text-center mt-3"><h4 style="color:dodgerblue">Purchase Orders</h4></div>
+					<div class="text-center mt-2"><h1 style="color:dodgerblue" id="total_purchase_order"/></div>
+					<div class="btn btn-sm purchase-order-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#c8e6c9;border-color:#c8e6c9">
+					<div class="card border-success shadow text-success p-3 my-card" ><i class="fa fa-comment"/></div>
+					<div class="text-success text-center mt-3"><h4 style="color:green">RFQ Sent</h4></div>
+					<div class="text-success text-center mt-2"><h1 style="color:green" id="rfq_sent"/></div>
+					<div class="btn btn-sm rfq-sent-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#ffcccc;border-color:#ffcccc">
+					<div class="card shadow p-3 my-card" style="color:crimson;border-color:crimson"><i class="fa fa-times-circle-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:crimson">Cancel</h4></div>
+					<div class="text-center mt-2"><h1 style="color:crimson" id="purchase_cancel"/></div>
+					<div class="btn btn-sm purchase-cancel-info more-info">More Info</div>
+				</div>
+			</div>
+		</div><br/><br/>
+		<div class="row">
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#b2dfdb;border-color:#b2dfdb">
+					<div class="card shadow p-3 my-card" style="color:teal;border-color:teal"><i class="fa fa-user-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:teal">Vendors</h4></div>
+					<div class="text-center mt-2"><h1 style="color:teal" id="total_vendors"/></div>
+					<div class="btn btn-sm venodrs-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#ffcce5;border-color:#ffcce5">
+					<div class="card shadow p-3 my-card" style="color:#d6145f;border-color:#d6145f"><i class="fa fa-file-text-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:#d6145f">To Be Receipted</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#d6145f" id="to_be_shipped"/></div>
+					<div class="btn btn-sm to-be-shipped-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#cce0ff;border-color:#cce0ff">
+					<div class="card shadow p-3 my-card" style="color:#2a4ea5;border-color:#2a4ea5"><i class="fa fa-file-text-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:#2a4ea5">Fully Receipted</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#2a4ea5" id="fully_shipped"/></div>
+					<div class="btn btn-sm fully-shipped-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#ffcce5;border-color:#ffcce5">
+					<div class="card shadow p-3 my-card" style="color:#d6145f;border-color:#d6145f"><i class="fa fa-file-text-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:#d6145f">Fully Billed</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#d6145f" id="fully_billed"/></div>
+					<div class="btn btn-sm fully-billed-info more-info">More Info</div>
+				</div>
+			</div>
+		</div><br/><br/>
+		<div class="row">
+			<div class="col-md-4">
+				<div class="card border-warning">
+					<div class="card-header text-center">
+						<div class="card-title bg-warning border-warning shadow text-center font-weight-bold text-white p-3 w-75 my-table">Top Purchase Orders</div>
+					</div>
+					<div class="table table-responsive scroll-content"> 
+						<table class="table table-hover">
+							<thead class="text-warning">
+								<tr>
+									<th>Order reference</th>
+									<th>Vendor Name</th>
+									<th>Creation Date</th>
+								</tr>
+							</thead>
+							<tbody id="top_four_purchase_orders"/>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card border-danger">
+					<div class="card-header text-center">
+						<div class="card-header text-center bg-danger border-danger shadow text-center font-weight-bold text-white p-3 w-75 my-table">Purchase Orders Cancel</div>
+					</div>
+					<div class="table table-responsive scroll-content"> 
+						<table class="table table-hover">
+							<thead class="text-danger">
+								<tr>
+									<th>Order reference</th>
+									<th>Vendor Name</th>
+									<th>Creation Date</th>
+								</tr>
+							</thead>
+							<tbody id="cancel_purchase_orders"/>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card border-success">
+					<div class="card-header text-center">
+						<div class="card-title bg-success border-success shadow text-center font-weight-bold text-white p-3 w-75 my-table">Fully Billed Purchase Orders</div>
+					</div>
+					<div class="table table-responsive scroll-content"> 
+						<table class="table table-hover">
+							<thead class="text-success">
+								<tr>
+									<th>Order reference</th>
+									<th>Vendor Name</th>
+									<th>Creation Date</th>
+								</tr>
+							</thead>
+						<tbody id="purchase_orders_with_fully_billed"/>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br/>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid MediumSpringGreen">
+						<div class="card-title">
+							<b>
+								<h3>Count Wise Vendor Purchase Order</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="recent_vendors_graph" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid MediumSpringGreen">
+						<div class="card-title">
+							<b>
+								<h3>TOP 5 Purchase Orders</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="top_10_purchase_order_graph" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br/>
+	</t>
+	<t t-name="PurchaseDashboard">
+		<div class="container Dashboard-container">
+			<div style="margin-top:3em;">
+				<div class="dashboard-header">
+					<t t-call="purchase_header_template"/>
+				</div>
+			</div>
+		</div>
+	</t>
+</templates>

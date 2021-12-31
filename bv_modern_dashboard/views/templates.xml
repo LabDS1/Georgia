@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo><data>
+        <!-- Sale Dashboard Menu -->
+        <record id="action_sale_dashboard" model="ir.actions.client">
+		    <field name="name">Sale Dashboard</field>
+		    <field name="tag">bv_sale_dashboard</field>
+        </record>
+        <menuitem id="main_menu_sale_dashboard"
+                  action="bv_modern_dashboard.action_sale_dashboard"
+                  name="Sale Dashboard"
+                  parent="sale.sale_menu_root"
+                  sequence="1"
+                  groups="bv_modern_dashboard.group_access_sale_dashboard"
+        />
+
+        <!-- Purchase Dashboard Menu -->
+        <record id="action_purchase_dashboard" model="ir.actions.client">
+                <field name="name">Purchase Dashboard</field>
+                <field name="tag">bv_purchase_dashboard</field>
+        </record>
+        <menuitem id="main_menu_purchase_dashboard"
+                  name="Purchase Dashboard"
+                  sequence="0"
+                  action="bv_modern_dashboard.action_purchase_dashboard"
+                  parent="purchase.menu_purchase_root"
+                  groups="bv_modern_dashboard.group_access_purchase_dashboard"
+        />
+
+</data></odoo>

@@ -1,0 +1,45 @@
+html .o_web_client > .o_action_manager{
+    direction: ltr;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 auto;
+    flex: 1 1 auto;
+    height: 100%;
+    overflow: scroll;
+}
+
+.Dashboard-container {
+    font-family: Lato;
+}
+
+.Dashboard-container .dashboard-header .more-info {
+    font-weight:normal; 
+    float:right; border-radius: 15px; 
+    background-color:white; 
+    box-shadow: 5px 5px 5px #aaaaaa;
+}
+
+.Dashboard-container .dashboard-header .scroll-content{
+    position: relative;
+    overflow-y: auto;
+    height: 20em;
+}
+
+.Dashboard-container .dashboard-header .table-content{
+    border-top:4px solid red;
+}
+
+.my-card
+{
+    position:absolute;
+    left:15%;
+    top:-20px;
+    border-radius:10%;
+}
+
+.my-table
+{
+    z-index:999;
+    left:12.5%;
+    top:-20px;
+    position:absolute;
+}
