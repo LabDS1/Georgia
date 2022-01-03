@@ -218,7 +218,7 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
 						responsive: true,
 						onClick:function(e){
                             var activePoints = myCharts.getElementsAtEvent(e);
-                            if (activePoints.length>0){
+                            if (result!=null && activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_id = result[2][selectedIndex]
                                 self.do_action({
@@ -273,7 +273,7 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
 						responsive: true,
 						onClick:function(e){
                             var activePoints = myCharts.getElementsAtEvent(e);
-                            if (activePoints.length>0){
+                            if (result!=null && activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_id = result[2][selectedIndex]
                                 self.do_action({

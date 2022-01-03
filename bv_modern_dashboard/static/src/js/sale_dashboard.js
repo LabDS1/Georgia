@@ -371,7 +371,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 					},
 					onClick:function(e){
                             var activePoints = myCharts.getElementsAtEvent(e);
-                            if (activePoints.length>0){
+                            if (result!=null && activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_id = result[2][selectedIndex]
                                 self.do_action({
@@ -460,7 +460,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 					},
 					onClick:function(e){
                             var activePoints = myCharts.getElementsAtEvent(e);
-                            if (activePoints.length>0){
+                            if (result!=null && activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_id = result[2][selectedIndex]
                                 self.do_action({
@@ -598,7 +598,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 						responsive: true,
 						onClick:function(e){
                             var activePoints = myCharts.getElementsAtEvent(e);
-                            if (activePoints.length>0){
+                            if (result!=null && activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_id = result[2][selectedIndex]
                                 self.do_action({
@@ -631,8 +631,10 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 			}).then(function (result) {
 			    var dynamicColors = function() {
 			        var colors=[];
-			        for(let i=0;i<result[0].length;i++){
-                        colors.push('#'+Math.floor(Math.random()*16777215).toString(16));
+			        if(result!=null && result.length>0){
+                        for(let i=0;i<result[0].length;i++){
+                            colors.push('#'+Math.floor(Math.random()*16777215).toString(16));
+                        }
                     }
                     return colors;
 			    }
@@ -681,7 +683,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 					},
 					onClick:function(e){
                             var activePoints = myCharts.getElementsAtEvent(e);
-                            if (activePoints.length>0){
+                            if (result!=null && activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_month = result[1][selectedIndex]
 
@@ -749,7 +751,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 						responsive: true,
 						onClick:function(e){
                             var activePoints = myCharts.getElementsAtEvent(e);
-                            if (activePoints.length>0){
+                            if (result!=null && activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_id = result[2][selectedIndex]
                                 self.do_action({
