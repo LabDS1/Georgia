@@ -639,7 +639,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 			}).then(function (result) {
 			    var dynamicColors = function() {
 			        var colors=[];
-			        if(result!=null && result.length>0){
+			        if(result!=null){
                         for(let i=0;i<result[0].length;i++){
                             colors.push('#'+Math.floor(Math.random()*16777215).toString(16));
                         }
