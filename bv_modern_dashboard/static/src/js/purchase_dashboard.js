@@ -401,9 +401,11 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
 			}).then(function(result) {
 				var i;
 				var body_html = "";
-				for (i = 0; i < result.length; i++) {
-					var data = result[i]
-					body_html += "<tr class='purchase_order_details' id='"+data['po_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['po_date']+"</td></tr>"
+				if(result!=null){
+                    for (i = 0; i < result.length; i++) {
+                        var data = result[i]
+                        body_html += "<tr class='purchase_order_details' id='"+data['po_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['amount_total']+"</td><td>"+data['po_date']+"</td></tr>"
+                    }
 				}
 				self.$el.find('tbody#top_four_purchase_orders').html(body_html);
 			});
@@ -434,9 +436,11 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
 			}).then(function(result) {
 				var i;
 				var body_html = "";
-				for (i = 0; i < result.length; i++) {
-					var data = result[i]
-					body_html += "<tr class='purchase_order_details' id='"+data['po_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['po_date']+"</td></tr>"
+				if(result!=null){
+                    for (i = 0; i < result.length; i++) {
+                        var data = result[i]
+                        body_html += "<tr class='purchase_order_details' id='"+data['po_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['po_date']+"</td></tr>"
+                    }
 				}
 				self.$el.find('tbody#cancel_purchase_orders').html(body_html);
 			});
@@ -452,9 +456,11 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
 			}).then(function(result) {
 				var i;
 				var body_html = "";
-				for (i = 0; i < result.length; i++) {
-					var data = result[i]
-					body_html += "<tr class='purchase_order_details' id='"+data['po_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['po_date']+"</td></tr>"
+				if(result!=null){
+                    for (i = 0; i < result.length; i++) {
+                        var data = result[i]
+                        body_html += "<tr class='purchase_order_details' id='"+data['po_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['po_date']+"</td></tr>"
+                    }
 				}
 				self.$el.find('tbody#purchase_orders_with_fully_billed').html(body_html);
 			});

@@ -222,10 +222,12 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 				}).then(function(result) {
 					var i;
 					var body_html = "";
-					for (i = 0; i < result.length; i++) {
-						var data = result[i]
-//						console.log(data)
-						body_html += "<tr class='sale_order_details' id='"+data['so_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['amount_total']+"</td><td>"+data['so_date']+"</td></tr>"
+					if(result!=null){
+                        for (i = 0; i < result.length; i++) {
+                            var data = result[i]
+    //						console.log(data)
+                            body_html += "<tr class='sale_order_details' id='"+data['so_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['amount_total']+"</td><td>"+data['so_date']+"</td></tr>"
+                    }
 				}
 				self.$el.find('tbody#top-order-list').html(body_html);
 			});
@@ -256,9 +258,11 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 				}).then(function(result) {
 					var i;
 					var body_html = "";
-					for (i = 0; i < result.length; i++) {
-						var data = result[i]
-						body_html += "<tr class='sale_order_details' id='"+data['so_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['so_date']+"</td></tr>"
+					if(result!=null){
+                        for (i = 0; i < result.length; i++) {
+                            var data = result[i]
+                            body_html += "<tr class='sale_order_details' id='"+data['so_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['so_date']+"</td></tr>"
+                    }
 				}
 				self.$el.find('tbody#cancel-order-list').html(body_html);
 			});
@@ -274,9 +278,11 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 				}).then(function(result) {
 					var i;
 					var body_html = "";
-					for (i = 0; i < result.length; i++) {
-						var data = result[i]
-						body_html += "<tr class='sale_order_details' id='"+data['so_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['so_date']+"</td><td>"+data['so_del']+"</td></tr>"
+					if(result!=null){
+                        for (i = 0; i < result.length; i++) {
+                            var data = result[i]
+                            body_html += "<tr class='sale_order_details' id='"+data['so_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['so_date']+"</td><td>"+data['so_del']+"</td></tr>"
+                    }
 				}
 				self.$el.find('tbody#sent-order-list').html(body_html);
 			});
@@ -292,9 +298,11 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 				}).then(function(result) {
 					var i;
 					var body_html = "";
-					for (i = 0; i < result.length; i++) {
-						var data = result[i]
-						body_html += "<tr class='customer_details' id='"+data['customer_id']+"'><td>"+data['customer_name']+"</td><td>"+data['sale_total']+"</td></tr>"
+					if(result!=null){
+                        for (i = 0; i < result.length; i++) {
+                            var data = result[i]
+                            body_html += "<tr class='customer_details' id='"+data['customer_id']+"'><td>"+data['customer_name']+"</td><td>"+data['sale_total']+"</td></tr>"
+                    }
 				}
 				self.$el.find('tbody#top-customer').html(body_html);
 			});
