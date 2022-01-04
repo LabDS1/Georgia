@@ -53,7 +53,7 @@ class PurchaseOrder(models.Model):
         result = []
         try:
             query = """
-                SELECT po.name AS so_number, rp.name AS customer_name, po.date_order AS po_date, po.id AS po_id, po.amount_total AS amount_total
+                SELECT po.name AS so_number, rp.name AS customer_name, po.date_order AS po_date, po.id AS po_id
                 FROM purchase_order po, res_partner rp
                 WHERE rp.id = po.partner_id 
                 AND state IN ('purchase') AND po.company_id = ANY (array[%s])

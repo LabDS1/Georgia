@@ -187,12 +187,12 @@ class Lead(models.Model):
         company_id = self._context.get('allowed_company_ids')
         result = []
         try:
-            query = """ 
-                SELECT DISTINCT to_char(lead.create_date, 'MON-YYYY') AS date, (sum(lead.expected_revenue * lead.probability)/100) AS revenue
-                FROM crm_lead lead
-                WHERE lead.create_date IS NOT NULL AND lead.company_id = ANY (array[%s])
-                GROUP BY date
-                """%(company_id)
+            query = """ SELECT DISTINCT to_char(lead.create_date, 'MON-YYYY') AS date, (sum(lead.expected_revenue * lead.probability)/100) AS revenue ,to_char(lead.create_date, 'YYYY-MM') AS year
+                        FROM crm_lead lead
+                        WHERE lead.create_date IS NOT NULL AND lead.company_id = ANY (array[%s])
+                        GROUP BY date, year
+                        ORDER BY year DESC
+                    """ % (company_id)
             self._cr.execute(query)
             docs = self._cr.dictfetchall()
             date = []
@@ -212,10 +212,10 @@ class Lead(models.Model):
         result = []
         try:
             query = """
-                SELECT count(lead.id) AS lead_name, stage.name AS stage_name, lead.stage_id AS stage_id
-                FROM crm_lead lead, crm_stage stage 
-                WHERE lead.stage_id = stage.id AND lead.company_id = ANY (array[%s])
-                GROUP BY stage_id, stage.name"""%(company_id)
+                    SELECT count(lead.id) AS lead_name, stage.name AS stage_name, lead.stage_id AS stage_id
+                    FROM crm_lead lead, crm_stage stage 
+                    WHERE lead.stage_id = stage.id AND lead.company_id = ANY (array[%s])
+                    GROUP BY stage_id, stage.name""" % (company_id)
             self._cr.execute(query)
             docs = self._cr.dictfetchall()
             lead = []
@@ -224,7 +224,9 @@ class Lead(models.Model):
             stage = []
             stage_ids = [record.get('stage_id') for record in docs]
             for record in docs:
-                stage.append(record.get('lead_name'))
+                lead_name = self.env['crm.lead'].search_count(
+                    [('stage_id', '=', record.get('stage_id')), ('company_id', 'in', company_id)])
+                stage.append(lead_name)
             result = [stage, lead, stage_ids]
         except Exception as e:
             result = []

@@ -82,7 +82,6 @@
 								<tr>
 									<th>Order reference</th>
 									<th>Vendor Name</th>
-									<th>Amount</th>
 									<th>Creation Date</th>
 								</tr>
 							</thead>

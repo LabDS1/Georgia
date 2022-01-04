@@ -36,6 +36,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 			self.get_cancel_orders();
 			self.price_wise_products();
 			self.montly_sale_orders();
+			self.quarterly_sale_orders();
 			self.top_sale_team();
 			self.recent_customer();
 			self.recent_5_sale_order();
@@ -222,12 +223,9 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 				}).then(function(result) {
 					var i;
 					var body_html = "";
-					if(result!=null){
-                        for (i = 0; i < result.length; i++) {
-                            var data = result[i]
-    //						console.log(data)
-                            body_html += "<tr class='sale_order_details' id='"+data['so_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['amount_total']+"</td><td>"+data['so_date']+"</td></tr>"
-                    }
+					for (i = 0; i < result.length; i++) {
+						var data = result[i]
+						body_html += "<tr class='sale_order_details' id='"+data['so_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['amount_total']+"</td><td>"+data['so_date']+"</td></tr>"
 				}
 				self.$el.find('tbody#top-order-list').html(body_html);
 			});
@@ -258,11 +256,9 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 				}).then(function(result) {
 					var i;
 					var body_html = "";
-					if(result!=null){
-                        for (i = 0; i < result.length; i++) {
-                            var data = result[i]
-                            body_html += "<tr class='sale_order_details' id='"+data['so_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['so_date']+"</td></tr>"
-                    }
+					for (i = 0; i < result.length; i++) {
+						var data = result[i]
+						body_html += "<tr class='sale_order_details' id='"+data['so_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['so_date']+"</td></tr>"
 				}
 				self.$el.find('tbody#cancel-order-list').html(body_html);
 			});
@@ -278,11 +274,9 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 				}).then(function(result) {
 					var i;
 					var body_html = "";
-					if(result!=null){
-                        for (i = 0; i < result.length; i++) {
-                            var data = result[i]
-                            body_html += "<tr class='sale_order_details' id='"+data['so_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['so_date']+"</td><td>"+data['so_del']+"</td></tr>"
-                    }
+					for (i = 0; i < result.length; i++) {
+						var data = result[i]
+						body_html += "<tr class='sale_order_details' id='"+data['so_id']+"'><td>"+data['so_number']+"</td><td>"+data['customer_name']+"</td><td>"+data['so_date']+"</td><td>"+data['so_del']+"</td></tr>"
 				}
 				self.$el.find('tbody#sent-order-list').html(body_html);
 			});
@@ -298,11 +292,9 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 				}).then(function(result) {
 					var i;
 					var body_html = "";
-					if(result!=null){
-                        for (i = 0; i < result.length; i++) {
-                            var data = result[i]
-                            body_html += "<tr class='customer_details' id='"+data['customer_id']+"'><td>"+data['customer_name']+"</td><td>"+data['sale_total']+"</td></tr>"
-                    }
+					for (i = 0; i < result.length; i++) {
+						var data = result[i]
+						body_html += "<tr class='customer_details' id='"+data['customer_id']+"'><td>"+data['customer_name']+"</td><td>"+data['sale_total']+"</td></tr>"
 				}
 				self.$el.find('tbody#top-customer').html(body_html);
 			});
@@ -379,7 +371,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 					},
 					onClick:function(e){
                             var activePoints = myCharts.getElementsAtEvent(e);
-                            if (result!=null && activePoints.length>0){
+                            if (activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_id = result[2][selectedIndex]
                                 self.do_action({
@@ -468,7 +460,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 					},
 					onClick:function(e){
                             var activePoints = myCharts.getElementsAtEvent(e);
-                            if (result!=null && activePoints.length>0){
+                            if (activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_id = result[2][selectedIndex]
                                 self.do_action({
@@ -606,7 +598,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 						responsive: true,
 						onClick:function(e){
                             var activePoints = myCharts.getElementsAtEvent(e);
-                            if (result!=null && activePoints.length>0){
+                            if (activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_id = result[2][selectedIndex]
                                 self.do_action({
@@ -639,8 +631,8 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 			}).then(function (result) {
 			    var dynamicColors = function() {
 			        var colors=[];
-			        if(result!=null){
-                        for(let i=0;i<result[0].length;i++){
+			        if(result!=null && result.length>0){
+			            for(var i=0;i<result[0].length;i++){
                             colors.push('#'+Math.floor(Math.random()*16777215).toString(16));
                         }
                     }
@@ -691,6 +683,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 					},
 					onClick:function(e){
                             var activePoints = myCharts.getElementsAtEvent(e);
+
                             if (result!=null && activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_month = result[1][selectedIndex]
@@ -718,6 +711,103 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 					},
 				};
 				var ctx = document.getElementById("montly_sale_orders");
+				var myCharts = new Chart(ctx, {
+					type: "bar",
+					data: data,
+					options: options
+					});
+
+			});
+		},
+
+		quarterly_sale_orders: function(){
+			var self = this
+			self._rpc({
+				model: "sale.order",
+				method: "quarterly_sale_orders",
+				args: [],
+				kwargs: {context: session.user_context},
+			}).then(function (result) {
+			    var dynamicColors = function() {
+			        var colors=[];
+			        if(result!=null && result.length>0){
+			            for(var i=0;i<result[0].length;i++){
+                            colors.push('#'+Math.floor(Math.random()*16777215).toString(16));
+                        }
+                    }
+                    return colors;
+			    }
+				var data = {
+					labels: result[1],
+					datasets: [
+					{
+						label: '',
+						data: result[0],
+						backgroundColor: dynamicColors(),
+						borderColor: [
+							"rgba(255, 99, 132, 0.2)",
+							"rgba(54, 162, 235, 0.2)",
+							"rgba(75, 192, 192, 0.2)",
+							"rgba(153, 102, 255, 0.2)",
+							"rgba(10,20,30,0.3)"
+						],
+					borderWidth: 1
+					},
+					]
+				};
+				//options
+				var options = {
+					responsive: true,
+					itle: {
+					display: false,
+					position: "top",
+					text: "",
+					fontSize: 18,
+					fontColor: "#111"
+					},
+					legend: {
+						display: false,
+						position: "bottom",
+						labels: {
+							fontColor: "#333",
+							fontSize: 16
+						}
+					},
+					scales: {
+						yAxes: [{
+						ticks: {
+							min: 0
+						}
+					}]
+					},
+					onClick:function(e){
+                            var activePoints = myCharts.getElementsAtEvent(e);
+
+                            if (result!=null && activePoints.length>0){
+                                console.log(result[3])
+                                var selectedIndex = activePoints[0]._index;
+
+                                var start_month = result[2][selectedIndex];
+                                var start_dt = new Date(start_month);
+
+                                var end_month = result[3][selectedIndex];
+                                var end_dt = new Date(end_month);
+                                self.do_action({
+                                    name: _t("Sale order"),
+                                    type: 'ir.actions.act_window',
+                                    res_model: 'sale.order',
+                                    view_mode: 'form',
+                                    views: [[false,'list'],[false, 'form']],
+                                    domain: [['date_order', '>=', start_dt],['date_order', '<=', end_month], ['state','in',['done','sale']]],
+                                    target: 'current',
+                                });
+                            }
+					    },
+					onHover: function(event, chartElement){
+					     event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+					},
+				};
+				var ctx = document.getElementById("quarterly_sale_orders");
 				var myCharts = new Chart(ctx, {
 					type: "bar",
 					data: data,
@@ -759,7 +849,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 						responsive: true,
 						onClick:function(e){
                             var activePoints = myCharts.getElementsAtEvent(e);
-                            if (result!=null && activePoints.length>0){
+                            if (activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_id = result[2][selectedIndex]
                                 self.do_action({

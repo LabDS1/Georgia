@@ -27,7 +27,7 @@ class SaleOrder(models.Model):
 
     @api.model
     def get_customers(self):
-        customers = self.env['sale.order'].search_count([('partner_id.customer_rank', '>=', 1)])
+        customers = self.env['sale.order'].search_count([('partner_id.customer_rank', '>=', 1), ('partner_id.child_ids', '=', False)])
         return customers
 
     @api.model
@@ -158,8 +158,53 @@ class SaleOrder(models.Model):
             for record in docs:
                 revenue.append(record.get('revenue'))
             result = [revenue, date]
+        except Exception as e:
+            result = []
+        return result
 
-            # print(result)
+    @api.model
+    def quarterly_sale_orders(self):
+        company_id = self._context.get('allowed_company_ids')
+        result = []
+        try:
+            query = """
+                    SELECT DISTINCT extract(quarter from date_order) AS quarter, (sum(amount_total)) AS revenue, to_char(date_order, 'YYYY') AS year
+                    FROM sale_order sale
+                    WHERE sale.create_date IS NOT NULL AND sale.company_id = ANY (array[%s]) AND sale.state in ('done', 'sale')
+                    GROUP BY extract(quarter from date_order), year
+                    ORDER BY year, extract(quarter from date_order) ASC
+                    """ % (company_id)
+            self._cr.execute(query)
+            docs = self._cr.dictfetchall()
+            date = []
+            for record in docs:
+                quarter = 'Q'+str(int(record.get('quarter')))+' '+str(record.get('year'))
+                date.append(quarter)
+            revenue = []
+            year_quarter_start_dt = []
+            year_quarter_end_dt = []
+            for record in docs:
+                quarter_no = int(record.get('quarter'))
+                start_dt = ''
+                end_dt = ''
+                if quarter_no is 1:
+                    start_dt = record.get('year')+"-01-01"
+                    end_dt = record.get('year')+"-03-31"
+                if quarter_no is 2:
+                    start_dt = record.get('year')+'-04-01'
+                    end_dt = record.get('year')+'-06-30'
+                if quarter_no is 3:
+                    start_dt = record.get('year')+'-07-01'
+                    end_dt = record.get('year')+'-09-30'
+                if quarter_no is 4:
+                    start_dt = record.get('year')+'-10-01'
+                    end_dt = record.get('year')+'-12-31'
+                year_quarter_start_dt.append(start_dt)
+                year_quarter_end_dt.append(end_dt)
+            for record in docs:
+                revenue.append(record.get('revenue'))
+            result = [revenue, date, year_quarter_start_dt, year_quarter_end_dt]
+            # print("===>",result)
         except Exception as e:
             result = []
         return result

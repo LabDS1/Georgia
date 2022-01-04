@@ -64,6 +64,49 @@
 		</div><br/><br/>
 		<div class="row">
 			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top:solid #d6145f">
+						<div class="card-title">
+							<b>
+								<h3>Monthly Sales</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="montly_sale_orders" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top:solid #d6145f">
+						<div class="card-title">
+							<b>
+								<h3>Quarterly Sales</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="quarterly_sale_orders" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br/><br/>
+		<div class="row">
+			<div class="col-md-6">
 				<div class="card border-success">
 					<div class="card-header text-center border-top-success">
 						<div class="card-title bg-success border-success shadow text-center font-weight-bold text-white p-3 w-75 my-table">Top Sold Orders</div>
@@ -248,48 +291,6 @@
 				</div>
 			</div>
 		</div><br/>
-		<div class="row">
-			<div class="col-md-6">
-				<div class="card">
-					<div class="card-header" style="border-top:solid #d6145f">
-						<div class="card-title">
-							<b>
-								<h3>Monthly Sales</h3>
-							</b>
-						</div>
-					</div>
-					<div class="card-body mt-3">
-						<div class="row">
-							<div class="col-md-12">
-								<div class="chart">
-									<canvas id="montly_sale_orders" style="height:fit-content;width:fit-content"> </canvas>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-<!--			<div class="col-md-6">-->
-<!--				<div class="card">-->
-<!--					<div class="card-header" style="border-top:solid #d6145f">-->
-<!--						<div class="card-title">-->
-<!--							<b>-->
-<!--								<h3>Top Sales Team</h3>-->
-<!--							</b>-->
-<!--						</div>-->
-<!--					</div>-->
-<!--					<div class="card-body mt-3">-->
-<!--						<div class="row">-->
-<!--							<div class="col-md-12">-->
-<!--								<div class="chart">-->
-<!--									<canvas id="top_sale_team_sale" style="height:fit-content;width:fit-content"> </canvas>-->
-<!--								</div>-->
-<!--							</div>-->
-<!--						</div>-->
-<!--					</div>-->
-<!--				</div>-->
-<!--			</div>-->
-		</div>
 	</t>
 	<t t-name="SaleDashboard">
 		<div class="container Dashboard-container">

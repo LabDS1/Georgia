@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Modern Dashboard",
-    'summary': """Modern Dashboard""",
-    'description': """Modern Dashboard""",
+    'name': "Modern Sale Purchase Dashboard",
+    'summary': """Modern Sale Purchase Dashboard""",
+    'description': """Modern Sale Purchase Dashboard""",
     'author': "Brainvire Infotech Inc.",
     'website': "http://www.brainvire.com",
     'category': 'Uncategorized',
