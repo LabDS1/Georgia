@@ -9,12 +9,15 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 	var BVCRMDashboard = AbstractAction.extend({
 		template:'CRMDashboard',
 		events: {
+		    'click .my-total-leads':'my_total_leads',
 			'click .my-pipeline-info':'my_pipeline_info',
 			'click .open-opportunities-info':'open_opportunity_info',
 			'click .overdue-opportunities-info':'overdue_opportunity_info',
 			'click .total-won-info':'total_won_info',
+			'click .total-loss-info':'total_loss_info',
 			'click .to-invoice-info':'to_invoice_info',
 			'click .lead_details':'lead_details',
+			'click .lost_lead_details':'lost_lead_details',
 			'click .customer_details':'customer_details',
 			'click .activity_details':'activity_details',
 		},
@@ -26,6 +29,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			self.get_open_opportunity();
 			self.get_overdue_opportunity();
 			self.get_total_won();
+			self.get_total_loss();
 			self.get_to_be_invoiced();
 			self.get_expected_revenue();
 			self.get_lead_opportunity();
@@ -53,7 +57,8 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 				var options = {
 					responsive: true
 				};
-				window.myCharts = new Chart($("#won_list_customer"), {
+				var ctx = document.getElementById("won_list_customer");
+				var myCharts = new Chart(ctx, {
 					type: 'doughnut',
 					tooltipFillColor: "rgba(51, 51, 51, 0.55)",
 					data: {
@@ -69,7 +74,26 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 						}]
 					},
 					options: {
-						responsive: true
+						responsive: true,
+						onClick:function(e){
+                            var activePoints = myCharts.getElementsAtEvent(e);
+                            if (activePoints.length>0){
+                                var selectedIndex = activePoints[0]._index;
+                                var target_id = result[2][selectedIndex]
+                                self.do_action({
+                                    name: _t("Customer details"),
+                                    type: 'ir.actions.act_window',
+                                    res_model: 'res.partner',
+                                    view_mode: 'form',
+                                    views: [[false,'list'],[false, 'form']],
+                                    domain: [['id', '=', target_id]],
+                                    target: 'current',
+                                });
+                            }
+					    },
+					    onHover: function(event, chartElement){
+					        event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+					    },
 					}
 				});
 			});
@@ -87,7 +111,8 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 				var options = {
 					responsive: true
 				};
-				window.myCharts = new Chart($("#top_recent_customer"), {
+				var ctx = document.getElementById("top_recent_customer");
+				var myCharts = new Chart(ctx, {
 					type: 'doughnut',
 					tooltipFillColor: "rgba(51, 51, 51, 0.55)",
 					data: {
@@ -103,7 +128,26 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 						}]
 					},
 					options: {
-						responsive: true
+						responsive: true,
+						onClick:function(e){
+                            var activePoints = myCharts.getElementsAtEvent(e);
+                            if (activePoints.length>0){
+                                var selectedIndex = activePoints[0]._index;
+                                var target_id = result[2][selectedIndex]
+                                self.do_action({
+                                    name: _t("Customer details"),
+                                    type: 'ir.actions.act_window',
+                                    res_model: 'res.partner',
+                                    view_mode: 'form',
+                                    views: [[false,'list'],[false, 'form']],
+                                    domain: [['id', '=', target_id]],
+                                    target: 'current',
+                                });
+                            }
+					    },
+					    onHover: function(event, chartElement){
+					        event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+					    },
 					}
 				});
 			});
@@ -169,18 +213,21 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 					},
 					onClick:function(e){
                             var activePoints = myCharts.getElementsAtEvent(e);
-                            if (activePoints.length>0){
-                                var selectedIndex = activePoints[0]._index;
-                                var target_id = result[2][selectedIndex]
-                                self.do_action({
-                                    name: _t("CRM Lead"),
-                                    type: 'ir.actions.act_window',
-                                    res_model: 'crm.lead',
-                                    view_mode: 'form',
-                                    views: [[false,'list'],[false, 'form']],
-                                    domain: [['stage_id', '=', target_id]],
-                                    target: 'current',
-                                });
+                            if(result!=null){
+                                if (activePoints.length>0){
+                                    var selectedIndex = activePoints[0]._index;
+                                    var allowed_company_ids = session.user_context.allowed_company_ids;
+                                    var target_id = result[2][selectedIndex]
+                                    self.do_action({
+                                        name: _t("CRM Lead"),
+                                        type: 'ir.actions.act_window',
+                                        res_model: 'crm.lead',
+                                        view_mode: 'list, form',
+                                        views: [[false,'list'],[false, 'form']],
+                                        domain: [['stage_id', '=', target_id],['company_id','in',allowed_company_ids]],
+                                        target: 'current',
+                                    });
+                                }
                             }
 					    },
 					onHover: function(event, chartElement){
@@ -188,7 +235,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 					},
 				};
 				var ctx = document.getElementById("count_wise_lead");
-				myCharts = new Chart(ctx, {
+				var myCharts = new Chart(ctx, {
 					type: "bar",
 					data: data,
 					options: options
@@ -206,19 +253,24 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 				args: [],
 				kwargs: {context: session.user_context},
 			}).then(function (result) {
+			    var dynamicColors = function() {
+			        var colors=[];
+			        if(result!=null){
+			            if(result.length>0){
+                            for(var i=0;i<result[0].length;i++){
+                                colors.push('#'+Math.floor(Math.random()*16777215).toString(16));
+                            }
+                        }
+                    }
+                    return colors;
+			    }
 				var data = {
 					labels: result[1],
 					datasets: [
 					{
 						label: '',
 						data: result[0],
-						backgroundColor: [
-							"rgba(145, 184, 122,1)",
-							"rgba(255, 209, 222, 1)",
-							"rgba(75, 192, 192,1)",
-							"rgba(153, 102, 255,1)",
-							"rgba(10,20,30,1)"
-						],
+						backgroundColor: dynamicColors(),
 						borderColor: [
 							"rgba(255, 99, 132, 0.2)",
 							"rgba(54, 162, 235, 0.2)",
@@ -254,9 +306,39 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 							min: 0
 						}
 					}]
-					}
+					},
+					onClick:function(e){
+                            var activePoints = myCharts.getElementsAtEvent(e);
+                            if(result!=null){
+                                if (activePoints.length>0){
+                                    var selectedIndex = activePoints[0]._index;
+                                    var target_month = result[1][selectedIndex]
+
+                                    var start_dt = new Date(target_month+'-'+1)
+
+                                    var days = target_month.split('-')
+                                    var month = start_dt.getMonth()
+                                    var total_days = new Date(days[1], month+1, 0).getDate();
+                                    var end_dt = new Date(new Date(target_month+'-'+total_days).getTime()+60 * 60 * 24 * 1000);
+//                                    alert(start_dt+" ==== "+end_dt)
+                                    self.do_action({
+                                        name: _t("CRM Lead"),
+                                        type: 'ir.actions.act_window',
+                                        res_model: 'crm.lead',
+                                        view_mode: 'list, form',
+                                        views: [[false,'list'],[false, 'form']],
+                                        domain: [['create_date', '>=', start_dt],['create_date', '<=', end_dt]],
+                                        target: 'current',
+                                    });
+                                }
+                            }
+					    },
+					onHover: function(event, chartElement){
+					     event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+					},
 				};
-				window.myCharts = new Chart(self.$("#total_expected_revenue_graph"), {
+				var ctx = document.getElementById("total_expected_revenue_graph");
+				var myCharts = new Chart(ctx, {
 					type: "bar",
 					data: data,
 					options: options
@@ -277,6 +359,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 				var options = {
 					responsive: true
 				};
+//				alert(result);
 				window.myCharts = new Chart($("#loss_list_customer_graph"), {
 					type: 'doughnut',
 					tooltipFillColor: "rgba(51, 51, 51, 0.55)",
@@ -311,7 +394,8 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 				var options = {
 					responsive: true
 				};
-				window.myCharts = new Chart($("#top_sale_team_graph"), {
+				var ctx = document.getElementById("top_sale_team_graph");
+				var myCharts = new Chart(ctx, {
 					type: 'doughnut',
 					tooltipFillColor: "rgba(51, 51, 51, 0.55)",
 					data: {
@@ -327,7 +411,26 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 						}]
 					},
 					options: {
-						responsive: true
+						responsive: true,
+						onClick:function(e){
+                            var activePoints = myCharts.getElementsAtEvent(e);
+                            if (activePoints.length>0){
+                                var selectedIndex = activePoints[0]._index;
+                                var target_id = result[2][selectedIndex]
+                                self.do_action({
+                                    name: _t("CRM Lead"),
+                                    type: 'ir.actions.act_window',
+                                    res_model: 'crm.lead',
+                                    view_mode: 'form',
+                                    views: [[false,'list'],[false, 'form']],
+                                    domain: [['id', '=', target_id]],
+                                    target: 'current',
+                                });
+                            }
+					    },
+					    onHover: function(event, chartElement){
+					        event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+					    },
 					}
 				});
 			});
@@ -393,6 +496,18 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			});
 		},
 
+		get_total_loss: function() {
+			var self = this;
+			self._rpc({
+				model: 'crm.lead',
+				method: 'get_total_loss',
+				args: [],
+				kwargs: {context: session.user_context},
+			}).then(function(result) {
+				self.$el.find("#totalLoss").html(result);
+			});
+		},
+
 		get_to_be_invoiced: function() {
 			var self = this;
 			self._rpc({
@@ -419,32 +534,52 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 
 		my_pipeline_info: function(e){
 		var self = this;
+		var context_data = session.user_context;
+		var allowed_company_ids = context_data.allowed_company_ids;
+		var uid = context_data.uid
 		this.do_action({
 			name: _t("CRM Lead"),
 			type: 'ir.actions.act_window',
 			res_model: 'crm.lead',
 			view_mode: 'tree,kanban,form',
 			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
+			domain:[['user_id','=', uid],['company_id','in',allowed_company_ids]],
 			context: {'search_default_assigned_to_me':true},
+			target: 'current',
+			})
+		},
+
+		my_total_leads: function(e){
+		var allowed_companies_ids = session.user_context.allowed_company_ids
+		var self = this;
+		this.do_action({
+			name: _t("CRM Lead"),
+			type: 'ir.actions.act_window',
+			res_model: 'crm.lead',
+			view_mode: 'tree,kanban,form',
+			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
+			domain: [['company_id','in',allowed_companies_ids]],
 			target: 'current',
 			})
 		},
 
 		open_opportunity_info: function(e){
 		var self = this;
+		var allowed_companies_ids = session.user_context.allowed_company_ids;
 		this.do_action({
 			name: _t("CRM Lead"),
 			type: 'ir.actions.act_window',
 			res_model: 'crm.lead',
 			view_mode: 'tree,kanban,form',
 			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
-			domain: [['type', '=', 'opportunity'],['probability', '<',100]],
+			domain: [['type', '=', 'opportunity'],['probability', '<',100],['company_id','in',allowed_companies_ids]],
 			target: 'current',
 			})
 		},
 
 		overdue_opportunity_info: function(e){
 		var self = this;
+		var allowed_companies_ids = session.user_context.allowed_company_ids;
 		var today_date = new Date();
 		this.do_action({
 			name: _t("CRM Lead"),
@@ -452,33 +587,49 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			res_model: 'crm.lead',
 			view_mode: 'tree,kanban,form',
 			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
-			domain: [['type', '=', 'opportunity'],['date_deadline', '<', today_date], ['date_closed', '=', false]],
+			domain: [['type', '=', 'opportunity'],['date_deadline', '<', today_date], ['date_closed', '=', false],['company_id','in',allowed_companies_ids]],
 			target: 'current',
 			})
 		},
 
 		total_won_info: function(e){
 		var self = this;
+		var allowed_companies_ids = session.user_context.allowed_company_ids;
 		this.do_action({
-			name: _t("CRM Lead"),
+			name: _t("CRM Won Leads"),
 			type: 'ir.actions.act_window',
 			res_model: 'crm.lead',
-			view_mode: 'treekanban,form',
+			view_mode: 'tree,kanban,form',
 			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
-			domain: [['active', '=', true],['probability', '=', 100]],
+			domain: [['active', '=', true],['probability', '=', 100],['company_id','in',allowed_companies_ids]],
+			target: 'current',
+			})
+		},
+
+		total_loss_info: function(e){
+		var self = this;
+		var allowed_companies_ids = session.user_context.allowed_company_ids;
+		this.do_action({
+			name: _t("CRM Loss Leads"),
+			type: 'ir.actions.act_window',
+			res_model: 'crm.lead',
+			view_mode: 'tree,kanban,form',
+			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
+			domain: [['active', '=', false],['probability', '=', 0],['company_id','in',allowed_companies_ids]],
 			target: 'current',
 			})
 		},
 
 		to_invoice_info: function(e){
 		var self = this;
+		var allowed_companies_ids = session.user_context.allowed_company_ids;
 		this.do_action({
 			name: _t("Sale Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'sale.order',
 			view_mode: 'tree,kanban,form',
 			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
-			domain: [['invoice_status','=','to invoice']],
+			domain: [['invoice_status','=','to invoice'],['company_id','in',allowed_companies_ids]],
 			target: 'current',
 			})
 		},
@@ -505,7 +656,6 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 		lead_details: function(e){
 		var self = this;
 		var target_id = Number(e.currentTarget.id);
-		console.log(target_id);
 		this.do_action({
 			name: _t("Lead details"),
 			type: 'ir.actions.act_window',
@@ -585,6 +735,21 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			});
 		},
 
+		// GET lost details record
+		lost_lead_details: function(e){
+		var self = this;
+		var target_id = Number(e.currentTarget.id);
+		this.do_action({
+			name: _t("Lead details"),
+			type: 'ir.actions.act_window',
+			res_model: 'crm.lead',
+			view_mode: 'form',
+			views: [[false,'list'],[false, 'form']],
+			domain: [['id', '=', target_id], ['active','=', 0]],
+			target: 'current',
+			});
+		},
+
 		get_lost_list: function() {
 			var self = this;
 			self._rpc({
@@ -597,7 +762,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 				var body_html = "";
 				for (i = 0; i < result.length; i++) {
 					var data = result[i]
-					body_html += "<tr class='lead_details' id='"+data['cl_id']+"'><td>"+data['cl_name']+"</td><td>"+data['cl_probability']+"</td></tr>"
+					body_html += "<tr class='lost_lead_details' id='"+data['cl_id']+"'><td>"+data['cl_name']+"</td><td>"+data['cl_probability']+"</td></tr>"
 				}
 				self.$el.find('tbody#loss-list').html(body_html);
 			});

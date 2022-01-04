@@ -4,18 +4,19 @@
 		<div class="text-center font-weight-bold text-primary">CRM Dashboard</div><br/><br/>
 		<div class="row">
 			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#b2ebf2;border-color:#b2ebf2">
+					<div class="card shadow p-3 my-card" style="color:dodgerblue;border-color:dodgerblue"><i class="fa fa-comment"/></div>
+					<div class="text-center mt-3"><h4 style="color:dodgerblue">Total Leads</h4></div>
+					<div class="text-center mt-2"><h1 style="color:dodgerblue" id="totalLead"/></div>
+					<div class="btn btn-sm my-total-leads more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
 				<div class="card-header mx-sm-1 p-3" style="background-color:#ffeecc;border-color:#ffeecc">
 					<div class="card shadow p-3 my-card" style="color:orange;border-color:orange"><i class="fa fa-shopping-cart"/></div>
 					<div class="text-center mt-3"><h4 style="color:orange">My Pipeline</h4></div>
 					<div class="text-center mt-2"><h1 style="color:orange" id="myPipeline"/></div>
 					<div class="btn btn-sm my-pipeline-info more-info">More Info</div>
-				</div>
-			</div>
-			<div class="col-md-3">
-				<div class="card mx-sm-1 p-3" style="background-color:#b2ebf2;border-color:#b2ebf2">
-					<div class="card shadow p-3 my-card" style="color:dodgerblue;border-color:dodgerblue"><i class="fa fa-comment"/></div>
-					<div class="text-center mt-3"><h4 style="color:dodgerblue">Total Leads/Opportunity</h4></div>
-					<div class="text-center mt-2"><h1 style="color:dodgerblue" id="totalLead"/></div>
 				</div>
 			</div>
 			<div class="col-md-3">
@@ -36,7 +37,7 @@
 			</div>
 		</div><br/><br/>
 		<div class="row">
-			<div class="col-md-4">
+			<div class="col-md-3">
 				<div class="card-header mx-sm-1 p-3" style="background-color:#b2dfdb;border-color:#b2dfdb">
 					<div class="card shadow p-3 my-card" style="color:teal;border-color:teal"><i class="fa fa-user-o"/></div>
 					<div class="text-center mt-3"><h4 style="color:teal">Total Won</h4></div>
@@ -44,7 +45,15 @@
 					<div class="btn btn-sm total-won-info more-info">More Info</div>
 				</div>
 			</div>
-			<div class="col-md-4">
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#c8e6c9;border-color:#c8e6c9">
+					<div class="card shadow p-3 my-card" style="color:#008818;border-color:#008818"><i class="fa fa-file-text-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:#00A04A">Total Lost</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#00A04A" id="totalLoss"/></div>
+					<div class="btn btn-sm total-loss-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
 				<div class="card-header mx-sm-1 p-3" style="background-color:#ffcce5;border-color:#ffcce5">
 					<div class="card shadow p-3 my-card" style="color:#d6145f;border-color:#d6145f"><i class="fa fa-file-text-o"/></div>
 					<div class="text-center mt-3"><h4 style="color:#d6145f">To Be Invoiced</h4></div>
@@ -52,7 +61,7 @@
 					<div class="btn btn-sm to-invoice-info more-info">More Info</div>
 				</div>
 			</div>
-			<div class="col-md-4">
+			<div class="col-md-3">
 				<div class="card-header mx-sm-1 p-3" style="background-color:#cce0ff;border-color:#cce0ff">
 					<div class="card shadow p-3 my-card" style="color:#2a4ea5;border-color:#2a4ea5"><i class="fa fa-file-text-o"/></div>
 					<div class="text-center mt-3"><h4 style="color:#2a4ea5">Total Expected Revenue</h4></div>
@@ -62,15 +71,58 @@
 		</div><br/><br/>
 		<div class="row">
 			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid green">
+						<div class="card-title">
+							<b>
+								<h3>Stage wise Lead Count</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="count_wise_lead" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid green">
+						<div class="card-title">
+							<b>
+								<h3>Total Expected Revenue</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="total_expected_revenue_graph" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br/><br/>
+		<div class="row">
+			<div class="col-md-6">
 				<div class="card border-warning">
 					<div class="card-header text-center">
-				<div class="card-title bg-warning border-warning shadow text-center font-weight-bold text-white p-3 w-75 my-table">Top Lead/Opportunity</div>
+				<div class="card-title bg-warning border-warning shadow text-center font-weight-bold text-white p-3 w-75 my-table">Top Lead</div>
 					</div>
 					<div class="table table-responsive scroll-content"> 
 						<table class="table table-hover">
 							<thead class="text-warning">
 								<tr>
-									<th>Leads/Opportunity Name</th>
+									<th>Leads Name</th>
 									<th>Planned Revenue</th>
 									<th>Probability</th>
 								</tr>
@@ -154,48 +206,7 @@
 				</div>
 			</div>
 		</div><br/><br/>
-		<div class="row">
-			<div class="col-md-6">
-				<div class="card">
-					<div class="card-header" style="border-top: solid green">
-						<div class="card-title">
-							<b>
-								<h3>Stage wise Lead Count</h3>
-							</b>
-						</div>
-					</div>
-					<div class="card-body mt-3">
-						<div class="row">
-							<div class="col-md-12">
-								<div class="chart">
-									<canvas id="count_wise_lead" style="height:fit-content;width:fit-content"> </canvas>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-6">
-				<div class="card">
-					<div class="card-header" style="border-top: solid green">
-						<div class="card-title">
-							<b>
-								<h3>Total Expected Revenue</h3>
-							</b>
-						</div>
-					</div>
-					<div class="card-body mt-3">
-						<div class="row">
-							<div class="col-md-12">
-								<div class="chart">
-									<canvas id="total_expected_revenue_graph" style="height:fit-content;width:fit-content"> </canvas>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div><br/>
+
 		<div class="row">
 			<div class="col-md-6">
 				<div class="card">

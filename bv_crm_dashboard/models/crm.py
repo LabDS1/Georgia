@@ -33,7 +33,13 @@ class Lead(models.Model):
     @api.model
     def get_total_won(self):
         total_won = self.env['crm.lead'].sudo().search_count([('active', '=', True), ('probability', '=', 100), ('company_id', 'in', self._context.get('allowed_company_ids'))])
-        return total_won   
+        return total_won
+
+    @api.model
+    def get_total_loss(self):
+        total_loss = self.env['crm.lead'].sudo().search_count([('active', '=', False), ('probability', '=', 0), (
+        'company_id', 'in', self._context.get('allowed_company_ids'))])
+        return total_loss
 
     @api.model
     def get_to_be_invoiced(self):
@@ -42,7 +48,7 @@ class Lead(models.Model):
 
     @api.model
     def get_expected_revenue(self):
-        obj_opr=self.env['crm.lead'].sudo().search([('company_id', 'in', self._context.get('allowed_company_ids'))])
+        obj_opr=self.env['crm.lead'].sudo().search([('company_id', 'in', self._context.get('allowed_company_ids')), ('priority', '>=', 2), ('stage_id.name', '=', 'Quotation Sent')])
         expected_revenue=0
         for lead in obj_opr:
             expected_revenue=round(expected_revenue + (lead.expected_revenue or 0.0) * (lead.probability or 0) / 100.0, 2)
@@ -206,10 +212,10 @@ class Lead(models.Model):
         result = []
         try:
             query = """
-                SELECT count(lead.id) AS lead_name, stage.name AS stage_name, stage.id AS stage_id
+                SELECT count(lead.id) AS lead_name, stage.name AS stage_name, lead.stage_id AS stage_id
                 FROM crm_lead lead, crm_stage stage 
                 WHERE lead.stage_id = stage.id AND lead.company_id = ANY (array[%s])
-                GROUP BY stage.id, stage.name"""%(company_id)
+                GROUP BY stage_id, stage.name"""%(company_id)
             self._cr.execute(query)
             docs = self._cr.dictfetchall()
             lead = []
@@ -230,10 +236,10 @@ class Lead(models.Model):
         result = []
         try:
             query = """
-                SELECT c.name AS partner_name, sum(cl.expected_revenue) AS cl_plan_revenue
+                SELECT c.name AS partner_name, sum(cl.expected_revenue) AS cl_plan_revenue, c.id AS partner_id
                 FROM crm_lead cl, res_partner c 
                 WHERE cl.partner_id = c.id AND cl.expected_revenue > 0  AND cl.company_id = ANY (array[%s])                     
-                GROUP BY c.name, cl.create_date
+                GROUP BY c.name, cl.create_date, c.id
                 ORDER BY cl.create_date DESC LIMIT 5"""%(company_id)
             self._cr.execute(query)
             docs = self._cr.dictfetchall()
@@ -243,7 +249,8 @@ class Lead(models.Model):
             lead_revenue_total = []
             for record in docs:
                 lead_revenue_total.append(record.get('cl_plan_revenue'))
-            result = [lead_revenue_total, partner]
+            partner_ids = [record.get('partner_id') for record in docs]
+            result = [lead_revenue_total, partner, partner_ids]
         except Exception as e:
             result = []
         return result
@@ -253,10 +260,10 @@ class Lead(models.Model):
         company_id = self._context.get('allowed_company_ids')
         result = []
         try:
-            query = """SELECT c.name AS partner_name, sum(cl.expected_revenue) AS cl_plan_revenue
+            query = """SELECT c.name AS partner_name, sum(cl.expected_revenue) AS cl_plan_revenue, c.id AS partner_id
                 FROM crm_lead cl, res_partner c
                 WHERE cl.probability = 100 AND c.id = cl.partner_id AND cl.company_id = ANY (array[%s])
-                GROUP BY c.name, cl.expected_revenue
+                GROUP BY c.name, cl.expected_revenue, c.id
                 ORDER BY cl.expected_revenue LIMIT 5"""%(company_id)
             self._cr.execute(query)
             docs = self._cr.dictfetchall()
@@ -266,7 +273,8 @@ class Lead(models.Model):
             revenue = []
             for record in docs:
                 revenue.append(record.get('cl_plan_revenue'))
-            result = [revenue, partner]
+            partner_ids = [record.get('partner_id') for record in docs]
+            result = [revenue, partner, partner_ids]
         except Exception as e:
             result = []
         return result
