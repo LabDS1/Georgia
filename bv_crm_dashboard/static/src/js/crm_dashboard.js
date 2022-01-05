@@ -37,7 +37,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			self.get_activity_type();
 			self.get_lost_list();
 			self.get_partner_list();
-			self.get_top_salesteam_graph();
+			self.get_top_sales_rep_graph();
 			self.loss_list_customer_graph();
 			self.total_expected_revenue_graph();
 			self.count_wise_lead();
@@ -327,7 +327,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
                                         res_model: 'crm.lead',
                                         view_mode: 'list, form',
                                         views: [[false,'list'],[false, 'form']],
-                                        domain: [['create_date', '>=', start_dt],['create_date', '<=', end_dt]],
+                                        domain: [['create_date', '>=', start_dt],['create_date', '<=', end_dt],['company_id','=',1]],
                                         target: 'current',
                                     });
                                 }
@@ -360,41 +360,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 					responsive: true
 				};
 //				alert(result);
-				window.myCharts = new Chart($("#loss_list_customer_graph"), {
-					type: 'doughnut',
-					tooltipFillColor: "rgba(51, 51, 51, 0.55)",
-					data: {
-						labels: result[1],
-						datasets: [{
-							data: result[0],
-							backgroundColor: [
-								'#cc9900', '#cc3300 ', '#666fcf', '#7c66cf', '#9c66cf'
-							],
-							hoverBackgroundColor: [
-								'#cc9900', '#cc3300 ', '#666fcf', '#7c66cf', '#9c66cf'
-							]
-						}]
-					},
-					options: {
-						responsive: true
-					}
-				});
-			});
-		},
-
-		get_top_salesteam_graph: function(){
-			var self = this
-			self._rpc({
-				model: "crm.lead",
-				method: "get_top_salesteam_graph",
-				args: [],
-				kwargs: {context: session.user_context},
-			}).then(function (result) {
-				var array_lst = []
-				var options = {
-					responsive: true
-				};
-				var ctx = document.getElementById("top_sale_team_graph");
+                var ctx = document.getElementById("loss_list_customer_graph");
 				var myCharts = new Chart(ctx, {
 					type: 'doughnut',
 					tooltipFillColor: "rgba(51, 51, 51, 0.55)",
@@ -403,10 +369,10 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 						datasets: [{
 							data: result[0],
 							backgroundColor: [
-								'#66aecf ', '#6993d6 ', '#666fcf', '#7c66cf', '#9c66cf'
+								'#cc9900', '#cc3300 ', '#666fcf', '#7c66cf', '#9c66cf'
 							],
 							hoverBackgroundColor: [
-								'#66aecf ', '#6993d6 ', '#666fcf', '#7c66cf', '#9c66cf'
+								'#cc9900', '#cc3300 ', '#666fcf', '#7c66cf', '#9c66cf'
 							]
 						}]
 					},
@@ -423,7 +389,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
                                     res_model: 'crm.lead',
                                     view_mode: 'form',
                                     views: [[false,'list'],[false, 'form']],
-                                    domain: [['id', '=', target_id]],
+                                    domain: [['id', '=', target_id], ['active','=',false]],
                                     target: 'current',
                                 });
                             }
@@ -433,6 +399,89 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 					    },
 					}
 				});
+			});
+		},
+
+		get_top_sales_rep_graph: function(){
+			var self = this
+			self._rpc({
+				model: "crm.lead",
+				method: "get_top_sales_rep_graph",
+				args: [],
+				kwargs: {context: session.user_context},
+			}).then(function (result) {
+			    var dynamicColors = function() {
+			        var colors=[];
+			        if(result!=null && result.length>0){
+			            for(var i=0;i<result[0].length;i++){
+                            colors.push('#'+Math.floor(Math.random()*16777215).toString(16));
+                        }
+                    }
+                    return colors;
+			    }
+				var array_lst = []
+				var options = {
+					responsive: true
+				};
+				var data = {
+				    labels: result[1],
+				    datasets: [{
+				        label:'',
+						data: result[0],
+						backgroundColor: dynamicColors,
+						borderWidth: 1
+						}]
+					}
+				var options = {
+				    responsive: true,
+                    itle: {
+                        display: false,
+                        position: "top",
+                        text: "",
+                        fontSize: 18,
+                        fontColor: "#111"
+                    },
+                    legend: {
+                        display: false,
+                        position: "bottom",
+                        labels: {
+                            fontColor: "#333",
+                            fontSize: 16
+                           }
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                min: 0
+                            }
+                        }]
+                    },
+                    onClick:function(e){
+                        var activePoints = myCharts.getElementsAtEvent(e);
+                        if (activePoints.length>0){
+                            var selectedIndex = activePoints[0]._index;
+                            var target_id = result[2][selectedIndex]
+                            self.do_action({
+                                name: _t("CRM Lead"),
+                                type: 'ir.actions.act_window',
+                                res_model: 'sale.order',
+                                view_mode: 'form',
+                                views: [[false,'list'],[false, 'form']],
+                                domain: [['user_id', '=', target_id], ['invoice_status','in',['invoiced','to invoice']]],
+                                target: 'current',
+                            });
+                        }
+					},
+					onHover: function(event, chartElement){
+					    event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+					},
+			    };
+			    var ctx = document.getElementById("get_top_sales_rep_graph");
+				var myCharts = new Chart(ctx, {
+				    type: "bar",
+				    data: data,
+				    options: options
+			    });
 			});
 		},
 

@@ -639,7 +639,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
                     return colors;
 			    }
 				var data = {
-					labels: result[1],
+					labels: result[2],
 					datasets: [
 					{
 						label: '',
@@ -686,14 +686,14 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 
                             if (result!=null && activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
-                                var target_month = result[1][selectedIndex]
+                                var get_dt = result[2][selectedIndex]+"-01"
 
-                                var start_dt = new Date(target_month+'-'+1)
-
-                                var days = target_month.split('-')
+                                var start_dt = new Date(get_dt)
                                 var month = start_dt.getMonth()
-                                var total_days = new Date(days[1], month+1, 0).getDate();
-                                var end_dt = new Date(new Date(target_month+'-'+total_days).getTime()+60 * 60 * 24 * 1000);
+                                var year = start_dt.getFullYear()
+
+                                var days_of_month = new Date(year, month+1, 0).getDate();
+                                var end_dt = new Date(year, month, days_of_month+1);
 
                                 self.do_action({
                                     name: _t("Sale order"),
@@ -701,7 +701,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
                                     res_model: 'sale.order',
                                     view_mode: 'form',
                                     views: [[false,'list'],[false, 'form']],
-                                    domain: [['date_order', '>=', start_dt],['date_order', '<=', end_dt]],
+                                    domain: [['date_order', '>=', start_dt],['date_order', '<=', end_dt], ['company_id','=',1]],
                                     target: 'current',
                                 });
                             }
@@ -716,7 +716,6 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 					data: data,
 					options: options
 					});
-
 			});
 		},
 

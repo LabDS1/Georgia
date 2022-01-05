@@ -160,15 +160,40 @@ class Lead(models.Model):
         return result
 
     @api.model
+    def get_top_sales_rep_graph(self):
+        result = []
+        try:
+            query = """
+                SELECT DISTINCT so.user_id AS sales_rep_id, sum(so.amount_total) AS total_amount, rp.name AS rep_name
+                FROM sale_order so, res_users ru, res_partner as rp
+                WHERE ru.id = so.user_id AND rp.id = ru.partner_id AND so.invoice_status in ('invoiced','to invoice') AND ru.active = true
+                GROUP BY sales_rep_id, rep_name
+                ORDER BY total_amount DESC
+            """
+            self._cr.execute(query)
+            docs = self._cr.dictfetchall()
+            sales_rep = []
+            for record in docs:
+                sales_rep.append(record.get('rep_name'))
+            total_amount = []
+            for record in docs:
+                total_amount.append(record.get('total_amount'))
+            sales_rep_id = [record.get('sales_rep_id') for record in docs]
+            result = [total_amount, sales_rep, sales_rep_id]
+        except Exception as e:
+            result = []
+        return result
+
+    @api.model
     def loss_list_customer_graph(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
         try:
-            query = """SELECT c.name AS partner_name, sum(cl.expected_revenue) AS cl_plan_revenue
+            query = """SELECT c.name AS partner_name, sum(cl.expected_revenue) AS cl_plan_revenue, cl.id AS cl_id
                 FROM crm_lead cl, res_partner c
                 WHERE cl.probability = 0 AND c.id = cl.partner_id AND cl.company_id = ANY (array[%s])
-                GROUP BY c.name, cl.expected_revenue
-                ORDER BY cl.expected_revenue LIMIT 5"""%(company_id)
+                GROUP BY c.name, cl.expected_revenue, cl.id
+                ORDER BY cl.expected_revenue DESC LIMIT 5"""%(company_id)
             self._cr.execute(query)
             docs = self._cr.dictfetchall()
             partner_name = []
@@ -177,7 +202,8 @@ class Lead(models.Model):
             revenue = []
             for record in docs:
                 revenue.append(record.get('cl_plan_revenue'))
-            result = [revenue, partner_name]
+            cl_id = [record.get('cl_id') for record in docs]
+            result = [revenue, partner_name, cl_id]
         except Exception as e:
             result = []
         return result

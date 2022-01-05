@@ -142,22 +142,38 @@ class SaleOrder(models.Model):
         company_id = self._context.get('allowed_company_ids')
         result = []
         try:
+            # query = """
+            #     SELECT DISTINCT to_char(date_order, 'MON-YYYY') AS date, (sum(amount_total)) AS revenue, to_char(date_order, 'YYYY-MM') AS year
+            #     FROM sale_order sale
+            #     WHERE sale.create_date IS NOT NULL AND sale.company_id = ANY (array[%s])
+            #     GROUP BY date, year
+            #     ORDER BY year DESC
+            #     """%(company_id)
+            # query = """
+            #     SELECT DISTINCT DATE_TRUNC('month', date_order) AS date, (sum(amount_total)) AS revenue
+            #     FROM sale_order sale
+            #     WHERE sale.create_date IS NOT NULL AND sale.company_id = ANY (array[%s])
+            #     GROUP BY date
+            #     ORDER BY date DESC
+            # """%(company_id)
             query = """
-                SELECT DISTINCT to_char(date_order, 'MON-YYYY') AS date, (sum(amount_total)) AS revenue, to_char(date_order, 'YYYY-MM') AS year
+                SELECT DISTINCT EXTRACT(MONTH FROM date_order) AS month_count, sum(amount_total) AS revenue, to_char(date_order, 'YYYY-MON') AS month_year
                 FROM sale_order sale
-                WHERE sale.create_date IS NOT NULL AND sale.company_id = ANY (array[%s])
-                GROUP BY date, year
-                ORDER BY year DESC
-                """%(company_id)
+                WHERE sale.date_order IS NOT NULL AND sale.company_id = ANY (array[%s])
+                GROUP BY EXTRACT(MONTH FROM date_order), month_year
+                ORDER BY month_year, EXTRACT(MONTH FROM date_order) ASC
+            """%(company_id)
             self._cr.execute(query)
             docs = self._cr.dictfetchall()
-            date = []
+            month_count = []
             for record in docs:
-                date.append(record.get('date'))
+                month_count.append(record.get('month_count'))
             revenue = []
             for record in docs:
                 revenue.append(record.get('revenue'))
-            result = [revenue, date]
+            month_year = [record.get('month_year') for record in docs]
+            result = [revenue, month_count, month_year]
+            # print("==>", result)
         except Exception as e:
             result = []
         return result
