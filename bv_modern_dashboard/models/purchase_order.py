@@ -152,6 +152,31 @@ class PurchaseOrder(models.Model):
         return result
 
     @api.model
+    def get_top_5_vendor_graph(self):
+        company_id = self._context.get('allowed_company_ids')
+        result = []
+        try:
+            query = """
+                    SELECT DISTINCT c.name AS partner_name, sum(po.amount_total) AS total, c.id AS partner_id
+                    FROM purchase_order po, res_partner c
+                    WHERE c.id = po.partner_id AND po.state = 'purchase' AND po.amount_total > 0 AND po.company_id = ANY (array[%s])
+                    GROUP BY c.name, c.id
+                    ORDER BY total DESC LIMIT 5 """ % (company_id)
+            self._cr.execute(query)
+            docs = self._cr.dictfetchall()
+            partner = []
+            for record in docs:
+                partner.append(record.get('partner_name'))
+            amt_total = []
+            for record in docs:
+                amt_total.append(record.get('total'))
+            partner_ids = [record.get('partner_id') for record in docs]
+            result = [amt_total, partner, partner_ids]
+        except Exception as e:
+            result = []
+        return result
+
+    @api.model
     def amount_wise_purchase_order_ac_to_vendor(self):
         company_id = self._context.get('allowed_company_ids')
         result = []

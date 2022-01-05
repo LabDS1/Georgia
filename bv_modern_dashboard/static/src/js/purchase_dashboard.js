@@ -35,7 +35,8 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
 			self.get_cancel_purchase_orders();
 			self.get_purchase_orders_fully_billed();
 			self.get_recent_vendores_graph();
-			self.get_top_10_purchase_order_graph();
+//			self.get_top_10_purchase_order_graph();
+			self.get_top_5_vendor_graph();
 			self.get_supplier_info_graph();
 			self.amount_wise_purchase_order_ac_to_vendor();
 			// self.get_supplier_price_graph();
@@ -185,20 +186,20 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
 			});
 		},
 
-		get_top_10_purchase_order_graph: function(){
+
+        get_top_5_vendor_graph: function(){
 			var self = this
 			self._rpc({
 				model: "purchase.order",
-				method: "get_top_10_purchase_order",
+				method: "get_top_5_vendor_graph",
 				args: [],
 				kwargs: {context: session.user_context},
 			}).then(function (result) {
+				var array_lst = []
 				var options = {
 					responsive: true
 				};
-				// if (window.donut != undefined)
-				//     window.donut.destroy();
-				var ctx = document.getElementById("top_10_purchase_order_graph");
+				var ctx = document.getElementById("top_5_vendor_graph");
 				var myCharts = new Chart(ctx, {
 					type: 'doughnut',
 					tooltipFillColor: "rgba(51, 51, 51, 0.55)",
@@ -207,10 +208,10 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
 						datasets: [{
 							data: result[0],
 							backgroundColor: [
-								'#1f1f7a', '#ff0066 ', '#ff8000', '#86b300', '#00e600'
+								'#66aecf ', '#6993d6 ', '#666fcf', '#7c66cf', '#9c66cf'
 							],
 							hoverBackgroundColor: [
-								'#1f1f7a ', '#ff0066 ', '#ff8000', '#86b300', '#00e600'
+								'#66aecf ', '#6993d6 ', '#666fcf', '#7c66cf', '#9c66cf'
 							]
 						}]
 					},
@@ -222,9 +223,9 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
                                 var selectedIndex = activePoints[0]._index;
                                 var target_id = result[2][selectedIndex]
                                 self.do_action({
-                                    name: _t("Purchase Order"),
+                                    name: _t("Customer details"),
                                     type: 'ir.actions.act_window',
-                                    res_model: 'purchase.order',
+                                    res_model: 'res.partner',
                                     view_mode: 'form',
                                     views: [[false,'list'],[false, 'form']],
                                     domain: [['id', '=', target_id]],
@@ -239,6 +240,62 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
 				});
 			});
 		},
+
+
+//		get_top_10_purchase_order_graph: function(){
+//			var self = this
+//			self._rpc({
+//				model: "purchase.order",
+//				method: "get_top_10_purchase_order",
+//				args: [],
+//				kwargs: {context: session.user_context},
+//			}).then(function (result) {
+//				var options = {
+//					responsive: true
+//				};
+//				// if (window.donut != undefined)
+//				//     window.donut.destroy();
+//				var ctx = document.getElementById("top_10_purchase_order_graph");
+//				var myCharts = new Chart(ctx, {
+//					type: 'doughnut',
+//					tooltipFillColor: "rgba(51, 51, 51, 0.55)",
+//					data: {
+//						labels: result[1],
+//						datasets: [{
+//							data: result[0],
+//							backgroundColor: [
+//								'#1f1f7a', '#ff0066 ', '#ff8000', '#86b300', '#00e600'
+//							],
+//							hoverBackgroundColor: [
+//								'#1f1f7a ', '#ff0066 ', '#ff8000', '#86b300', '#00e600'
+//							]
+//						}]
+//					},
+//					options: {
+//						responsive: true,
+//						onClick:function(e){
+//                            var activePoints = myCharts.getElementsAtEvent(e);
+//                            if (activePoints.length>0){
+//                                var selectedIndex = activePoints[0]._index;
+//                                var target_id = result[2][selectedIndex]
+//                                self.do_action({
+//                                    name: _t("Purchase Order"),
+//                                    type: 'ir.actions.act_window',
+//                                    res_model: 'purchase.order',
+//                                    view_mode: 'form',
+//                                    views: [[false,'list'],[false, 'form']],
+//                                    domain: [['id', '=', target_id]],
+//                                    target: 'current',
+//                                });
+//                            }
+//					    },
+//					    onHover: function(event, chartElement){
+//					        event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+//					    },
+//					}
+//				});
+//			});
+//		},
 
 		get_recent_vendores_graph: function(){
 			var self = this
