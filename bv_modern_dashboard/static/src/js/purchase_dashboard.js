@@ -574,10 +574,10 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
 		this.do_action({
 			name: _t("Vendors"),
 			type: 'ir.actions.act_window',
-			res_model: 'purchase.order',
+			res_model: 'res.partner',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['partner_id.supplier_rank', '=',1]],
+			domain: [['purchase_line_ids', '!=', false]],
 			target: 'current',
 			})
 		},

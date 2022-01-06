@@ -27,7 +27,7 @@ class SaleOrder(models.Model):
 
     @api.model
     def get_customers(self):
-        customers = self.env['sale.order'].search_count([('partner_id.customer_rank', '>=', 1), ('partner_id.child_ids', '=', False)])
+        customers = self.env['res.partner'].search_count([('sale_order_ids', '!=', False)])
         return customers
 
     @api.model
@@ -52,7 +52,7 @@ class SaleOrder(models.Model):
                 WHERE rp.id = so.partner_id AND so.company_id = ANY (array[%s])AND state IN ('sale', 'done')
                 ORDER BY so.amount_total DESC
                 /*ORDER BY so.name*/
-                """%(company_id)
+                """ % (company_id)
             self.env.cr.execute(query)
             result = self.env.cr.dictfetchall()
         except Exception as e:
@@ -72,7 +72,7 @@ class SaleOrder(models.Model):
                 GROUP BY c.name, c.id
                 ORDER BY sale_total DESC
                 /*ORDER BY rp.name DESC*/
-                """%(company_id)
+                """ % (company_id)
             self.env.cr.execute(query)
             result = self.env.cr.dictfetchall()
         except Exception as e:
@@ -88,7 +88,7 @@ class SaleOrder(models.Model):
                 SELECT so.id AS so_id, so.name AS so_number, rp.name AS customer_name, so.date_order AS so_date, so.commitment_date AS so_del
                 FROM sale_order so, res_partner rp
                 WHERE rp.id = so.partner_id AND so.company_id = ANY (array[%s]) AND so.state IN ('sent')
-                """%(company_id)
+                """ % (company_id)
             self.env.cr.execute(query)
             result = self.env.cr.dictfetchall()
         except Exception as e:
@@ -104,7 +104,7 @@ class SaleOrder(models.Model):
                 SELECT so.id AS so_id, so.name AS so_number, rp.name AS customer_name, so.date_order AS so_date
                 FROM sale_order so, res_partner rp
                 WHERE rp.id = so.partner_id AND so.company_id = ANY (array[%s]) AND so.state IN ('cancel')
-                """%(company_id)
+                """ % (company_id)
             self.env.cr.execute(query)
             result = self.env.cr.dictfetchall()
         except Exception as e:
@@ -123,7 +123,7 @@ class SaleOrder(models.Model):
                 inner join product_template on product_product.product_tmpl_id = product_template.id
                 WHERE sale_order_line.company_id = ANY (array[%s])
                 GROUP BY product_template.id
-                ORDER BY price DESC"""%(company_id)
+                ORDER BY price DESC""" % (company_id)
             self.env.cr.execute(query)
             docs = self._cr.dictfetchall()
             product = []
@@ -162,7 +162,7 @@ class SaleOrder(models.Model):
                 WHERE sale.date_order IS NOT NULL AND sale.company_id = ANY (array[%s])
                 GROUP BY EXTRACT(MONTH FROM date_order), month_year
                 ORDER BY month_year, EXTRACT(MONTH FROM date_order) ASC
-            """%(company_id)
+            """ % (company_id)
             self._cr.execute(query)
             docs = self._cr.dictfetchall()
             month_count = []
@@ -194,7 +194,7 @@ class SaleOrder(models.Model):
             docs = self._cr.dictfetchall()
             date = []
             for record in docs:
-                quarter = 'Q'+str(int(record.get('quarter')))+' '+str(record.get('year'))
+                quarter = 'Q' + str(int(record.get('quarter'))) + ' ' + str(record.get('year'))
                 date.append(quarter)
             revenue = []
             year_quarter_start_dt = []
@@ -204,17 +204,17 @@ class SaleOrder(models.Model):
                 start_dt = ''
                 end_dt = ''
                 if quarter_no is 1:
-                    start_dt = record.get('year')+"-01-01"
-                    end_dt = record.get('year')+"-03-31"
+                    start_dt = record.get('year') + "-01-01"
+                    end_dt = record.get('year') + "-03-31"
                 if quarter_no is 2:
-                    start_dt = record.get('year')+'-04-01'
-                    end_dt = record.get('year')+'-06-30'
+                    start_dt = record.get('year') + '-04-01'
+                    end_dt = record.get('year') + '-06-30'
                 if quarter_no is 3:
-                    start_dt = record.get('year')+'-07-01'
-                    end_dt = record.get('year')+'-09-30'
+                    start_dt = record.get('year') + '-07-01'
+                    end_dt = record.get('year') + '-09-30'
                 if quarter_no is 4:
-                    start_dt = record.get('year')+'-10-01'
-                    end_dt = record.get('year')+'-12-31'
+                    start_dt = record.get('year') + '-10-01'
+                    end_dt = record.get('year') + '-12-31'
                 year_quarter_start_dt.append(start_dt)
                 year_quarter_end_dt.append(end_dt)
             for record in docs:
@@ -235,7 +235,7 @@ class SaleOrder(models.Model):
                 FROM crm_team ct, sale_order sale
                 WHERE ct.id = sale.team_id AND sale.company_id = ANY (array[%s])
                 GROUP BY ct.name
-                """%(company_id)
+                """ % (company_id)
             self.env.cr.execute(query)
             docs = self._cr.dictfetchall()
             name = []
@@ -260,7 +260,7 @@ class SaleOrder(models.Model):
                 WHERE c.id = sale.partner_id AND state IN ('sale', 'done') AND sale.company_id = ANY (array[%s])
                 GROUP BY c.name,sale.date_order, c.id
                 ORDER BY sale.date_order DESC LIMIT 5
-                """%(company_id)
+                """ % (company_id)
             self.env.cr.execute(query)
             docs = self._cr.dictfetchall()
             partner = []
@@ -287,7 +287,7 @@ class SaleOrder(models.Model):
                 WHERE sale.state = 'sale' AND sale.company_id = ANY (array[%s])
                 GROUP BY sale_name, sale.date_order, sale.id
                 ORDER BY sale.date_order DESC LIMIT 5
-                """%(company_id)
+                """ % (company_id)
             self.env.cr.execute(query)
             docs = self._cr.dictfetchall()
             name = []
@@ -313,7 +313,7 @@ class SaleOrder(models.Model):
                 WHERE c.id = so.partner_id AND so.amount_total > 0 AND so.company_id = ANY (array[%s])
                 GROUP BY c.name, customer_id
                 ORDER BY c.name
-                """%(company_id)
+                """ % (company_id)
             self.env.cr.execute(query)
             docs = self._cr.dictfetchall()
             partner = []
@@ -340,7 +340,7 @@ class SaleOrder(models.Model):
                 WHERE c.id = so.partner_id AND so.company_id = ANY (array[%s])
                 GROUP BY c.name, customer_id
                 ORDER BY c.name
-                """%(company_id)
+                """ % (company_id)
             self.env.cr.execute(query)
             docs = self._cr.dictfetchall()
             partner = []

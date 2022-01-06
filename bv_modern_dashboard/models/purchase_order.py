@@ -28,8 +28,8 @@ class PurchaseOrder(models.Model):
 
     @api.model
     def get_vendors_lst(self):
-        partners = self.env['res.partner'].search([('supplier_rank', '=', 1)])
-        vendors_count = self.env['purchase.order'].search_count([('partner_id', 'in', partners.ids)])
+        partners = self.env['res.partner'].search([('supplier_rank', '=', '1')])
+        vendors_count = self.env['res.partner'].search_count([('purchase_line_ids', '!=', False)])
         return vendors_count
 
     @api.model

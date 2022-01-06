@@ -179,10 +179,10 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 			this.do_action({
 			name: _t("Customers"),
 			type: 'ir.actions.act_window',
-			res_model: 'sale.order',
+			res_model: 'res.partner',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['partner_id.customer_rank', '>=',1]],
+			domain: [['sale_order_ids', '!=', false]],
 			target: 'current',
 			})
 		},
