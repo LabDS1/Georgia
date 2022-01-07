@@ -8,6 +8,7 @@ class Lead(models.Model):
 
     @api.model
     def get_my_pipeline(self):
+        
         uid = request.session.uid
         # user_id=self.env['res.users'].browse(uid)
         my_pipeline = self.env['crm.lead'].sudo().search_count([('user_id', '=', uid),
