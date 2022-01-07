@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+	<t t-name="sale_header_template">
+		<div class="text-center font-weight-bold text-primary">Sales Dashboard</div><br/><br/>
+		<div class="row">
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#ffeecc;border-color:#ffeecc">
+					<div class="card shadow p-3 my-card" style="color:orange;border-color:orange"><i class="fa fa-comment"/></div>
+					<div class="text-center mt-3"><h4 style="color:orange">Quotations</h4></div>
+					<div class="text-center mt-2"><h1 style="color:orange" id="quotation_draft"/></div>
+					<div class="btn btn-sm quotation-draft-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#b2ebf2;border-color:#b2ebf2">
+					<div class="card shadow p-3 my-card" style="color:dodgerblue;border-color:dodgerblue" ><i class="fa fa-shopping-cart"/></div>
+					<div class="text-center mt-3"><h4 style="color:dodgerblue;">Sales Orders</h4></div>
+					<div class="text-center mt-2"><h1 style="color:dodgerblue;" id="total_sale_order"/></div>
+					<div class="btn btn-sm sale-order-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#c8e6c9;border-color:#c8e6c9">
+					<div class="card border-success shadow text-success p-3 my-card" ><i class="fa fa-comment"/></div>
+					<div class="text-center mt-3"><h4 style="color:#00A04A">Quotation Sent</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#00A04A" id="quotation_sent"/></div>
+					<div class="btn btn-sm quotation-sent-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#ffcccc;border-color:#ffcccc">
+					<div class="card shadow p-3 my-card" style="color:crimson;border-color:crimson"><i class="fa fa-times-circle-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:crimson">Quotation Cancel</h4></div>
+					<div class="text-center mt-2"><h1 style="color:crimson" id="quotation_cancel"/></div>
+					<div class="btn btn-sm quotation-cancel-info more-info">More Info</div>
+				</div>
+			</div>
+		 </div><br/><br/>
+		<div class="row">
+			<div class="col-md-4">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#b2dfdb;border-color:#b2dfdb">
+					<div class="card shadow p-3 my-card" style="color:teal;border-color:teal"><i class="fa fa-user-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:teal">Customers</h4></div>
+					<div class="text-center mt-2"><h1 style="color:teal" id="total_customers"/></div>
+					<div class="btn btn-sm customers-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#ffcce5;border-color:#ffcce5">
+					<div class="card shadow p-3 my-card" style="color:#d6145f;border-color:#d6145f"><i class="fa fa-file-text-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:#d6145f">To Be Invoiced</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#d6145f" id="to_be_invoiced"/></div>
+					<div class="btn btn-sm to-be-invoiced-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#cce0ff;border-color:#cce0ff">
+					<div class="card shadow p-3 my-card" style="color:#2a4ea5;border-color:#2a4ea5"><i class="fa fa-file-text-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:#2a4ea5">Fully Invoiced</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#2a4ea5" id="fully_invoiced"/></div>
+					<div class="btn btn-sm fully-invoiced-info more-info">More Info</div>
+				</div>
+			</div>
+		</div><br/><br/>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top:solid #d6145f">
+						<div class="card-title">
+							<b>
+								<h3>Monthly Sales</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="montly_sale_orders" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top:solid #d6145f">
+						<div class="card-title">
+							<b>
+								<h3>Quarterly Sales</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="quarterly_sale_orders" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br/><br/>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid green">
+						<div class="card-title">
+							<b>
+								<h3>Amount wise Sale order a/c to customer</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="amount_wise_sale_order_ac_to_customer" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid green">
+						<div class="card-title">
+							<b>
+								<h3>Count Wise Customer Sale Order</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="count_wise_customer_sale_order" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><br/><br/>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card border-success">
+					<div class="card-header text-center border-top-success">
+						<div class="card-title bg-success border-success shadow text-center font-weight-bold text-white p-3 w-75 my-table">Top Sold Orders</div>
+					</div>
+					<div class="table table-responsive scroll-content">
+						<table class="table table-hover">
+							<thead class="text-success">
+								<tr>
+									<th>Order Reference</th>
+									<th>Customer Name</th>
+									<th>Amount</th>
+									<th>Creation Order</th>
+								</tr>
+							</thead>
+							<tbody id="top-order-list"/>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card border-info">
+					<div class="card-header text-center">
+						<div class="card-title bg-info border-info shadow text-center font-weight-bold text-white p-3 w-75 my-table">Top Customers</div>
+					</div>
+					<div class="table table-responsive scroll-content">
+						<table class="table table-hover">
+							<thead class="text-info">
+								<tr>
+									<th>Customer Name</th>
+									<th>Amount</th>
+								</tr>
+							</thead>
+							<tbody id="top-customer"/>
+						</table>
+					</div>
+				</div>
+			</div>
+
+		</div><br/><br/>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card border-warning">
+					<div class="card-header text-center">
+						<div class="card-title bg-warning border-warning shadow text-center font-weight-bold text-white p-3 w-75 my-table">Quotation Sent Details</div>
+					</div>
+					<div class="table table-responsive scroll-content">
+						<table class="table table-hover">
+							<thead class="text-warning">
+								<tr>
+									<th>Order Reference</th>
+									<th>Customer Name</th>
+									<th>Creation Order</th>
+									<th>Delivery Date</th>
+								</tr>
+							</thead>
+							<tbody id="sent-order-list"/>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card border-danger">
+					<div class="card-header text-center border-top-danger">
+						<div class="card-title bg-danger border-danger shadow text-center font-weight-bold text-white p-3 w-75 my-table">Sale Order Cancel</div>
+					</div>
+					<div class="table table-responsive scroll-content">
+						<table class="table table-hover">
+							<thead class="text-danger">
+								<tr>
+									<th>Order Reference</th>
+									<th>Customer Name</th>
+									<th>Creation Order</th>
+								</tr>
+							</thead>
+							<tbody id="cancel-order-list"/>
+						</table>
+					</div>
+				</div>
+			</div>
+<!--			<div class="col-md-8">-->
+<!--				<div class="card">-->
+<!--					<div class="card-header" style="border-top: solid DarkOrange">-->
+<!--						<div class="card-title">-->
+<!--							<b>-->
+<!--								<h3>Price wise products</h3>-->
+<!--							</b>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--					<div class="card-body mt-3">-->
+<!--						<div class="row">-->
+<!--							<div class="col-md-12">-->
+<!--								<div class="chart">-->
+<!--									<canvas id="price_wise_products" style="height:fit-content;width:fit-content"> </canvas>-->
+<!--								</div>-->
+<!--							</div>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--				</div>-->
+<!--			</div>-->
+		</div><br/>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid #2a4ea5">
+						<div class="card-title">
+							<b>
+								<h3>Recent 5 Customers</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="recent_customer" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid #2a4ea5">
+						<div class="card-title">
+							<b>
+								<h3>Recent 5 Sale Orders</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="recent_5_sale_order" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><br/>
+	</t>
+	<t t-name="SaleDashboard">
+		<div class="container Dashboard-container">
+			<div style="margin-top:3em;">
+				<div class="dashboard-header">
+					<t t-call="sale_header_template"/>
+				</div>
+			</div>
+		</div>
+	</t>
+</templates>

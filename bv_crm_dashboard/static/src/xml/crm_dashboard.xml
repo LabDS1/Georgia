@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+	<t t-name="crm_header_template">
+		<div class="text-center font-weight-bold text-primary">CRM Dashboard</div><br/><br/>
+		<div class="row">
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#b2ebf2;border-color:#b2ebf2">
+					<div class="card shadow p-3 my-card" style="color:dodgerblue;border-color:dodgerblue"><i class="fa fa-comment"/></div>
+					<div class="text-center mt-3"><h4 style="color:dodgerblue">Total Leads</h4></div>
+					<div class="text-center mt-2"><h1 style="color:dodgerblue" id="totalLead"/></div>
+					<div class="btn btn-sm my-total-leads more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#ffeecc;border-color:#ffeecc">
+					<div class="card shadow p-3 my-card" style="color:orange;border-color:orange"><i class="fa fa-shopping-cart"/></div>
+					<div class="text-center mt-3"><h4 style="color:orange">My Pipeline</h4></div>
+					<div class="text-center mt-2"><h1 style="color:orange" id="myPipeline"/></div>
+					<div class="btn btn-sm my-pipeline-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#c8e6c9;border-color:#c8e6c9">
+					<div class="card border-success shadow text-success p-3 my-card" ><i class="fa fa-comment"/></div>
+					<div class="text-center mt-3"><h4 style="color:#00A04A">Open Opportunities</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#00A04A" id="openOpportunity"/></div>
+					<div class="btn btn-sm open-opportunities-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#ffcccc;border-color:#ffcccc">
+					<div class="card shadow p-3 my-card" style="color:crimson;border-color:crimson"><i class="fa fa-times-circle-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:crimson">Overdue Opportunities</h4></div>
+					<div class="text-center mt-2"><h1 style="color:crimson" id="overdueOpportunity"/></div>
+					<div class="btn btn-sm overdue-opportunities-info more-info">More Info</div>
+				</div>
+			</div>
+		</div><br/><br/>
+		<div class="row">
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#b2dfdb;border-color:#b2dfdb">
+					<div class="card shadow p-3 my-card" style="color:teal;border-color:teal"><i class="fa fa-user-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:teal">Total Won</h4></div>
+					<div class="text-center mt-2"><h1 style="color:teal" id="totalWon"/></div>
+					<div class="btn btn-sm total-won-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#c8e6c9;border-color:#c8e6c9">
+					<div class="card shadow p-3 my-card" style="color:#008818;border-color:#008818"><i class="fa fa-file-text-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:#00A04A">Total Lost</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#00A04A" id="totalLoss"/></div>
+					<div class="btn btn-sm total-loss-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#ffcce5;border-color:#ffcce5">
+					<div class="card shadow p-3 my-card" style="color:#d6145f;border-color:#d6145f"><i class="fa fa-file-text-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:#d6145f">To Be Invoiced</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#d6145f" id="totalInvoice"/></div>
+					<div class="btn btn-sm to-invoice-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#cce0ff;border-color:#cce0ff">
+					<div class="card shadow p-3 my-card" style="color:#2a4ea5;border-color:#2a4ea5"><i class="fa fa-file-text-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:#2a4ea5">Total Expected Revenue</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#2a4ea5" id="expectedRevenue"/></div>
+				</div>
+			</div>
+		</div><br/><br/>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid green">
+						<div class="card-title">
+							<b>
+								<h3>Stage wise Lead Count</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="count_wise_lead" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid green">
+						<div class="card-title">
+							<b>
+								<h3>Total Expected Revenue</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="total_expected_revenue_graph" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br/><br/>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card border-warning">
+					<div class="card-header text-center">
+				<div class="card-title bg-warning border-warning shadow text-center font-weight-bold text-white p-3 w-75 my-table">Top Lead</div>
+					</div>
+					<div class="table table-responsive scroll-content"> 
+						<table class="table table-hover">
+							<thead class="text-warning">
+								<tr>
+									<th>Leads Name</th>
+									<th>Planned Revenue</th>
+									<th>Probability</th>
+								</tr>
+							</thead>
+							<tbody id="top-lead-list"/>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card border-success">
+					<div class="card-header text-center">
+						<div class="card-title bg-success border-success shadow text-center font-weight-bold text-white p-3 w-75 my-table">Top Customer</div>
+					</div>
+					<div class="table table-responsive scroll-content"> 
+						<table class="table table-hover">
+							<thead class="text-success">
+								<tr>
+									<th>Customer Name</th>
+									<th>Planned Revenue</th>
+								</tr>
+							</thead>
+							<tbody id="partner-list"/>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div><br/><br/>
+		<div class="row">
+			<div class="col-md-4">
+				<div class="card border-primary">
+					<div class="card-header text-center">
+						<div class="card-title bg-primary border-primary shadow text-center font-weight-bold text-white p-3 w-75 my-table">Won List</div>
+					</div>
+					<div class="table table-responsive scroll-content"> 
+						<table class="table table-hover">
+							<thead class="text-primary">
+								<tr>
+									<th>Leads/Opportunity Name</th>
+									<th>Probability</th>
+								</tr>
+							</thead>
+							<tbody id="won-list"/>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card border-danger">
+					<div class="card-header text-center">
+						<div class="card-title bg-danger border-danger shadow text-center font-weight-bold text-white p-3 w-75 my-table">Loss List</div>
+					</div>
+					<div class="table table-responsive scroll-content"> 
+						<table class="table table-hover">
+							<thead class="text-danger">
+								<tr>
+									<th>Leads/Opportunity Name</th>
+									<th>Probability</th>
+								</tr>
+							</thead>
+						<tbody id="loss-list"/>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card border-info">
+					<div class="card-header text-center">
+						<div class="card-title bg-info border-info shadow text-center font-weight-bold text-white p-3 w-75 my-table">Activity Type</div>
+					</div>
+					<div class="table table-responsive scroll-content"> 
+						<table class="table table-hover">
+							<thead class="text-info">
+								<tr>
+									<th>Activity Name</th>
+								</tr>
+							</thead>
+							<tbody id="activity_type"/>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div><br/><br/>
+
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid red">
+						<div class="card-title">
+							<b>
+								<h3>Top Sales REP</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="get_top_sales_rep_graph" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid red">
+						<div class="card-title">
+							<b>
+								<h3>Recent 5 Customers</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="top_recent_customer" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><br/>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid #2a4ea5">
+						<div class="card-title">
+							<b>
+								<h3>Top 5 Won Customers</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="won_list_customer" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid #2a4ea5">
+						<div class="card-title">
+							<b>
+								<h3>Top 5 Lost Customers</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="loss_list_customer_graph" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</t>
+	<t t-name="CRMDashboard">
+		<div class="container Dashboard-container">
+			<div style="margin-top:3em;">
+				<div class="dashboard-header">
+					<t t-call="crm_header_template"/>
+				</div>
+			</div>
+		</div>
+	</t>
+</templates>
