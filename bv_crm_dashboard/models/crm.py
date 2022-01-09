@@ -1,6 +1,52 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _
 from odoo.http import request
 import datetime
+from odoo.exceptions import ValidationError, UserError
+
+
+class Team(models.Model):
+    _inherit = 'crm.team.member'
+
+    sales_target_line = fields.One2many('sales.target', 'crm_team_member_id', string='Sales Target')
+
+
+class SalesTarget(models.Model):
+    _name = 'sales.target'
+    _description = 'Sales Target Management'
+
+    def _compute_target_achieved_amount(self):
+        all_total = 0
+        team_member_id = self._context.get('sales_person_id')
+        for rec in self:
+            from_date = rec.date_from
+            to_date = rec.date_to
+            # if to_date <= from_date:
+            #     raise UserError(_("Sorry, 'Date To' Must be greater Than 'Date From'..."))
+            target_invoice_ids = self.env['account.move'].sudo().search([
+                ('invoice_user_id', '=', team_member_id),
+                ('payment_state', 'in', ('paid', 'in_payment')),
+                ('state', '=', 'posted'),
+                ('move_type', '=', 'out_invoice'),
+                ('invoice_date', '>=', from_date),
+                ('invoice_date', '<=', to_date)
+            ])
+
+            if len(target_invoice_ids) > 0:
+                for total in target_invoice_ids:
+                    all_total += total.amount_total
+                    rec.target_achieved_amount = all_total
+                    rec.write({'target_achieved_amount_hidden': all_total})
+            else:
+                rec.target_achieved_amount = all_total
+                rec.write({'target_achieved_amount_hidden': all_total})
+            all_total = 0
+
+    crm_team_member_id = fields.Many2one('crm.team.member', string='Team member')
+    date_from = fields.Date(string='Date From', required=True)
+    date_to = fields.Date(string='Date To', required=True)
+    target_amount = fields.Float(string='Target Amount')
+    target_achieved_amount = fields.Float(string='Target Achieved', compute='_compute_target_achieved_amount') #
+    target_achieved_amount_hidden = fields.Float()
 
 
 class Lead(models.Model):
@@ -48,7 +94,7 @@ class Lead(models.Model):
 
     @api.model
     def get_expected_revenue(self):
-        obj_opr=self.env['crm.lead'].sudo().search([('company_id', 'in', self._context.get('allowed_company_ids')), ('priority', '>=', 2), ('stage_id.name', '=', 'Quotation Sent')])
+        obj_opr=self.env['crm.lead'].sudo().search([('company_id', 'in', self._context.get('allowed_company_ids')), ('priority', 'in', ('2', '3')), ('stage_id.name', '=', 'Quotation Sent')])
         expected_revenue=0
         for lead in obj_opr:
             expected_revenue=round(expected_revenue + (lead.expected_revenue or 0.0) * (lead.probability or 0) / 100.0, 2)
@@ -213,21 +259,28 @@ class Lead(models.Model):
         company_id = self._context.get('allowed_company_ids')
         result = []
         try:
-            query = """ SELECT DISTINCT to_char(lead.create_date, 'MON-YYYY') AS date, (sum(lead.expected_revenue * lead.probability)/100) AS revenue ,to_char(lead.create_date, 'YYYY-MM') AS year
-                        FROM crm_lead lead
-                        WHERE lead.create_date IS NOT NULL AND lead.company_id = ANY (array[%s])
-                        GROUP BY date, year
-                        ORDER BY year DESC
+            query = """ 
+                        SELECT DISTINCT to_char(lead.create_date, 'YYYY-MM') AS dates, SUM(lead.expected_revenue) AS revenue, to_char(lead.create_date, 'YYYY-MON') AS yr_mon
+                        FROM crm_lead lead, crm_stage ct
+                        WHERE lead.priority IN ('2','3') 
+                        AND ct.id = lead.stage_id 
+                        AND ct.name='Quotation Sent' 
+                        AND lead.active=TRUE 
+                        AND lead.company_id = ANY (array[%s])
+                        GROUP BY dates, ct.id, yr_mon
+                        ORDER BY dates DESC
                     """ % (company_id)
             self._cr.execute(query)
             docs = self._cr.dictfetchall()
             date = []
             for record in docs:
-                date.append(record.get('date'))
+                date.append(record.get('dates'))
             revenue = []
             for record in docs:
                 revenue.append(record.get('revenue'))
-            result = [revenue, date]
+            yr_mon = [record.get('yr_mon') for record in docs]
+            result = [revenue, date, yr_mon]
+            # print("===>", result)
         except Exception as e:
             result = []
         return result
@@ -303,6 +356,51 @@ class Lead(models.Model):
                 revenue.append(record.get('cl_plan_revenue'))
             partner_ids = [record.get('partner_id') for record in docs]
             result = [revenue, partner, partner_ids]
+        except Exception as e:
+            result = []
+        return result
+
+    @api.model
+    def get_target_vs_achieved(self):
+        company_id = self._context.get('allowed_company_ids')
+        result = []
+        data = []
+        try:
+            query = """
+                SELECT DISTINCT st.id AS st_id,st.date_from AS date_from, st.date_to AS date_to, 
+                st.target_achieved_amount_hidden AS achieved_amount, st.target_amount AS target_amount,
+                ru.id AS res_user_id, rp.name AS rp_name, extract(year from st.date_from) AS Year
+                FROM sales_target st, crm_team_member ctm, res_users AS ru, res_partner AS rp 
+                WHERE st.crm_team_member_id = ctm.id AND ctm.user_id = ru.id AND rp.id = ru.partner_id AND ru.company_id = ANY (array[%s]) 
+                GROUP BY st_id, date_from, date_to, res_user_id, achieved_amount, rp_name 
+                ORDER BY rp_name, st_id, year DESC
+            """%(company_id)
+            self._cr.execute(query)
+            docs = self.env.cr.dictfetchall()
+            year_list = list(set([record.get('year') for record in docs]))
+            year_list.sort(reverse=True)
+            id_list = list(set([record.get('res_user_id') for record in docs]))
+            for year in year_list:
+                for res_id in id_list:
+                    count = 0
+                    yearly_achieved = 0
+                    yearly_target = 0
+                    record_dict = {}
+                    for record in docs:
+                        if record.get('res_user_id') == res_id and record.get('year') == year:
+                            record_dict['year'] = year
+                            record_dict['res_user_id'] = res_id
+                            count += 1
+                            record_dict['sales_person_name'] = record.get('rp_name')
+                            record_dict['q'+str(count)+'_achieved_amount'] = round(record.get('achieved_amount'), 2)
+                            yearly_achieved += record.get('achieved_amount')
+                            record_dict['q'+str(count)+'_target_amount'] = round(record.get('target_amount'), 2)
+                            yearly_target += record.get('target_amount')
+
+                            record_dict['yearly_achieved_total'] = round(yearly_achieved, 2)
+                            record_dict['yearly_target_total'] = round(yearly_target, 2)
+                    data.append(record_dict)
+            result = list(filter(None, data))
         except Exception as e:
             result = []
         return result

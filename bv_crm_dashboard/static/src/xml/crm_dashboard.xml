@@ -173,7 +173,7 @@
 			<div class="col-md-4">
 				<div class="card border-danger">
 					<div class="card-header text-center">
-						<div class="card-title bg-danger border-danger shadow text-center font-weight-bold text-white p-3 w-75 my-table">Loss List</div>
+						<div class="card-title bg-danger border-danger shadow text-center font-weight-bold text-white p-3 w-75 my-table">Lost List</div>
 					</div>
 					<div class="table table-responsive scroll-content"> 
 						<table class="table table-hover">
@@ -290,7 +290,48 @@
 					</div>
 				</div>
 			</div>
+		</div><br/><br/>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card">
+					<div class="card-header" style="border-top: solid #2a4ea5">
+						<div class="card-title">
+							<b>
+								<h3>Target vs Achievement</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div style="overflow-x:auto;">
+								  	<table class="table table-hover">
+										<thead class="text-warning">
+											<tr>
+												<th>Year</th>
+												<th>Sales person</th>
+												<th>Q1 target</th>
+												<th>Q1 Achieved</th>
+												<th>Q2 target</th>
+												<th>Q2 Achieved</th>
+												<th>Q3 target</th>
+												<th>Q3 Achieved</th>
+												<th>Q4 target</th>
+												<th>Q4 Achieved</th>
+												<th>Yearly target</th>
+												<th>Yearly Achieved</th>
+											</tr>
+										</thead>
+										<tbody id="target-vs-achieved"/>
+								  </table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
+		<br/>
 	</t>
 	<t t-name="CRMDashboard">
 		<div class="container Dashboard-container">

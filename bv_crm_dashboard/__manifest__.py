@@ -10,7 +10,9 @@
     'depends': ['sale_management', 'sale', 'crm', 'point_of_sale', 'account', 'stock', 'purchase', 'purchase_stock','hr'],
     'data': [
         'security/dashboard_security.xml',
+        'security/ir.model.access.csv',
         'views/templates.xml',
+        'views/crm_team_member_views.xml',
     ],
     'installable': True,
     'auto_install': False,

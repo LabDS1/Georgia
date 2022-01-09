@@ -43,6 +43,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			self.count_wise_lead();
 			self.top_recent_customer();
 			self.won_list_customer();
+			self.get_target_vs_achieved();
 		},
 
 		won_list_customer: function(){
@@ -265,7 +266,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
                     return colors;
 			    }
 				var data = {
-					labels: result[1],
+					labels: result[2],
 					datasets: [
 					{
 						label: '',
@@ -311,6 +312,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
                             var activePoints = myCharts.getElementsAtEvent(e);
                             if(result!=null){
                                 if (activePoints.length>0){
+                                    var allowed_company_ids = session.user_context.allowed_company_ids;
                                     var selectedIndex = activePoints[0]._index;
                                     var target_month = result[1][selectedIndex]
 
@@ -320,14 +322,19 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
                                     var month = start_dt.getMonth()
                                     var total_days = new Date(days[1], month+1, 0).getDate();
                                     var end_dt = new Date(new Date(target_month+'-'+total_days).getTime()+60 * 60 * 24 * 1000);
-//                                    alert(start_dt+" ==== "+end_dt)
                                     self.do_action({
                                         name: _t("CRM Lead"),
                                         type: 'ir.actions.act_window',
                                         res_model: 'crm.lead',
                                         view_mode: 'list, form',
                                         views: [[false,'list'],[false, 'form']],
-                                        domain: [['create_date', '>=', start_dt],['create_date', '<=', end_dt],['company_id','=',1]],
+                                        domain: [
+                                            ['create_date', '>=', start_dt],
+                                            ['create_date', '<=', end_dt],
+                                            ['company_id','=',allowed_company_ids],
+                                            ['priority','>=',2],
+                                            ['stage_id.name','=','Quotation Sent']
+                                        ],
                                         target: 'current',
                                     });
                                 }
@@ -681,6 +688,46 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			domain: [['invoice_status','=','to invoice'],['company_id','in',allowed_companies_ids]],
 			target: 'current',
 			})
+		},
+
+		get_target_vs_achieved: function() {
+			var self = this;
+			self._rpc({
+				model: 'crm.lead',
+				method: 'get_target_vs_achieved',
+				args: [],
+				kwargs: {context: session.user_context},
+				}).then(function(result) {
+				var i;
+				var body_html = "";
+				for (i = 0; i < result.length; i++) {
+					var data = result[i]
+					data['q1_target_amount'] = (data['q1_target_amount'] !== undefined) ? data['q1_target_amount']:0;
+					data['q1_achieved_amount'] = (data['q1_achieved_amount'] !== undefined) ? data['q1_achieved_amount']:0;
+					data['q2_target_amount'] = (data['q2_target_amount'] !== undefined) ? data['q2_target_amount']:0;
+					data['q2_achieved_amount'] = (data['q2_achieved_amount'] !== undefined) ? data['q2_achieved_amount']:0;
+					data['q3_target_amount'] = (data['q3_target_amount'] !== undefined) ? data['q3_target_amount']:0;
+					data['q3_achieved_amount'] = (data['q3_achieved_amount'] !== undefined) ? data['q3_achieved_amount']:0;
+					data['q4_target_amount'] = (data['q4_target_amount'] !== undefined) ? data['q4_target_amount']:0;
+					data['q4_achieved_amount'] = (data['q4_achieved_amount'] !== undefined) ? data['q4_achieved_amount']:0;
+
+					body_html +=
+					"<tr><td>"+data['year']+
+					"</td><td>"+data['sales_person_name']+
+					"</td><td>"+data['q1_target_amount']+
+					"</td><td>"+data['q1_achieved_amount']+
+					"</td><td>"+data['q2_target_amount']+
+					"</td><td>"+data['q2_achieved_amount']+
+					"</td><td>"+data['q3_target_amount']+
+					"</td><td>"+data['q3_achieved_amount']+
+					"</td><td>"+data['q4_target_amount']+
+					"</td><td>"+data['q4_achieved_amount']+
+					"</td><td>"+data['yearly_target_total']+
+					"</td><td>"+data['yearly_achieved_total']+
+					"</td></tr>"
+				}
+				self.$el.find('tbody#target-vs-achieved').html(body_html);
+			});
 		},
 
 		get_lead_opportunity: function() {
