@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo><data>
+        <record id="crm_team_member_view_form" model="ir.ui.view">
+                <field name="name">crm.team.member.view.form.inherit.crm</field>
+                <field name="model">crm.team.member</field>
+                <field name="inherit_id" ref="sales_team.crm_team_member_view_form"/>
+                <field name="arch" type="xml">
+                        <xpath expr="//group[@name='group_assign']" position="after">
+                                <notebook>
+                                        <page string="Sales Target" name="sales_target">
+                                                <field name="sales_target_line" context="{'sales_person_id': user_id}">
+                                                        <tree editable="bottom">
+                                                                <field name="date_from"/>
+                                                                <field name="date_to"/>
+                                                                <field name="target_amount"/>
+                                                                <field name="target_achieved_amount"/>
+                                                        </tree>
+                                                </field>
+                                        </page>
+                                </notebook>
+                        </xpath>
+                </field>
+        </record>
+</data></odoo>

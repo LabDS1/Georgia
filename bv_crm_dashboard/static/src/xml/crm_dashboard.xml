@@ -4,7 +4,7 @@
 		<div class="text-center font-weight-bold text-primary">CRM Dashboard</div><br/><br/>
 		<div class="row">
 			<div class="col-md-3">
-				<div class="card-header mx-sm-1 p-3" style="background-color:#b2ebf2;border-color:#b2ebf2">
+				<div class="card-header mx-sm-1 p-4" style="background-color:#b2ebf2;border-color:#b2ebf2">
 					<div class="card shadow p-3 my-card" style="color:dodgerblue;border-color:dodgerblue"><i class="fa fa-comment"/></div>
 					<div class="text-center mt-3"><h4 style="color:dodgerblue">Total Leads</h4></div>
 					<div class="text-center mt-2"><h1 style="color:dodgerblue" id="totalLead"/></div>
@@ -14,13 +14,14 @@
 			<div class="col-md-3">
 				<div class="card-header mx-sm-1 p-3" style="background-color:#ffeecc;border-color:#ffeecc">
 					<div class="card shadow p-3 my-card" style="color:orange;border-color:orange"><i class="fa fa-shopping-cart"/></div>
-					<div class="text-center mt-3"><h4 style="color:orange">My Pipeline</h4></div>
-					<div class="text-center mt-2"><h1 style="color:orange" id="myPipeline"/></div>
+					<div class="text-center mt-1"><h4 style="color:orange">My Pipeline</h4></div>
+					<div class="text-center mt-1"><h1 style="color:orange" id="myPipeline"/></div>
+					<div class="text-center mt-1"><h5 style="color:orange" id="myPipeline_expected_revenue"/></div>
 					<div class="btn btn-sm my-pipeline-info more-info">More Info</div>
 				</div>
 			</div>
 			<div class="col-md-3">
-				<div class="card-header mx-sm-1 p-3" style="background-color:#c8e6c9;border-color:#c8e6c9">
+				<div class="card-header mx-sm-1 p-4" style="background-color:#c8e6c9;border-color:#c8e6c9">
 					<div class="card border-success shadow text-success p-3 my-card" ><i class="fa fa-comment"/></div>
 					<div class="text-center mt-3"><h4 style="color:#00A04A">Open Opportunities</h4></div>
 					<div class="text-center mt-2"><h1 style="color:#00A04A" id="openOpportunity"/></div>
@@ -28,7 +29,7 @@
 				</div>
 			</div>
 			<div class="col-md-3">
-				<div class="card-header mx-sm-1 p-3" style="background-color:#ffcccc;border-color:#ffcccc">
+				<div class="card-header mx-sm-1 p-4" style="background-color:#ffcccc;border-color:#ffcccc">
 					<div class="card shadow p-3 my-card" style="color:crimson;border-color:crimson"><i class="fa fa-times-circle-o"/></div>
 					<div class="text-center mt-3"><h4 style="color:crimson">Overdue Opportunities</h4></div>
 					<div class="text-center mt-2"><h1 style="color:crimson" id="overdueOpportunity"/></div>
@@ -38,7 +39,7 @@
 		</div><br/><br/>
 		<div class="row">
 			<div class="col-md-3">
-				<div class="card-header mx-sm-1 p-3" style="background-color:#b2dfdb;border-color:#b2dfdb">
+				<div class="card-header mx-sm-1 p-4" style="background-color:#b2dfdb;border-color:#b2dfdb">
 					<div class="card shadow p-3 my-card" style="color:teal;border-color:teal"><i class="fa fa-user-o"/></div>
 					<div class="text-center mt-3"><h4 style="color:teal">Total Won</h4></div>
 					<div class="text-center mt-2"><h1 style="color:teal" id="totalWon"/></div>
@@ -46,23 +47,33 @@
 				</div>
 			</div>
 			<div class="col-md-3">
-				<div class="card-header mx-sm-1 p-3" style="background-color:#c8e6c9;border-color:#c8e6c9">
+				<div class="card-header mx-sm-1 p-4" style="background-color:#c8e6c9;border-color:#c8e6c9">
 					<div class="card shadow p-3 my-card" style="color:#008818;border-color:#008818"><i class="fa fa-file-text-o"/></div>
 					<div class="text-center mt-3"><h4 style="color:#00A04A">Total Lost</h4></div>
 					<div class="text-center mt-2"><h1 style="color:#00A04A" id="totalLoss"/></div>
 					<div class="btn btn-sm total-loss-info more-info">More Info</div>
 				</div>
 			</div>
+
+<!--			<div class="col-md-3">-->
+<!--				<div class="card-header mx-sm-1 p-3" style="background-color:#ffcce5;border-color:#ffcce5">-->
+<!--					<div class="card shadow p-3 my-card" style="color:#d6145f;border-color:#d6145f"><i class="fa fa-file-text-o"/></div>-->
+<!--					<div class="text-center mt-3"><h4 style="color:#d6145f">To Be Invoiced</h4></div>-->
+<!--					<div class="text-center mt-2"><h1 style="color:#d6145f" id="totalInvoice"/></div>-->
+<!--					<div class="btn btn-sm to-invoice-info more-info">More Info</div>-->
+<!--				</div>-->
+<!--			</div>-->
 			<div class="col-md-3">
-				<div class="card-header mx-sm-1 p-3" style="background-color:#ffcce5;border-color:#ffcce5">
+				<div class="card-header mx-sm-1 p-4" style="background-color:#ffcce5;border-color:#ffcce5">
 					<div class="card shadow p-3 my-card" style="color:#d6145f;border-color:#d6145f"><i class="fa fa-file-text-o"/></div>
-					<div class="text-center mt-3"><h4 style="color:#d6145f">To Be Invoiced</h4></div>
-					<div class="text-center mt-2"><h1 style="color:#d6145f" id="totalInvoice"/></div>
-					<div class="btn btn-sm to-invoice-info more-info">More Info</div>
+					<div class="text-center mt-3"><h4 style="color:#d6145f">Total Archived</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#d6145f" id="totalArchived"/></div>
+					<div class="btn btn-sm archived-info more-info">More Info</div>
 				</div>
 			</div>
+
 			<div class="col-md-3">
-				<div class="card-header mx-sm-1 p-3" style="background-color:#cce0ff;border-color:#cce0ff">
+				<div class="card-header mx-sm-1 p-4" style="background-color:#cce0ff;border-color:#cce0ff">
 					<div class="card shadow p-3 my-card" style="color:#2a4ea5;border-color:#2a4ea5"><i class="fa fa-file-text-o"/></div>
 					<div class="text-center mt-3"><h4 style="color:#2a4ea5">Total Expected Revenue</h4></div>
 					<div class="text-center mt-2"><h1 style="color:#2a4ea5" id="expectedRevenue"/></div>
@@ -173,7 +184,7 @@
 			<div class="col-md-4">
 				<div class="card border-danger">
 					<div class="card-header text-center">
-						<div class="card-title bg-danger border-danger shadow text-center font-weight-bold text-white p-3 w-75 my-table">Loss List</div>
+						<div class="card-title bg-danger border-danger shadow text-center font-weight-bold text-white p-3 w-75 my-table">Lost List</div>
 					</div>
 					<div class="table table-responsive scroll-content"> 
 						<table class="table table-hover">
@@ -290,7 +301,48 @@
 					</div>
 				</div>
 			</div>
+		</div><br/><br/>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card">
+					<div class="card-header" style="border-top: solid #2a4ea5">
+						<div class="card-title">
+							<b>
+								<h3>Target vs Achievement</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div style="overflow-x:auto;">
+								  	<table class="table table-hover">
+										<thead class="text-warning">
+											<tr>
+												<th>Year</th>
+												<th>Sales person</th>
+												<th>Q1 target</th>
+												<th>Q1 Achieved</th>
+												<th>Q2 target</th>
+												<th>Q2 Achieved</th>
+												<th>Q3 target</th>
+												<th>Q3 Achieved</th>
+												<th>Q4 target</th>
+												<th>Q4 Achieved</th>
+												<th>Yearly target</th>
+												<th>Yearly Achieved</th>
+											</tr>
+										</thead>
+										<tbody id="target-vs-achieved"/>
+								  </table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
+		<br/>
 	</t>
 	<t t-name="CRMDashboard">
 		<div class="container Dashboard-container">

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="view_sale_order_form_inherit">
+        <field name="name">view.sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_shipping_id']" position="before">
+                <field name="is_delivery_address_same"/>
+            </xpath>
+           <xpath expr="//button[@name='update_prices']" position="attributes">
+               <attribute name="attrs">{'invisible': [('state', 'in', ['sale', 'done','cancel'])]}</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="sale_margin.sale_margin_sale_order_line_form">
+        <field name="name">sale.order.line.tree.margin.view.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+           <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="after">
+                <field name="purchase_price"/>
+                <field name="margin" optional="hide"/>
+                <field name="margin_percent"
+                    attrs="{'invisible': [('price_subtotal', '=', 0)]}"
+                    optional="hide" widget="percentage"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -15,7 +15,8 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			'click .overdue-opportunities-info':'overdue_opportunity_info',
 			'click .total-won-info':'total_won_info',
 			'click .total-loss-info':'total_loss_info',
-			'click .to-invoice-info':'to_invoice_info',
+//			'click .to-invoice-info':'to_invoice_info',
+			'click .archived-info':'archived_info',
 			'click .lead_details':'lead_details',
 			'click .lost_lead_details':'lost_lead_details',
 			'click .customer_details':'customer_details',
@@ -30,7 +31,8 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			self.get_overdue_opportunity();
 			self.get_total_won();
 			self.get_total_loss();
-			self.get_to_be_invoiced();
+//			self.get_to_be_invoiced();
+            self.get_total_archived();
 			self.get_expected_revenue();
 			self.get_lead_opportunity();
 			self.get_won_list();
@@ -43,6 +45,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			self.count_wise_lead();
 			self.top_recent_customer();
 			self.won_list_customer();
+			self.get_target_vs_achieved();
 		},
 
 		won_list_customer: function(){
@@ -155,6 +158,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 
 		count_wise_lead: function(){
 			var self = this
+			var uid = session.user_context.uid
 			/*var ctx = self.$("#count_wise_lead");*/
 			self._rpc({
 				model: "crm.lead",
@@ -218,13 +222,19 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
                                     var selectedIndex = activePoints[0]._index;
                                     var allowed_company_ids = session.user_context.allowed_company_ids;
                                     var target_id = result[2][selectedIndex]
+                                    var user_id_domain = "";
+                                    if (session.is_admin === true){
+                                        user_id_domain = [['stage_id', '=', target_id],['company_id','in',allowed_company_ids]]
+                                    }else{
+                                        user_id_domain = [['user_id','=',uid],['stage_id', '=', target_id],['company_id','in',allowed_company_ids]]
+                                    }
                                     self.do_action({
                                         name: _t("CRM Lead"),
                                         type: 'ir.actions.act_window',
                                         res_model: 'crm.lead',
                                         view_mode: 'list, form',
                                         views: [[false,'list'],[false, 'form']],
-                                        domain: [['stage_id', '=', target_id],['company_id','in',allowed_company_ids]],
+                                        domain: user_id_domain,
                                         target: 'current',
                                     });
                                 }
@@ -246,6 +256,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 
 		total_expected_revenue_graph: function(){
 			var self = this
+			var uid = session.user_context.uid
 			/*var ctx = self.$("#total_expected_revenue_graph");*/
 			self._rpc({
 				model: "crm.lead",
@@ -265,7 +276,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
                     return colors;
 			    }
 				var data = {
-					labels: result[1],
+					labels: result[2],
 					datasets: [
 					{
 						label: '',
@@ -311,6 +322,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
                             var activePoints = myCharts.getElementsAtEvent(e);
                             if(result!=null){
                                 if (activePoints.length>0){
+                                    var allowed_company_ids = session.user_context.allowed_company_ids;
                                     var selectedIndex = activePoints[0]._index;
                                     var target_month = result[1][selectedIndex]
 
@@ -320,14 +332,21 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
                                     var month = start_dt.getMonth()
                                     var total_days = new Date(days[1], month+1, 0).getDate();
                                     var end_dt = new Date(new Date(target_month+'-'+total_days).getTime()+60 * 60 * 24 * 1000);
-//                                    alert(start_dt+" ==== "+end_dt)
+
+                                    var user_id_domain = "";
+                                    if (session.is_admin === true){
+                                        user_id_domain = [['create_date', '>=', start_dt],['create_date', '<=', end_dt],['company_id','=',allowed_company_ids],['priority','>=',2],['stage_id','=','Quotation Sent']]
+                                    }else{
+                                        user_id_domain = [['user_id','=',uid],['create_date', '>=', start_dt],['create_date', '<=', end_dt],['company_id','=',allowed_company_ids],['priority','>=',2],['stage_id','=','Quotation Sent']]
+                                    }
+
                                     self.do_action({
                                         name: _t("CRM Lead"),
                                         type: 'ir.actions.act_window',
                                         res_model: 'crm.lead',
                                         view_mode: 'list, form',
                                         views: [[false,'list'],[false, 'form']],
-                                        domain: [['create_date', '>=', start_dt],['create_date', '<=', end_dt],['company_id','=',1]],
+                                        domain: user_id_domain,
                                         target: 'current',
                                     });
                                 }
@@ -404,6 +423,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 
 		get_top_sales_rep_graph: function(){
 			var self = this
+			var uid = session.user_context.uid
 			self._rpc({
 				model: "crm.lead",
 				method: "get_top_sales_rep_graph",
@@ -505,7 +525,8 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 				args: [],
 				kwargs: {context: session.user_context},
 			}).then(function(result) {
-				self.$el.find('#myPipeline').html(result);
+				self.$el.find('#myPipeline').html(result[0]);
+				self.$el.find('#myPipeline_expected_revenue').html("Revenue :" + result[1][0]['expected_revenue']);
 			});
 		},
 
@@ -557,15 +578,27 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			});
 		},
 
-		get_to_be_invoiced: function() {
+//		get_to_be_invoiced: function() {
+//			var self = this;
+//			self._rpc({
+//				model: 'crm.lead',
+//				method: 'get_to_be_invoiced',
+//				args: [],
+//				kwargs: {context: session.user_context},
+//			}).then(function(result) {
+//				self.$el.find("#totalInvoice").html(result);
+//			});
+//		},
+
+		get_total_archived: function() {
 			var self = this;
 			self._rpc({
 				model: 'crm.lead',
-				method: 'get_to_be_invoiced',
+				method: 'get_total_archived',
 				args: [],
 				kwargs: {context: session.user_context},
 			}).then(function(result) {
-				self.$el.find("#totalInvoice").html(result);
+				self.$el.find("#totalArchived").html(result);
 			});
 		},
 
@@ -577,7 +610,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 				args: [],
 				kwargs: {context: session.user_context},
 			}).then(function(result) {
-				self.$el.find("#expectedRevenue").html(result);
+				self.$el.find("#expectedRevenue").html(result.toLocaleString());
 			});
 		},
 
@@ -586,20 +619,35 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 		var context_data = session.user_context;
 		var allowed_company_ids = context_data.allowed_company_ids;
 		var uid = context_data.uid
+
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['company_id','in',allowed_company_ids], ['stage_id', 'in', ['Needs Analysis', 'Quotation Sent']]]
+		}else{
+		    user_id_domain = [['user_id','=', uid],['company_id','in',allowed_company_ids], ['stage_id', 'in', ['Needs Analysis', 'Quotation Sent']]]
+		}
+
 		this.do_action({
 			name: _t("CRM Lead"),
 			type: 'ir.actions.act_window',
 			res_model: 'crm.lead',
 			view_mode: 'tree,kanban,form',
 			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
-			domain:[['user_id','=', uid],['company_id','in',allowed_company_ids]],
-			context: {'search_default_assigned_to_me':true},
+			domain: user_id_domain,
+//			context: {'search_default_assigned_to_me':true},
 			target: 'current',
 			})
 		},
 
 		my_total_leads: function(e){
 		var allowed_companies_ids = session.user_context.allowed_company_ids
+		var uid = session.user_context.uid
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = ['|', ['type', '=', 'lead'], ['type', '=', false]]
+		}else{
+		    user_id_domain = ['|', ['type', '=', 'lead'], ['type', '=', false], ['user_id', '=', uid]]
+		}
 		var self = this;
 		this.do_action({
 			name: _t("CRM Lead"),
@@ -607,7 +655,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			res_model: 'crm.lead',
 			view_mode: 'tree,kanban,form',
 			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
-			domain: [['company_id','in',allowed_companies_ids]],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
@@ -615,13 +663,21 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 		open_opportunity_info: function(e){
 		var self = this;
 		var allowed_companies_ids = session.user_context.allowed_company_ids;
+		var uid = session.user_context.uid
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['type', '=', 'opportunity'],['probability', '<',100],['company_id','in',allowed_companies_ids], ['stage_id', 'in', ['Quotation Sent']]]
+		}else{
+		    user_id_domain = [['user_id', '=', uid], ['type', '=', 'opportunity'],['probability', '<',100],['company_id','in',allowed_companies_ids], ['stage_id', 'in', ['Quotation Sent']]]
+		}
+
 		this.do_action({
 			name: _t("CRM Lead"),
 			type: 'ir.actions.act_window',
 			res_model: 'crm.lead',
 			view_mode: 'tree,kanban,form',
 			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
-			domain: [['type', '=', 'opportunity'],['probability', '<',100],['company_id','in',allowed_companies_ids]],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
@@ -630,13 +686,22 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 		var self = this;
 		var allowed_companies_ids = session.user_context.allowed_company_ids;
 		var today_date = new Date();
+
+		var uid = session.user_context.uid
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['type', '=', 'opportunity'],['date_deadline', '<', today_date], ['date_closed', '=', false],['company_id','in',allowed_companies_ids]]
+		}else{
+		    user_id_domain = [['user_id','=',uid],['type', '=', 'opportunity'],['date_deadline', '<', today_date], ['date_closed', '=', false],['company_id','in',allowed_companies_ids]]
+		}
+
 		this.do_action({
 			name: _t("CRM Lead"),
 			type: 'ir.actions.act_window',
 			res_model: 'crm.lead',
 			view_mode: 'tree,kanban,form',
 			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
-			domain: [['type', '=', 'opportunity'],['date_deadline', '<', today_date], ['date_closed', '=', false],['company_id','in',allowed_companies_ids]],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
@@ -644,13 +709,22 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 		total_won_info: function(e){
 		var self = this;
 		var allowed_companies_ids = session.user_context.allowed_company_ids;
+
+		var uid = session.user_context.uid
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['active', '=', true],['probability', '=', 100],['company_id','in',allowed_companies_ids]]
+		}else{
+		    user_id_domain = [['user_id', '=', uid], ['active', '=', true],['probability', '=', 100],['company_id','in',allowed_companies_ids]]
+		}
+
 		this.do_action({
 			name: _t("CRM Won Leads"),
 			type: 'ir.actions.act_window',
 			res_model: 'crm.lead',
 			view_mode: 'tree,kanban,form',
 			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
-			domain: [['active', '=', true],['probability', '=', 100],['company_id','in',allowed_companies_ids]],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
@@ -658,29 +732,101 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 		total_loss_info: function(e){
 		var self = this;
 		var allowed_companies_ids = session.user_context.allowed_company_ids;
+
+		var uid = session.user_context.uid
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['active', '=', false],['probability', '=', 0],['company_id','in',allowed_companies_ids]]
+		}else{
+		    user_id_domain = [['user_id', '=', uid], ['active', '=', false],['probability', '=', 0],['company_id','in',allowed_companies_ids]]
+		}
+
 		this.do_action({
 			name: _t("CRM Loss Leads"),
 			type: 'ir.actions.act_window',
 			res_model: 'crm.lead',
 			view_mode: 'tree,kanban,form',
 			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
-			domain: [['active', '=', false],['probability', '=', 0],['company_id','in',allowed_companies_ids]],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
 
-		to_invoice_info: function(e){
-		var self = this;
-		var allowed_companies_ids = session.user_context.allowed_company_ids;
-		this.do_action({
-			name: _t("Sale Order"),
-			type: 'ir.actions.act_window',
-			res_model: 'sale.order',
-			view_mode: 'tree,kanban,form',
-			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
-			domain: [['invoice_status','=','to invoice'],['company_id','in',allowed_companies_ids]],
-			target: 'current',
-			})
+//		to_invoice_info: function(e){
+//		var self = this;
+//		var allowed_companies_ids = session.user_context.allowed_company_ids;
+//		this.do_action({
+//			name: _t("Sale Order"),
+//			type: 'ir.actions.act_window',
+//			res_model: 'sale.order',
+//			view_mode: 'tree,kanban,form',
+//			views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
+//			domain: [['invoice_status','=','to invoice'],['company_id','in',allowed_companies_ids]],
+//			target: 'current',
+//			})
+//		},
+
+		archived_info: function(e){
+            var self = this;
+            var allowed_companies_ids = session.user_context.allowed_company_ids;
+
+            var uid = session.user_context.uid
+            var user_id_domain = "";
+            if (session.is_admin === true){
+                user_id_domain = [['active', '=', false],['company_id','in',allowed_companies_ids]]
+            }else{
+                user_id_domain = [['user_id', '=', uid], ['active', '=', false], ['company_id','in',allowed_companies_ids]]
+            }
+
+            this.do_action({
+                name: _t("CRM Leads"),
+                type: 'ir.actions.act_window',
+                res_model: 'crm.lead',
+                view_mode: 'tree,kanban,form',
+                views: [[false, 'list'],[false, 'kanban'],[false, 'form']],
+                domain: user_id_domain,
+                target: 'current',
+                })
+		},
+
+		get_target_vs_achieved: function() {
+			var self = this;
+			self._rpc({
+				model: 'crm.lead',
+				method: 'get_target_vs_achieved',
+				args: [],
+				kwargs: {context: session.user_context},
+				}).then(function(result) {
+				var i;
+				var body_html = "";
+				for (i = 0; i < result.length; i++) {
+					var data = result[i]
+					data['q1_target_amount'] = (data['q1_target_amount'] !== undefined) ? data['q1_target_amount']:0;
+					data['q1_achieved_amount'] = (data['q1_achieved_amount'] !== undefined) ? data['q1_achieved_amount']:0;
+					data['q2_target_amount'] = (data['q2_target_amount'] !== undefined) ? data['q2_target_amount']:0;
+					data['q2_achieved_amount'] = (data['q2_achieved_amount'] !== undefined) ? data['q2_achieved_amount']:0;
+					data['q3_target_amount'] = (data['q3_target_amount'] !== undefined) ? data['q3_target_amount']:0;
+					data['q3_achieved_amount'] = (data['q3_achieved_amount'] !== undefined) ? data['q3_achieved_amount']:0;
+					data['q4_target_amount'] = (data['q4_target_amount'] !== undefined) ? data['q4_target_amount']:0;
+					data['q4_achieved_amount'] = (data['q4_achieved_amount'] !== undefined) ? data['q4_achieved_amount']:0;
+
+					body_html +=
+					"<tr><td>"+data['year']+
+					"</td><td>"+data['sales_person_name']+
+					"</td><td>"+data['q1_target_amount']+
+					"</td><td>"+data['q1_achieved_amount']+
+					"</td><td>"+data['q2_target_amount']+
+					"</td><td>"+data['q2_achieved_amount']+
+					"</td><td>"+data['q3_target_amount']+
+					"</td><td>"+data['q3_achieved_amount']+
+					"</td><td>"+data['q4_target_amount']+
+					"</td><td>"+data['q4_achieved_amount']+
+					"</td><td>"+data['yearly_target_total']+
+					"</td><td>"+data['yearly_achieved_total']+
+					"</td></tr>"
+				}
+				self.$el.find('tbody#target-vs-achieved').html(body_html);
+			});
 		},
 
 		get_lead_opportunity: function() {
