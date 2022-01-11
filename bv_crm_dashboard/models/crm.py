@@ -329,10 +329,17 @@ class Lead(models.Model):
     def loss_list_customer_graph(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND cl.user_id =' + str(uid)
+
         try:
             query = """SELECT c.name AS partner_name, sum(cl.expected_revenue) AS cl_plan_revenue, cl.id AS cl_id
                 FROM crm_lead cl, res_partner c
-                WHERE cl.probability = 0 AND c.id = cl.partner_id AND cl.company_id = ANY (array[%s])
+                WHERE cl.probability = 0 AND c.id = cl.partner_id """ + user_id + """ AND cl.company_id = ANY (array[%s])
                 GROUP BY c.name, cl.expected_revenue, cl.id
                 ORDER BY cl.expected_revenue DESC LIMIT 5"""%(company_id)
             self._cr.execute(query)
@@ -353,6 +360,13 @@ class Lead(models.Model):
     def total_expected_revenue_graph(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND lead.user_id =' + str(uid)
+
         try:
             query = """ 
                         SELECT DISTINCT to_char(lead.create_date, 'YYYY-MM') AS dates, SUM(lead.expected_revenue) AS revenue, to_char(lead.create_date, 'YYYY-MON') AS yr_mon
@@ -360,7 +374,7 @@ class Lead(models.Model):
                         WHERE lead.priority IN ('2','3') 
                         AND ct.id = lead.stage_id 
                         AND ct.name='Quotation Sent' 
-                        AND lead.active=TRUE 
+                        AND lead.active=TRUE """ + user_id + """ 
                         AND lead.company_id = ANY (array[%s])
                         GROUP BY dates, ct.id, yr_mon
                         ORDER BY dates DESC
@@ -384,11 +398,18 @@ class Lead(models.Model):
     def count_wise_lead(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND lead.user_id =' + str(uid)
+
         try:
             query = """
                     SELECT count(lead.id) AS lead_name, stage.name AS stage_name, lead.stage_id AS stage_id
                     FROM crm_lead lead, crm_stage stage 
-                    WHERE lead.stage_id = stage.id AND lead.company_id = ANY (array[%s])
+                    WHERE lead.stage_id = stage.id """ + user_id + """ AND lead.company_id = ANY (array[%s])
                     GROUP BY stage_id, stage.name""" % (company_id)
             self._cr.execute(query)
             docs = self._cr.dictfetchall()
@@ -398,8 +419,11 @@ class Lead(models.Model):
             stage = []
             stage_ids = [record.get('stage_id') for record in docs]
             for record in docs:
-                lead_name = self.env['crm.lead'].search_count(
-                    [('stage_id', '=', record.get('stage_id')), ('company_id', 'in', company_id)])
+                if self.env.user.has_group('base.group_user') and self.env.is_admin():
+                    domain = [('stage_id', '=', record.get('stage_id')), ('company_id', 'in', company_id)]
+                else:
+                    domain = [('user_id', '=', uid), ('stage_id', '=', record.get('stage_id')), ('company_id', 'in', company_id)]
+                lead_name = self.env['crm.lead'].search_count(domain)
                 stage.append(lead_name)
             result = [stage, lead, stage_ids]
         except Exception as e:
@@ -410,11 +434,18 @@ class Lead(models.Model):
     def top_recent_customer(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND cl.user_id =' + str(uid)
+
         try:
             query = """
                 SELECT c.name AS partner_name, sum(cl.expected_revenue) AS cl_plan_revenue, c.id AS partner_id
                 FROM crm_lead cl, res_partner c 
-                WHERE cl.partner_id = c.id AND cl.expected_revenue > 0  AND cl.company_id = ANY (array[%s])                     
+                WHERE cl.partner_id = c.id AND cl.expected_revenue > 0 """ + user_id + """ AND cl.company_id = ANY (array[%s])                     
                 GROUP BY c.name, cl.create_date, c.id
                 ORDER BY cl.create_date DESC LIMIT 5"""%(company_id)
             self._cr.execute(query)
@@ -434,13 +465,19 @@ class Lead(models.Model):
     @api.model
     def won_list_customer(self):
         company_id = self._context.get('allowed_company_ids')
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND cl.user_id =' + str(uid)
+
         result = []
         try:
             query = """SELECT c.name AS partner_name, sum(cl.expected_revenue) AS cl_plan_revenue, c.id AS partner_id
                 FROM crm_lead cl, res_partner c
-                WHERE cl.probability = 100 AND c.id = cl.partner_id AND cl.company_id = ANY (array[%s])
+                WHERE cl.probability = 100 AND c.id = cl.partner_id """ + user_id + """ AND cl.company_id = ANY (array[%s])
                 GROUP BY c.name, cl.expected_revenue, c.id
-                ORDER BY cl.expected_revenue LIMIT 5"""%(company_id)
+                ORDER BY cl.expected_revenue DESC LIMIT 5"""%(company_id)
             self._cr.execute(query)
             docs = self._cr.dictfetchall()
             partner = []

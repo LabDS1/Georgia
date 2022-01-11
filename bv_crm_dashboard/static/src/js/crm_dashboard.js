@@ -256,6 +256,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 
 		total_expected_revenue_graph: function(){
 			var self = this
+			var uid = session.user_context.uid
 			/*var ctx = self.$("#total_expected_revenue_graph");*/
 			self._rpc({
 				model: "crm.lead",
@@ -331,19 +332,21 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
                                     var month = start_dt.getMonth()
                                     var total_days = new Date(days[1], month+1, 0).getDate();
                                     var end_dt = new Date(new Date(target_month+'-'+total_days).getTime()+60 * 60 * 24 * 1000);
+
+                                    var user_id_domain = "";
+                                    if (session.is_admin === true){
+                                        user_id_domain = [['create_date', '>=', start_dt],['create_date', '<=', end_dt],['company_id','=',allowed_company_ids],['priority','>=',2],['stage_id','=','Quotation Sent']]
+                                    }else{
+                                        user_id_domain = [['user_id','=',uid],['create_date', '>=', start_dt],['create_date', '<=', end_dt],['company_id','=',allowed_company_ids],['priority','>=',2],['stage_id','=','Quotation Sent']]
+                                    }
+
                                     self.do_action({
                                         name: _t("CRM Lead"),
                                         type: 'ir.actions.act_window',
                                         res_model: 'crm.lead',
                                         view_mode: 'list, form',
                                         views: [[false,'list'],[false, 'form']],
-                                        domain: [
-                                            ['create_date', '>=', start_dt],
-                                            ['create_date', '<=', end_dt],
-                                            ['company_id','=',allowed_company_ids],
-                                            ['priority','>=',2],
-                                            ['stage_id.name','=','Quotation Sent']
-                                        ],
+                                        domain: user_id_domain,
                                         target: 'current',
                                     });
                                 }
@@ -420,6 +423,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 
 		get_top_sales_rep_graph: function(){
 			var self = this
+			var uid = session.user_context.uid
 			self._rpc({
 				model: "crm.lead",
 				method: "get_top_sales_rep_graph",
