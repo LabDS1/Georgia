@@ -10,6 +10,7 @@
     'depends': ['sale_management', 'sale', 'sale_margin'],
     'data': [
         'views/sale_view.xml',
+        'views/account_move_view.xml',
     ],
     'installable': True,
     'auto_install': False,
