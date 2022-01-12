@@ -335,9 +335,9 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 
                                     var user_id_domain = "";
                                     if (session.is_admin === true){
-                                        user_id_domain = [['create_date', '>=', start_dt],['create_date', '<=', end_dt],['company_id','=',allowed_company_ids],['priority','>=',2],['stage_id','=','Quotation Sent']]
+                                        user_id_domain = [['create_date', '>=', start_dt],['create_date', '<=', end_dt],['company_id','in',allowed_company_ids],['priority','>=',2],['stage_id','=','Quotation Sent']]
                                     }else{
-                                        user_id_domain = [['user_id','=',uid],['create_date', '>=', start_dt],['create_date', '<=', end_dt],['company_id','=',allowed_company_ids],['priority','>=',2],['stage_id','=','Quotation Sent']]
+                                        user_id_domain = [['user_id','=',uid],['create_date', '>=', start_dt],['create_date', '<=', end_dt],['company_id','in',allowed_company_ids],['priority','>=',2],['stage_id','=','Quotation Sent']]
                                     }
 
                                     self.do_action({
@@ -526,7 +526,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 				kwargs: {context: session.user_context},
 			}).then(function(result) {
 				self.$el.find('#myPipeline').html(result[0]);
-				self.$el.find('#myPipeline_expected_revenue').html("Revenue :" + result[1][0]['expected_revenue']);
+				self.$el.find('#myPipeline_expected_revenue').html("Revenue :" + result[1][0]['expected_revenue'].toLocaleString());
 			});
 		},
 
@@ -813,16 +813,16 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 					body_html +=
 					"<tr><td>"+data['year']+
 					"</td><td>"+data['sales_person_name']+
-					"</td><td>"+data['q1_target_amount']+
-					"</td><td>"+data['q1_achieved_amount']+
-					"</td><td>"+data['q2_target_amount']+
-					"</td><td>"+data['q2_achieved_amount']+
-					"</td><td>"+data['q3_target_amount']+
-					"</td><td>"+data['q3_achieved_amount']+
-					"</td><td>"+data['q4_target_amount']+
-					"</td><td>"+data['q4_achieved_amount']+
-					"</td><td>"+data['yearly_target_total']+
-					"</td><td>"+data['yearly_achieved_total']+
+					"</td><td>"+data['q1_target_amount'].toLocaleString()+
+					"</td><td>"+data['q1_achieved_amount'].toLocaleString()+
+					"</td><td>"+data['q2_target_amount'].toLocaleString()+
+					"</td><td>"+data['q2_achieved_amount'].toLocaleString()+
+					"</td><td>"+data['q3_target_amount'].toLocaleString()+
+					"</td><td>"+data['q3_achieved_amount'].toLocaleString()+
+					"</td><td>"+data['q4_target_amount'].toLocaleString()+
+					"</td><td>"+data['q4_achieved_amount'].toLocaleString()+
+					"</td><td>"+data['yearly_target_total'].toLocaleString()+
+					"</td><td>"+data['yearly_achieved_total'].toLocaleString()+
 					"</td></tr>"
 				}
 				self.$el.find('tbody#target-vs-achieved').html(body_html);

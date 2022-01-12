@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import api, models, fields
+from odoo.http import request
 
 
 class SaleOrder(models.Model):
@@ -7,49 +8,90 @@ class SaleOrder(models.Model):
 
     @api.model
     def get_quotation_draft(self):
-        quotation = self.env['sale.order'].search_count([('state', '=', 'draft')])
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('state', '=', 'draft')]
+        else:
+            domain = [('user_id', '=', uid), ('state', '=', 'draft')]
+        quotation = self.env['sale.order'].search_count(domain)
         return quotation
 
     @api.model
     def get_sale_order_total(self):
-        sale_order = self.env['sale.order'].search_count([('state', '=', 'sale')])
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('state', '=', 'sale')]
+        else:
+            domain = [('user_id', '=', uid), ('state', '=', 'sale')]
+        sale_order = self.env['sale.order'].search_count(domain)
         return sale_order
 
     @api.model
     def get_quotation_sent(self):
-        quotation_sent = self.env['sale.order'].search_count([('state', '=', 'sent')])
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('state', '=', 'sent')]
+        else:
+            domain = [('user_id', '=', uid), ('state', '=', 'sent')]
+        quotation_sent = self.env['sale.order'].search_count(domain)
         return quotation_sent
 
     @api.model
     def get_quotation_cancel(self):
-        quotation_cancel = self.env['sale.order'].search_count([('state', '=', 'cancel')])
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('state', '=', 'cancel')]
+        else:
+            domain = [('user_id', '=', uid), ('state', '=', 'cancel')]
+        quotation_cancel = self.env['sale.order'].search_count(domain)
         return quotation_cancel
 
     @api.model
     def get_customers(self):
-        customers = self.env['res.partner'].search_count([('sale_order_ids', '!=', False)])
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('sale_order_ids', '!=', False)]
+        else:
+            domain = [('user_id', '=', uid), ('sale_order_ids', '!=', False)]
+        customers = self.env['res.partner'].search_count(domain)
         return customers
 
     @api.model
     def get_to_be_invoiced(self):
-        to_be_invoiced = self.env['sale.order'].search_count([('invoice_status', '=', 'to invoice')])
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('invoice_status', '=', 'to invoice')]
+        else:
+            domain = [('user_id', '=', uid), ('invoice_status', '=', 'to invoice')]
+        to_be_invoiced = self.env['sale.order'].search_count(domain)
         return to_be_invoiced
 
     @api.model
     def get_fully_invoiced(self):
-        fully_invoiced = self.env['sale.order'].search_count([('invoice_status', '=', 'invoiced')])
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('invoice_status', '=', 'invoiced')]
+        else:
+            domain = [('user_id', '=', uid), ('invoice_status', '=', 'invoiced')]
+        fully_invoiced = self.env['sale.order'].search_count(domain)
         return fully_invoiced
 
     # @contextmanager
     @api.model
     def get_top_orders(self):
         company_id = self._context.get('allowed_company_ids')
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND so.user_id =' + str(uid)
+
         result = []
         try:
             query = """
                 SELECT so.id as so_id, so.name AS so_number, rp.name AS customer_name, so.date_order AS so_date, so.amount_total AS amount_total
                 FROM sale_order so, res_partner rp
-                WHERE rp.id = so.partner_id AND so.company_id = ANY (array[%s])AND state IN ('sale', 'done')
+                WHERE rp.id = so.partner_id """ + user_id + """ AND  so.company_id = ANY (array[%s])AND state IN ('sale', 'done')
                 ORDER BY so.amount_total DESC
                 /*ORDER BY so.name*/
                 """ % (company_id)
@@ -63,12 +105,17 @@ class SaleOrder(models.Model):
     @api.model
     def get_top_customers(self):
         company_id = self._context.get('allowed_company_ids')
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND sale.user_id =' + str(uid)
         result = []
         try:
             query = """
                 SELECT DISTINCT c.name AS customer_name, c.id AS customer_id, sum(sale.amount_total) AS sale_total
                 FROM res_partner c, sale_order sale
-                WHERE c.id = sale.partner_id AND state IN ('sale', 'done') AND sale.company_id = ANY (array[%s])
+                WHERE c.id = sale.partner_id AND state IN ('sale', 'done') """ + user_id + """ AND sale.company_id = ANY (array[%s])
                 GROUP BY c.name, c.id
                 ORDER BY sale_total DESC
                 /*ORDER BY rp.name DESC*/
@@ -82,12 +129,17 @@ class SaleOrder(models.Model):
     @api.model
     def get_sent_quotations(self):
         company_id = self._context.get('allowed_company_ids')
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND so.user_id =' + str(uid)
         result = []
         try:
             query = """
                 SELECT so.id AS so_id, so.name AS so_number, rp.name AS customer_name, so.date_order AS so_date, so.commitment_date AS so_del
                 FROM sale_order so, res_partner rp
-                WHERE rp.id = so.partner_id AND so.company_id = ANY (array[%s]) AND so.state IN ('sent')
+                WHERE rp.id = so.partner_id """ + user_id + """ AND so.company_id = ANY (array[%s]) AND so.state IN ('sent')
                 """ % (company_id)
             self.env.cr.execute(query)
             result = self.env.cr.dictfetchall()
@@ -98,12 +150,19 @@ class SaleOrder(models.Model):
     @api.model
     def get_cancel_orders(self):
         company_id = self._context.get('allowed_company_ids')
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND so.user_id =' + str(uid)
+
         result = []
         try:
             query = """
                 SELECT so.id AS so_id, so.name AS so_number, rp.name AS customer_name, so.date_order AS so_date
                 FROM sale_order so, res_partner rp
-                WHERE rp.id = so.partner_id AND so.company_id = ANY (array[%s]) AND so.state IN ('cancel')
+                WHERE rp.id = so.partner_id """ + user_id + """ AND so.company_id = ANY (array[%s]) AND so.state IN ('cancel')
                 """ % (company_id)
             self.env.cr.execute(query)
             result = self.env.cr.dictfetchall()
@@ -141,6 +200,13 @@ class SaleOrder(models.Model):
     def montly_sale_orders(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND sale.user_id =' + str(uid)
+
         try:
             # query = """
             #     SELECT DISTINCT to_char(date_order, 'MON-YYYY') AS date, (sum(amount_total)) AS revenue, to_char(date_order, 'YYYY-MM') AS year
@@ -159,7 +225,7 @@ class SaleOrder(models.Model):
             query = """
                 SELECT DISTINCT EXTRACT(MONTH FROM date_order) AS month_count, sum(amount_total) AS revenue, to_char(date_order, 'YYYY-MON') AS month_year
                 FROM sale_order sale
-                WHERE sale.date_order IS NOT NULL AND sale.company_id = ANY (array[%s])
+                WHERE sale.date_order IS NOT NULL """ + user_id + """ AND sale.company_id = ANY (array[%s])
                 GROUP BY EXTRACT(MONTH FROM date_order), month_year
                 ORDER BY month_year, EXTRACT(MONTH FROM date_order) ASC
             """ % (company_id)
@@ -182,11 +248,18 @@ class SaleOrder(models.Model):
     def quarterly_sale_orders(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND sale.user_id =' + str(uid)
+
         try:
             query = """
                     SELECT DISTINCT extract(quarter from date_order) AS quarter, (sum(amount_total)) AS revenue, to_char(date_order, 'YYYY') AS year
                     FROM sale_order sale
-                    WHERE sale.create_date IS NOT NULL AND sale.company_id = ANY (array[%s]) AND sale.state in ('done', 'sale')
+                    WHERE sale.create_date IS NOT NULL """ + user_id + """ AND sale.company_id = ANY (array[%s]) AND sale.state in ('done', 'sale')
                     GROUP BY extract(quarter from date_order), year
                     ORDER BY year, extract(quarter from date_order) ASC
                     """ % (company_id)
@@ -229,11 +302,18 @@ class SaleOrder(models.Model):
     def top_sale_team(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND sale.user_id =' + str(uid)
+
         try:
             query = """
                 SELECT ct.name AS sales_team_name, sum(sale.amount_total) AS sale_total
                 FROM crm_team ct, sale_order sale
-                WHERE ct.id = sale.team_id AND sale.company_id = ANY (array[%s])
+                WHERE ct.id = sale.team_id """ + user_id + """ AND sale.company_id = ANY (array[%s])
                 GROUP BY ct.name
                 """ % (company_id)
             self.env.cr.execute(query)
@@ -253,11 +333,18 @@ class SaleOrder(models.Model):
     def recent_customer(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND sale.user_id =' + str(uid)
+
         try:
             query = """
                 SELECT c.name AS partner_name, sum(sale.amount_total) AS sale_total, sale.date_order, c.id AS customer_id
                 FROM res_partner c, sale_order sale
-                WHERE c.id = sale.partner_id AND state IN ('sale', 'done') AND sale.company_id = ANY (array[%s])
+                WHERE c.id = sale.partner_id AND state IN ('sale', 'done') """ + user_id + """ AND sale.company_id = ANY (array[%s])
                 GROUP BY c.name,sale.date_order, c.id
                 ORDER BY sale.date_order DESC LIMIT 5
                 """ % (company_id)
@@ -280,11 +367,18 @@ class SaleOrder(models.Model):
     def recent_5_sale_order(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND sale.user_id =' + str(uid)
+
         try:
             query = """
                 SELECT sale.name AS sale_name, sum(sale.amount_total) AS sale_total, sale.date_order, sale.id AS so_id
                 FROM sale_order sale
-                WHERE sale.state = 'sale' AND sale.company_id = ANY (array[%s])
+                WHERE sale.state = 'sale' """ + user_id + """ AND sale.company_id = ANY (array[%s])
                 GROUP BY sale_name, sale.date_order, sale.id
                 ORDER BY sale.date_order DESC LIMIT 5
                 """ % (company_id)
@@ -306,11 +400,18 @@ class SaleOrder(models.Model):
     def amount_wise_sale_order_ac_to_customer(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND so.user_id =' + str(uid)
+
         try:
             query = """
                 SELECT DISTINCT sum(so.amount_total) AS total, c.name AS partner_name, c.id AS customer_id
                 FROM sale_order so, res_partner c
-                WHERE c.id = so.partner_id AND so.amount_total > 0 AND so.company_id = ANY (array[%s])
+                WHERE c.id = so.partner_id AND so.amount_total > 0 """ + user_id + """ AND so.company_id = ANY (array[%s])
                 GROUP BY c.name, customer_id
                 ORDER BY c.name
                 """ % (company_id)
@@ -333,11 +434,18 @@ class SaleOrder(models.Model):
     def count_wise_customer_sale_order(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND so.user_id =' + str(uid)
+
         try:
             query = """
                 SELECT DISTINCT count(so.id) AS sale_id, c.name AS partner_name, so.partner_id AS customer_id
                 FROM sale_order so, res_partner c
-                WHERE c.id = so.partner_id AND so.company_id = ANY (array[%s])
+                WHERE c.id = so.partner_id """ + user_id + """ AND so.company_id = ANY (array[%s])
                 GROUP BY c.name, customer_id
                 ORDER BY c.name
                 """ % (company_id)
