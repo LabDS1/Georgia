@@ -81,6 +81,46 @@
 			</div>
 		</div><br/><br/>
 		<div class="row">
+			<div class="col-md-12">
+				<div class="card">
+					<div class="card-header" style="border-top: solid #2a4ea5">
+						<div class="card-title">
+							<b>
+								<h3>Target vs Achievement</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div style="overflow-x:auto;">
+								  	<table class="table table-hover">
+										<thead class="text-warning">
+											<tr>
+												<th>Year</th>
+												<th>Sales person</th>
+												<th>Q1 target</th>
+												<th>Q1 Achieved</th>
+												<th>Q2 target</th>
+												<th>Q2 Achieved</th>
+												<th>Q3 target</th>
+												<th>Q3 Achieved</th>
+												<th>Q4 target</th>
+												<th>Q4 Achieved</th>
+												<th>Yearly target</th>
+												<th>Yearly Achieved</th>
+											</tr>
+										</thead>
+										<tbody id="target-vs-achieved"/>
+								  </table>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><br/><br/>
+		<div class="row">
 			<div class="col-md-6">
 				<div class="card">
 					<div class="card-header" style="border-top: solid green">
@@ -295,46 +335,6 @@
 							<div class="col-md-12">
 								<div class="chart">
 									<canvas id="loss_list_customer_graph" style="height:fit-content;width:fit-content"> </canvas>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div><br/><br/>
-		<div class="row">
-			<div class="col-md-12">
-				<div class="card">
-					<div class="card-header" style="border-top: solid #2a4ea5">
-						<div class="card-title">
-							<b>
-								<h3>Target vs Achievement</h3>
-							</b>
-						</div>
-					</div>
-					<div class="card-body mt-3">
-						<div class="row">
-							<div class="col-md-12">
-								<div style="overflow-x:auto;">
-								  	<table class="table table-hover">
-										<thead class="text-warning">
-											<tr>
-												<th>Year</th>
-												<th>Sales person</th>
-												<th>Q1 target</th>
-												<th>Q1 Achieved</th>
-												<th>Q2 target</th>
-												<th>Q2 Achieved</th>
-												<th>Q3 target</th>
-												<th>Q3 Achieved</th>
-												<th>Q4 target</th>
-												<th>Q4 Achieved</th>
-												<th>Yearly target</th>
-												<th>Yearly Achieved</th>
-											</tr>
-										</thead>
-										<tbody id="target-vs-achieved"/>
-								  </table>
 								</div>
 							</div>
 						</div>

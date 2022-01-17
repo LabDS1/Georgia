@@ -124,91 +124,153 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 
 		quotation_draft_info: function(e){
 		var self = this;
+		var uid = session.user_context.uid;
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['state', '=','draft']]
+        }else{
+            user_id_domain = [['user_id', '=', uid], ['state', '=','draft']]
+        }
+
 		this.do_action({
 			name: _t("Sale Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'sale.order',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['state', '=','draft']],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
 
 		sale_order_info: function(e){
 		var self = this;
+
+		var uid = session.user_context.uid;
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['state', '=','sale']]
+        }else{
+            user_id_domain = [['user_id', '=', uid], ['state', '=','sale']]
+        }
+
 		this.do_action({
 			name: _t("Sale Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'sale.order',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['state', '=','sale']],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
 
 		quotation_sent_info: function(e){
 		var self = this;
+
+		var uid = session.user_context.uid;
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['state', '=','sent']]
+        }else{
+            user_id_domain = [['user_id', '=', uid], ['state', '=','sent']]
+        }
+
 		this.do_action({
 			name: _t("Sale Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'sale.order',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['state', '=','sent']],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
 
 		quotation_cancel_info: function(e){
 		var self = this;
+
+		var uid = session.user_context.uid;
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['state', '=','cancel']]
+        }else{
+            user_id_domain = [['user_id', '=', uid], ['state', '=','cancel']]
+        }
+
 		this.do_action({
 			name: _t("Sale Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'sale.order',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['state', '=','cancel']],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
 
 		customers_info: function(e){
 			var self = this;
+
+			var uid = session.user_context.uid;
+            var user_id_domain = "";
+            if (session.is_admin === true){
+                user_id_domain = [['sale_order_ids', '!=', false]]
+            }else{
+                user_id_domain = [['user_id', '=', uid], ['sale_order_ids', '!=', false]]
+            }
+
 			this.do_action({
 			name: _t("Customers"),
 			type: 'ir.actions.act_window',
 			res_model: 'res.partner',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['sale_order_ids', '!=', false]],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
 
 		to_be_invoiced_info: function(e){
 			var self = this;
+
+            var uid = session.user_context.uid;
+            var user_id_domain = "";
+            if (session.is_admin === true){
+                user_id_domain = [['invoice_status', '=', 'to invoice']]
+            }else{
+                user_id_domain = [['user_id', '=', uid], ['invoice_status', '=', 'to invoice']]
+            }
+
 			this.do_action({
 			name: _t("Sale Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'sale.order',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['invoice_status', '=', 'to invoice']],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
 
 		fully_invoiced_info: function(e){
 			var self = this;
+
+			var uid = session.user_context.uid;
+            var user_id_domain = "";
+            if (session.is_admin === true){
+                user_id_domain = [['invoice_status', '=', 'invoiced']]
+            }else{
+                user_id_domain = [['user_id', '=', uid], ['invoice_status', '=', 'invoiced']]
+            }
+
 			this.do_action({
 			name: _t("Sale Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'sale.order',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['invoice_status', '=', 'invoiced']],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
@@ -235,13 +297,22 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 		sale_order_details: function(e){
 		var self = this;
 		var target_id = Number(e.currentTarget.id);
+
+		var uid = session.user_context.uid;
+        var user_id_domain = "";
+        if (session.is_admin === true){
+            user_id_domain = [['id', '=', target_id]]
+        }else{
+            user_id_domain = [['user_id', '=', uid], ['id', '=', target_id]]
+        }
+
 		this.do_action({
 			name: _t("Sale Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'sale.order',
 			view_mode: 'form',
 			views: [[false,'list'],[false, 'form']],
-			domain: [['id', '=', target_id]],
+			domain: user_id_domain,
 			target: 'current',
 			});
 		},
@@ -319,6 +390,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 		count_wise_customer_sale_order: function(){
 			var self = this
 			/*var ctx = self.$("#count_wise_customer_sale_order");*/
+			var uid = session.user_context.uid
 			self._rpc({
 				model: "sale.order",
 				method: "count_wise_customer_sale_order",
@@ -374,13 +446,21 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
                             if (activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_id = result[2][selectedIndex]
+
+                                var user_id_domain = "";
+                                if (session.is_admin === true){
+                                     user_id_domain = [['partner_id', '=', target_id]]
+                                }else{
+                                     user_id_domain = [['user_id','=',uid],['partner_id', '=', target_id]]
+                                }
+
                                 self.do_action({
                                     name: _t("Sale order"),
                                     type: 'ir.actions.act_window',
                                     res_model: 'sale.order',
                                     view_mode: 'form',
                                     views: [[false,'list'],[false, 'form']],
-                                    domain: [['partner_id', '=', target_id]],
+                                    domain: user_id_domain,
                                     target: 'current',
                                 });
                             }
@@ -402,6 +482,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 		amount_wise_sale_order_ac_to_customer: function(){
 			var self = this
 			/*var ctx = self.$("#amount_wise_sale_order_ac_to_customer");*/
+			var uid = session.user_context.uid
 			self._rpc({
 				model: "sale.order",
 				method: "amount_wise_sale_order_ac_to_customer",
@@ -463,13 +544,21 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
                             if (activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_id = result[2][selectedIndex]
+
+                                var user_id_domain = "";
+                                if (session.is_admin === true){
+                                     user_id_domain = [['partner_id', '=', target_id]]
+                                }else{
+                                     user_id_domain = [['user_id','=',uid],['partner_id', '=', target_id]]
+                                }
+
                                 self.do_action({
                                     name: _t("Sale order"),
                                     type: 'ir.actions.act_window',
                                     res_model: 'sale.order',
                                     view_mode: 'form',
                                     views: [[false,'list'],[false, 'form']],
-                                    domain: [['partner_id', '=', target_id]],
+                                    domain: user_id_domain,
                                     target: 'current',
                                 });
                             }
@@ -623,6 +712,8 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 		montly_sale_orders: function(){
 			var self = this
 			/*var ctx = self.$("#montly_sale_orders");*/
+			var uid = session.user_context.uid
+			var allowed_company_ids = session.user_context.allowed_company_ids;
 			self._rpc({
 				model: "sale.order",
 				method: "montly_sale_orders",
@@ -695,13 +786,20 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
                                 var days_of_month = new Date(year, month+1, 0).getDate();
                                 var end_dt = new Date(year, month, days_of_month+1);
 
+                                var user_id_domain = "";
+                                if (session.is_admin === true){
+                                     user_id_domain = [['date_order', '>=', start_dt],['date_order', '<=', end_dt], ['company_id','in',allowed_company_ids]]
+                                }else{
+                                     user_id_domain = [['user_id', '=', uid],['date_order', '>=', start_dt],['date_order', '<=', end_dt], ['company_id','in',allowed_company_ids]]
+                                }
+
                                 self.do_action({
                                     name: _t("Sale order"),
                                     type: 'ir.actions.act_window',
                                     res_model: 'sale.order',
                                     view_mode: 'form',
                                     views: [[false,'list'],[false, 'form']],
-                                    domain: [['date_order', '>=', start_dt],['date_order', '<=', end_dt], ['company_id','=',1]],
+                                    domain: user_id_domain,
                                     target: 'current',
                                 });
                             }
@@ -721,6 +819,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 
 		quarterly_sale_orders: function(){
 			var self = this
+			var uid = session.user_context.uid
 			self._rpc({
 				model: "sale.order",
 				method: "quarterly_sale_orders",
@@ -783,7 +882,7 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
                             var activePoints = myCharts.getElementsAtEvent(e);
 
                             if (result!=null && activePoints.length>0){
-                                console.log(result[3])
+//                                console.log(result[3])
                                 var selectedIndex = activePoints[0]._index;
 
                                 var start_month = result[2][selectedIndex];
@@ -791,13 +890,21 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 
                                 var end_month = result[3][selectedIndex];
                                 var end_dt = new Date(end_month);
+
+                                var user_id_domain = "";
+                                if (session.is_admin === true){
+                                     user_id_domain = [['date_order', '>=', start_dt],['date_order', '<=', end_month], ['state','in',['done','sale']]]
+                                }else{
+                                     user_id_domain = [['user_id', '=', uid],['date_order', '>=', start_dt],['date_order', '<=', end_month], ['state','in',['done','sale']]]
+                                }
+
                                 self.do_action({
                                     name: _t("Sale order"),
                                     type: 'ir.actions.act_window',
                                     res_model: 'sale.order',
                                     view_mode: 'form',
                                     views: [[false,'list'],[false, 'form']],
-                                    domain: [['date_order', '>=', start_dt],['date_order', '<=', end_month], ['state','in',['done','sale']]],
+                                    domain: user_id_domain,
                                     target: 'current',
                                 });
                             }

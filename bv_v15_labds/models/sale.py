@@ -48,6 +48,84 @@ class SaleOrder(models.Model):
             )._get_default_team_id(domain=['|', ('company_id', '=', self.company_id.id), ('company_id', '=', False)], user_id=user_id)
         self.update(values)
 
+    def update_prices(self):
+        self.ensure_one()
+        lines_to_update = []
+        for line in self.order_line.filtered(lambda line: not line.display_type):
+            product = line.product_id.with_context(
+                partner=self.partner_id,
+                quantity=line.product_uom_qty,
+                date=self.date_order,
+                pricelist=self.pricelist_id.id,
+                uom=line.product_uom.id,
+                standard_price=line.product_id.standard_price,
+            )
+            price_unit = self.env['account.tax']._fix_tax_included_price_company(
+                line._get_display_price(product), line.product_id.taxes_id, line.tax_id, line.company_id)
+            line.product_id.standard_price = product._context.get('standard_price')
+            if self.pricelist_id.discount_policy == 'without_discount' and price_unit:
+                price_discount_unrounded = self.pricelist_id.get_product_price(product, line.product_uom_qty, self.partner_id, self.date_order, line.product_uom.id)
+                discount = max(0, (price_unit - price_discount_unrounded) * 100 / price_unit)
+            else:
+                discount = 0
+            lines_to_update.append((1, line.id, {'price_unit': price_unit, 'discount': discount}))
+        self.update({'order_line': lines_to_update})
+        self.show_update_pricelist = False
+        self.message_post(body=_("Product prices have been recomputed according to pricelist <b>%s<b> ", self.pricelist_id.display_name))
+
+
+
+
+class SaleOrderLine(models.Model):
+    _inherit = "sale.order.line"
+
+    def _get_display_price(self, product):
+        # TO DO: move me in master/saas-16 on sale.order
+        # awa: don't know if it's still the case since we need the "product_no_variant_attribute_value_ids" field now
+        # to be able to compute the full price
+
+        # it is possible that a no_variant attribute is still in a variant if
+        # the type of the attribute has been changed after creation.
+        no_variant_attributes_price_extra = [
+            ptav.price_extra for ptav in self.product_no_variant_attribute_value_ids.filtered(
+                lambda ptav:
+                    ptav.price_extra and
+                    ptav not in product.product_template_attribute_value_ids
+            )
+        ]
+        if no_variant_attributes_price_extra:
+            product = product.with_context(
+                no_variant_attributes_price_extra=tuple(no_variant_attributes_price_extra)
+            )
+
+        if self.order_id.pricelist_id.discount_policy == 'with_discount':
+            if self.purchase_price:
+                product.standard_price = self.purchase_price
+            return product.with_context(pricelist=self.order_id.pricelist_id.id, uom=self.product_uom.id).price
+        product_context = dict(self.env.context, partner_id=self.order_id.partner_id.id, date=self.order_id.date_order, uom=self.product_uom.id)
+
+        final_price, rule_id = self.order_id.pricelist_id.with_context(product_context).get_product_price_rule(product or self.product_id, self.product_uom_qty or 1.0, self.order_id.partner_id)
+        base_price, currency = self.with_context(product_context)._get_real_price_currency(product, rule_id, self.product_uom_qty, self.product_uom, self.order_id.pricelist_id.id)
+        if currency != self.order_id.pricelist_id.currency_id:
+            base_price = currency._convert(
+                base_price, self.order_id.pricelist_id.currency_id,
+                self.order_id.company_id or self.env.company, self.order_id.date_order or fields.Date.today())
+        # negative discounts (= surcharge) are included in the display price
+        return max(base_price, final_price)
+
+    @api.depends('product_id', 'company_id', 'currency_id', 'product_uom')
+    def _compute_purchase_price(self):
+        for line in self:
+            if not line.product_id:
+                line.purchase_price = 0.0
+                continue
+            line = line.with_company(line.company_id)
+            product_cost =0.00
+            if line.purchase_price:
+                product_cost = line.purchase_price
+            else:
+                product_cost = line.product_id.standard_price
+            line.purchase_price = line._convert_price(product_cost, line.product_id.uom_id)
 
 class MailTracking(models.Model):
     _inherit = "mail.tracking.value"
