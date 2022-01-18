@@ -298,7 +298,8 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
 //		},
 
 		get_recent_vendores_graph: function(){
-			var self = this
+			var self = this;
+			var uid = session.user_context.uid;
 			self._rpc({
 				model: "purchase.order",
 				method: "recent_vendores_graph",
@@ -333,13 +334,21 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
                             if (activePoints.length>0){
                                 var selectedIndex = activePoints[0]._index;
                                 var target_id = result[2][selectedIndex]
+
+                                var user_id_domain = "";
+                                if (session.is_admin === true){
+                                    user_id_domain = [['partner_id', '=', target_id], ['state', '=', 'purchase']]
+                                }else{
+                                    user_id_domain = [['user_id', '=', uid], ['partner_id', '=', target_id], ['state', '=', 'purchase']]
+                                }
+
                                 self.do_action({
                                     name: _t("Purchase Order"),
                                     type: 'ir.actions.act_window',
                                     res_model: 'purchase.order',
                                     view_mode: 'form',
                                     views: [[false,'list'],[false, 'form']],
-                                    domain: [['partner_id', '=', target_id], ['state', '=', 'purchase']],
+                                    domain: user_id_domain,
                                     target: 'current',
                                 });
                             }
@@ -519,103 +528,176 @@ odoo.define('bv_modern_dashboard.purchase_dashboard', function (require) {
 
 		rfqs_info: function(e){
 		var self = this;
+
+		var uid = session.user_context.uid;
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['state', '=','draft']]
+        }else{
+            user_id_domain = [['user_id', '=', uid], ['state', '=','draft']]
+        }
+
 		this.do_action({
 			name: _t("Purchase Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'purchase.order',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['state', '=','draft']],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
 
 		purchase_orders_info: function(e){
 		var self = this;
+
+		var uid = session.user_context.uid;
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['state', '=','purchase']]
+        }else{
+            user_id_domain = [['user_id', '=', uid], ['state', '=','purchase']]
+        }
+
 		this.do_action({
 			name: _t("Purchase Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'purchase.order',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['state', '=','purchase']],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
 
 		rfq_sent_info: function(e){
 		var self = this;
+
+		var uid = session.user_context.uid;
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['state', '=','sent']]
+        }else{
+            user_id_domain = [['user_id', '=', uid], ['state', '=','sent']]
+        }
+
 		this.do_action({
 			name: _t("Purchase Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'purchase.order',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['state', '=','sent']],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
 
 		purchase_cancel_info: function(e){
 		var self = this;
+
+		var uid = session.user_context.uid;
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['state', '=','cancel']]
+        }else{
+            user_id_domain = [['user_id', '=', uid], ['state', '=','cancel']]
+        }
+
 		this.do_action({
 			name: _t("Purchase Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'purchase.order',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['state', '=','cancel']],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
 
 		vendors_info: function(e){
 		var self = this;
+
+		var uid = session.user_context.uid;
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['purchase_line_ids', '!=', false]]
+        }else{
+            user_id_domain = [['user_id', '=', uid], ['purchase_line_ids', '!=', false]]
+        }
+
 		this.do_action({
 			name: _t("Vendors"),
 			type: 'ir.actions.act_window',
 			res_model: 'res.partner',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['purchase_line_ids', '!=', false]],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
+
 		to_be_shipped: function(e){
 		var self = this;
+
+		var uid = session.user_context.uid;
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['picking_ids.state', '=', 'assigned']]
+        }else{
+            user_id_domain = [['user_id', '=', uid], ['picking_ids.state', '=', 'assigned']]
+        }
+
 		this.do_action({
 			name: _t("Purchase Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'purchase.order',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['picking_ids.state', '=', 'assigned']],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
 
 		fully_shipped: function(e){
 		var self = this;
+
+		var uid = session.user_context.uid;
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['picking_ids.state', '=', 'done']]
+        }else{
+            user_id_domain = [['user_id', '=', uid], ['picking_ids.state', '=', 'done']]
+        }
+
 		this.do_action({
 			name: _t("Purchase Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'purchase.order',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['picking_ids.state', '=', 'done']],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
 
 		fully_billed: function(e){
 		var self = this;
+
+		var uid = session.user_context.uid;
+		var user_id_domain = "";
+		if (session.is_admin === true){
+		    user_id_domain = [['state', '=', 'purchase'], ['invoice_status', '=', 'invoiced']]
+        }else{
+            user_id_domain = [['user_id', '=', uid], ['state', '=', 'purchase'], ['invoice_status', '=', 'invoiced']]
+        }
+
 		this.do_action({
 			name: _t("Purchase Order"),
 			type: 'ir.actions.act_window',
 			res_model: 'purchase.order',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['state', '=', 'purchase'], ['invoice_status', '=', 'invoiced']],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},

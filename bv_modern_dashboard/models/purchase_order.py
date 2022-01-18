@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
+from odoo.http import request
 
 
 class PurchaseOrder(models.Model):
@@ -8,38 +9,75 @@ class PurchaseOrder(models.Model):
 
     @api.model
     def get_rfqs_count(self):
-        rfqs_count = self.env['purchase.order'].search_count([('state', '=', 'draft')])
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('state', '=', 'draft')]
+        else:
+            domain = [('user_id', '=', uid), ('state', '=', 'draft')]
+        rfqs_count = self.env['purchase.order'].search_count(domain)
         return rfqs_count
 
     @api.model
     def get_total_purchase_order_count(self):
-        total_purchase_count = self.env['purchase.order'].search_count([('state', '=', 'purchase')])
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('state', '=', 'purchase')]
+        else:
+            domain = [('user_id', '=', uid), ('state', '=', 'purchase')]
+        total_purchase_count = self.env['purchase.order'].search_count(domain)
         return total_purchase_count
 
     @api.model
     def get_rfq_sent_count(self):
-        rfq_sent_count = self.env['purchase.order'].search_count([('state', '=', 'sent')])
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('state', '=', 'sent')]
+        else:
+            domain = [('user_id', '=', uid), ('state', '=', 'sent')]
+        rfq_sent_count = self.env['purchase.order'].search_count(domain)
         return rfq_sent_count
 
     @api.model
     def get_purchase_cancel_count(self):
-        purchase_cancel_count = self.env['purchase.order'].search_count([('state', '=', 'cancel')])
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('state', '=', 'cancel')]
+        else:
+            domain = [('user_id', '=', uid), ('state', '=', 'cancel')]
+        purchase_cancel_count = self.env['purchase.order'].search_count(domain)
         return purchase_cancel_count
 
     @api.model
     def get_vendors_lst(self):
         partners = self.env['res.partner'].search([('supplier_rank', '=', '1')])
-        vendors_count = self.env['res.partner'].search_count([('purchase_line_ids', '!=', False)])
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('purchase_line_ids', '!=', False)]
+        else:
+            domain = [('user_id', '=', uid), ('purchase_line_ids', '!=', False)]
+
+        vendors_count = self.env['res.partner'].search_count(domain)
         return vendors_count
 
     @api.model
     def get_to_be_shipped_count(self):
-        purchase_orders = self.env['purchase.order'].search_count([('picking_ids.state', '=', 'assigned')])
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('picking_ids.state', '=', 'assigned')]
+        else:
+            domain = [('user_id', '=', uid), ('picking_ids.state', '=', 'assigned')]
+        purchase_orders = self.env['purchase.order'].search_count(domain)
         return purchase_orders
 
     @api.model
     def get_fully_shipped_count(self):
-        purchase_orders = self.env['purchase.order'].search_count([('picking_ids.state', '=', 'done')])
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('picking_ids.state', '=', 'done')]
+        else:
+            domain = [('user_id', '=', uid), ('picking_ids.state', '=', 'done')]
+        purchase_orders = self.env['purchase.order'].search_count(domain)
         return purchase_orders
 
     @api.model
@@ -50,19 +88,30 @@ class PurchaseOrder(models.Model):
 
     @api.model
     def get_fully_billed_count(self):
-        purchase_orders = self.env['purchase.order'].search_count([('state', '=', 'purchase'), ('invoice_status', '=', 'invoiced')])
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            domain = [('state', '=', 'purchase'), ('invoice_status', '=', 'invoiced')]
+        else:
+            domain = [('user_id', '=', uid), ('state', '=', 'purchase'), ('invoice_status', '=', 'invoiced')]
+        purchase_orders = self.env['purchase.order'].search_count(domain)
         return purchase_orders
 
     @api.model
     def get_top_purchase_orders(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND po.user_id =' + str(uid)
+
         try:
             query = """
                 SELECT po.name AS so_number, rp.name AS customer_name, po.date_order AS po_date, po.id AS po_id
                 FROM purchase_order po, res_partner rp
                 WHERE rp.id = po.partner_id 
-                AND state IN ('purchase') AND po.company_id = ANY (array[%s])
+                AND state IN ('purchase') """ + user_id + """ AND po.company_id = ANY (array[%s])
                 ORDER BY po.amount_total DESC
                 """%(company_id)
             self.env.cr.execute(query)
@@ -75,11 +124,18 @@ class PurchaseOrder(models.Model):
     def get_cancel_purchase_orders(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND po.user_id =' + str(uid)
+
         try:
             query = """
                 SELECT po.name AS so_number, rp.name AS customer_name, po.date_order AS po_date, po.id AS po_id
                 FROM purchase_order po, res_partner rp
-                WHERE rp.id = po.partner_id AND po.company_id = ANY (array[%s])
+                WHERE rp.id = po.partner_id """ + user_id + """ AND po.company_id = ANY (array[%s])
                 AND state IN ('cancel')
                 """%(company_id)
             self.env.cr.execute(query)
@@ -92,12 +148,19 @@ class PurchaseOrder(models.Model):
     def get_purchase_orders_fully_billed(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND po.user_id =' + str(uid)
+
         try:
             query = """
                 SELECT po.name AS so_number, rp.name AS customer_name, po.date_order AS po_date, po.id AS po_id
                 FROM purchase_order po, res_partner rp
                 WHERE rp.id = po.partner_id 
-                AND state IN ('purchase') AND po.company_id = ANY (array[%s])
+                AND state IN ('purchase') """ + user_id + """ AND po.company_id = ANY (array[%s])
                 AND po.invoice_status = 'invoiced'
                 """%(company_id)
             self.env.cr.execute(query)
@@ -110,11 +173,18 @@ class PurchaseOrder(models.Model):
     def recent_vendores_graph(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND purchase.user_id =' + str(uid)
+
         try:
             query = """
                 SELECT DISTINCT count(purchase.id) AS purchase_id, c.name AS partner_name, c.id AS vendor_id
                 FROM purchase_order purchase, res_partner c 
-                WHERE c.id = purchase.partner_id AND purchase.state = 'purchase' AND purchase.company_id = ANY (array[%s])
+                WHERE c.id = purchase.partner_id AND purchase.state = 'purchase' """ + user_id + """ AND purchase.company_id = ANY (array[%s])
                 GROUP BY c.name, c.id
                 ORDER BY purchase_id DESC LIMIT 5"""%(company_id)
             self._cr.execute(query)
@@ -135,11 +205,18 @@ class PurchaseOrder(models.Model):
     @api.model
     def get_top_10_purchase_order(self):
         company_id = self._context.get('allowed_company_ids')
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND po.user_id =' + str(uid)
+
         result = []
         try:
             query = """
                 SELECT po.name AS purchase_order_name, sum(po.amount_total) AS total, po.id AS po_id
-                FROM purchase_order po WHERE po.state = 'purchase' AND po.amount_total > 0 AND po.company_id = ANY (array[%s])
+                FROM purchase_order po WHERE po.state = 'purchase' AND po.amount_total > 0 """ + user_id + """ AND po.company_id = ANY (array[%s])
                 GROUP BY po.name, po.amount_total, po.id
                 ORDER BY po.amount_total DESC LIMIT 5
                 """%(company_id)
@@ -161,11 +238,18 @@ class PurchaseOrder(models.Model):
     def get_top_5_vendor_graph(self):
         company_id = self._context.get('allowed_company_ids')
         result = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND po.user_id =' + str(uid)
+
         try:
             query = """
                     SELECT DISTINCT c.name AS partner_name, sum(po.amount_total) AS total, c.id AS partner_id
                     FROM purchase_order po, res_partner c
-                    WHERE c.id = po.partner_id AND po.state = 'purchase' AND po.amount_total > 0 AND po.company_id = ANY (array[%s])
+                    WHERE c.id = po.partner_id AND po.state = 'purchase' AND po.amount_total > 0 """ + user_id + """ AND po.company_id = ANY (array[%s])
                     GROUP BY c.name, c.id
                     ORDER BY total DESC LIMIT 5 """ % (company_id)
             self._cr.execute(query)

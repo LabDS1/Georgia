@@ -211,13 +211,22 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 
 		customers_info: function(e){
 			var self = this;
+
+			var uid = session.user_context.uid;
+            var user_id_domain = "";
+            if (session.is_admin === true){
+                user_id_domain = [['sale_order_ids', '!=', false]]
+            }else{
+                user_id_domain = [['user_id', '=', uid], ['sale_order_ids', '!=', false]]
+            }
+
 			this.do_action({
 			name: _t("Customers"),
 			type: 'ir.actions.act_window',
 			res_model: 'res.partner',
 			view_mode: 'tree,form',
 			views: [[false, 'list'],[false, 'form']],
-			domain: [['sale_order_ids', '!=', false]],
+			domain: user_id_domain,
 			target: 'current',
 			})
 		},
