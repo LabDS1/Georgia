@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+	<t t-name="accounting_header_template">
+		<div class="text-center font-weight-bold text-primary">Invoice Dashboard</div><br/><br/>
+		<div class="row">
+			<div class="col-md-4">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#ffeecc;border-color:#ffeecc">
+					<div class="card shadow p-3 my-card" style="color:orange;border-color:orange"><i class="fa fa-file-text-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:#d6145f">To Be Invoiced</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#d6145f" id="to_be_invoiced"/></div>
+					<div class="btn btn-sm to-be-invoiced-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#ffcce5;border-color:#ffcce5">
+					<div class="card shadow p-3 my-card" style="color:#d6145f;border-color:#d6145f"><i class="fa fa-file-text-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:#d6145f">Open Invoice</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#d6145f" id="open_invoice"/></div>
+					<div class="btn btn-sm invoice-open-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#c8e6c9;border-color:#c8e6c9">
+					<div class="card border-success shadow text-success p-3 my-card" ><i class="fa fa-usd"/></div>
+					<div class="text-center mt-3"><h4 style="color:#00A04A">Customer Payment</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#00A04A" id="Customer_payment"/></div>
+					<div class="btn btn-sm customer-payment-info more-info">More Info</div>
+				</div>
+			</div>
+
+		</div><br/><br/>
+
+		<div class="row">
+			<div class="col-md-4">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#ffeecc;border-color:#ffeecc">
+					<div class="card shadow p-3 my-card" style="color:orange;border-color:orange"><i class="fa fa-file-text-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:#d6145f">To be Billed</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#d6145f" id="to_be_billed"/></div>
+					<div class="btn btn-sm to-be-billed-info more-info">More Info</div>
+				</div>
+			</div>
+
+			<div class="col-md-4">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#ffcce5;border-color:#ffcce5">
+					<div class="card shadow p-3 my-card" style="color:#d6145f;border-color:#d6145f"><i class="fa fa-file-text-o"/></div>
+					<div class="text-center mt-3"><h4 style="color:#d6145f">Open Vendor Bill</h4></div>
+					<div class="text-center mt-2"><h1 style="color:#d6145f" id="open_bill"/></div>
+					<div class="btn btn-sm bill-open-info more-info">More Info</div>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="card-header mx-sm-1 p-3" style="background-color:#b2ebf2;border-color:#b2ebf2">
+					<div class="card shadow p-3 my-card" style="color:dodgerblue;border-color:dodgerblue"><i class="fa fa-usd"/></div>
+					<div class="text-center mt-3"><h4 style="color:dodgerblue">Vendor Payment</h4></div>
+					<div class="text-center mt-2"><h1 style="color:dodgerblue" id="vendor_payment"/></div>
+					<div class="btn btn-sm vendor-payment-info more-info">More Info</div>
+				</div>
+			</div>
+		</div><br/><br/>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid MediumSpringGreen">
+						<div class="card-title">
+							<b>
+								<h3>Aged Receivable</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="agedReceivable" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid MediumSpringGreen">
+						<div class="card-title">
+							<b>
+								<h3>Aged Payable</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="agedPayable" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+<!--		<div class="row">-->
+<!--			<div class="col-md-6">-->
+<!--				<div class="card border-warning">-->
+<!--					<div class="card-header text-center">-->
+<!--						<div class="card-title bg-warning border-warning shadow text-center font-weight-bold text-white p-3 w-75 my-table">Customer Payment List</div>-->
+<!--					</div>-->
+<!--					<div class="table table-responsive scroll-content"> -->
+<!--						<table class="table table-hover">-->
+<!--							<thead class="text-warning">-->
+<!--								<tr>-->
+<!--									<th>Invoice Name</th>-->
+<!--									<th>Customer Name</th>-->
+<!--									<th>Amount</th>-->
+<!--								</tr>-->
+<!--							</thead>-->
+<!--							<tbody id="customer_payment_lst"/>-->
+<!--						</table>-->
+<!--					</div>-->
+<!--				</div>-->
+<!--			</div>-->
+<!--			<div class="col-md-6">-->
+<!--				<div class="card border-success">-->
+<!--					<div class="card-header text-center">-->
+<!--						<div class="card-title bg-success border-success shadow text-center font-weight-bold text-white p-3 w-75 my-table">Vendor Payment List</div>-->
+<!--					</div>-->
+<!--					<div class="table table-responsive scroll-content"> -->
+<!--						<table class="table table-hover">-->
+<!--							<thead class="text-success">-->
+<!--								<tr>-->
+<!--									<th>Invoice Name</th>-->
+<!--									<th>Customer Name</th>-->
+<!--									<th>Amount</th>-->
+<!--								</tr>-->
+<!--							</thead>-->
+<!--							<tbody id="vendor_payment_lst"/>-->
+<!--						</table>-->
+<!--					</div>-->
+<!--				</div>-->
+<!--			</div>-->
+<!--		</div>-->
+		<br/><br/>
+<!--		<div class="row">-->
+<!--			<div class="col-md-4">-->
+<!--				<div class="card border-primary">-->
+<!--					<div class="card-header text-center border-top-primary">-->
+<!--						<div class="card-title bg-primary border-primary shadow text-center font-weight-bold text-white p-3 w-75 my-table">Top Customer</div>-->
+<!--					</div>-->
+<!--					<div class="table table-responsive scroll-content"> -->
+<!--						<table class="table table-hover">-->
+<!--							<thead class="text-primary">-->
+<!--								<tr>-->
+<!--									<th>Customer Name</th>-->
+<!--								</tr>-->
+<!--							</thead>-->
+<!--						<tbody id="customer_lst"/>-->
+<!--						</table>-->
+<!--					</div>-->
+<!--				</div>-->
+<!--			</div>-->
+<!--			<div class="col-md-4">-->
+<!--				<div class="card border-danger">-->
+<!--					<div class="card-header text-center">-->
+<!--						<div class="card-title bg-danger border-danger shadow text-center font-weight-bold text-white p-3 w-75 my-table">Top Vendor</div>-->
+<!--					</div>-->
+<!--					<div class="table table-responsive scroll-content"> -->
+<!--						<table class="table table-hover">-->
+<!--							<thead class="text-danger">-->
+<!--								<tr>-->
+<!--									<th>Vendor Name</th>-->
+<!--								</tr>-->
+<!--							</thead>-->
+<!--							<tbody id="vendor_lst"/>-->
+<!--						</table>-->
+<!--					</div>-->
+<!--				</div>-->
+<!--			</div>-->
+<!--			<div class="col-md-4">-->
+<!--				<div class="card border-info">-->
+<!--					<div class="card-header text-center">-->
+<!--						<div class="card-title bg-info border-info shadow text-center font-weight-bold text-white p-3 w-75 my-table">Journal List</div>-->
+<!--					</div>-->
+<!--					<div class="table table-responsive scroll-content"> -->
+<!--						<table class="table table-hover">-->
+<!--							<thead class="text-info">-->
+<!--								<tr>-->
+<!--									<th>Journal Name</th>-->
+<!--									<th>Journal Type</th>										-->
+<!--								</tr>-->
+<!--							</thead>-->
+<!--							<tbody id="journal_lst"/>-->
+<!--						</table>-->
+<!--					</div>-->
+<!--				</div>-->
+<!--			</div>-->
+<!--		</div>-->
+		<br/><br/>
+<!-- 		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid green">
+						<div class="card-title">
+							<b>
+								<h3>Journal List</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="joutnal_list_graph" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card" style="height:25em">
+					<div class="card-header" style="border-top: solid green">
+						<div class="card-title">
+							<b>
+								<h3>Top 5 Customers</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="canvas1" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br/><br/> -->
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid green">
+						<div class="card-title">
+							<b>
+								<h3>Income - Expense</h3>
+							</b>
+						</div>
+<!--                         <div class="card-tools">
+                            <select id="income_expense_values">
+                                <option id="income_this_month" value="income_this_month">This Month</option>
+                                <option id="income_last_month" value="income_last_month">Last Month</option>
+                                <div role="separator" class="dropdown-divider" />
+                                <option id="income_this_year" value="income_this_year">This Year</option>
+                                <option id="income_last_year" value="income_this_year">Last Year</option>
+                            </select>
+                        </div> -->
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="income_expense_graph" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid green">
+						<div class="card-title">
+							<b>
+								<h3>Top 5 Customers</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="canvas1" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br/>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid red">
+						<div class="card-title">
+							<b>
+								<h3>Customer Invoice</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="customer_invoice_graph" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid red">
+						<div class="card-title">
+							<b>
+								<h3>Supplier Invoice</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="supplier_invoice_graph" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br/>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid MediumSpringGreen">
+						<div class="card-title">
+							<b>
+								<h3>Cash and Bank Balance</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="cash_bank_balance_graph" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header" style="border-top: solid MediumSpringGreen">
+						<div class="card-title">
+							<b>
+								<h3>Customer Payment</h3>
+							</b>
+						</div>
+					</div>
+					<div class="card-body mt-3">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="chart">
+									<canvas id="customer_payment_graph" style="height:fit-content;width:fit-content"> </canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><br/>
+	</t>
+	<t t-name="AccountingDashboard">
+		<div class="container Dashboard-container">
+			<div style="margin-top:3em;">
+				<div class="dashboard-header">
+					<t t-call="accounting_header_template"/>
+				</div>
+			</div>
+		</div>
+	</t>
+</templates>

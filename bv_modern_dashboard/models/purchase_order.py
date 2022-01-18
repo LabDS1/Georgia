@@ -43,6 +43,12 @@ class PurchaseOrder(models.Model):
         return purchase_orders
 
     @api.model
+    def get_to_be_billed_count(self):
+        purchase_orders = self.env['purchase.order'].search_count(
+            [('state', '=', 'purchase'), ('invoice_status', '=', 'to invoice')])
+        return purchase_orders
+
+    @api.model
     def get_fully_billed_count(self):
         purchase_orders = self.env['purchase.order'].search_count([('state', '=', 'purchase'), ('invoice_status', '=', 'invoiced')])
         return purchase_orders
