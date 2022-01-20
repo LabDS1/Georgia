@@ -37,8 +37,8 @@ odoo.define('bv_modern_dashboard.accounting_dashboard', function (require) {
 			self.renderElement();
 			self.get_customer_invoices();
 			self.get_supplier_invoices_graph();
-			self.get_customer_payment_graph();
-			self.get_cash_bank_balance_graph();
+//			self.get_customer_payment_graph();
+//			self.get_cash_bank_balance_graph();
 			/*self.get_journal_radar_graph();*/
 			self.aged_payable();
 			self.aged_receivable();
@@ -281,187 +281,187 @@ odoo.define('bv_modern_dashboard.accounting_dashboard', function (require) {
 			});
 		},
 
-		get_customer_payment_graph:function(){
-			var self = this
-			/*var ctx = self.$("#customer_payment_graph");*/
-			self._rpc({
-				model: "account.payment",
-				method: "get_customer_payment_graph",
-				args: [],
-				kwargs: {context: session.user_context},
-			}).then(function (result) {
-				var data = {
-					labels: result[1],
-					datasets: [
-					{
-						label: '',
-						data: result[0],
-						backgroundColor: [
-							"rgba(253, 91, 29,1)",
-							"rgba(177, 92, 74, 1)",
-							"rgba(230, 92, 74, 1)",
-							"rgba(153, 102, 255,1)",
-							"rgba(10,20,30,1)"
-						],
-						borderColor: [
-							"rgba(255, 99, 132, 0.2)",
-							"rgba(54, 162, 235, 0.2)",
-							"rgba(75, 192, 192, 0.2)",
-							"rgba(153, 102, 255, 0.2)",
-							"rgba(10,20,30,0.3)"
-						],
-					borderWidth: 1
-					},
-					]
-				};
-				//options
-				var options = {
-					responsive: true,
-					itle: {
-					display: false,
-					position: "top",
-					text: "INVOICE DETAILS",
-					fontSize: 18,
-					fontColor: "#111"
-					},
-					legend: {
-						display: false,
-						position: "bottom",
-						labels: {
-							fontColor: "#333",
-							fontSize: 16
-						}
-					},
-					scales: {
-						yAxes: [{
-						ticks: {
-							min: 0
-						}
-					}]
-					},
-					onClick:function(e){
-                        var activePoints = myCharts.getElementsAtEvent(e);
-                        if (activePoints.length>0){
-                            var selectedIndex = activePoints[0]._index;
-                            var target_id = result[3][selectedIndex]
-                            self.do_action({
-                                name: _t("Customer Payment"),
-                                type: 'ir.actions.act_window',
-                                res_model: 'account.payment',
-                                view_mode: 'form',
-                                views: [[false,'list'],[false, 'form']],
-                                domain: [['partner_id', '=', target_id]],
-                                target: 'current',
-                            });
-                        }
-					},
-					onHover: function(event, chartElement){
-					    event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-					},
-				};
+//		get_customer_payment_graph:function(){
+//			var self = this
+//			/*var ctx = self.$("#customer_payment_graph");*/
+//			self._rpc({
+//				model: "account.payment",
+//				method: "get_customer_payment_graph",
+//				args: [],
+//				kwargs: {context: session.user_context},
+//			}).then(function (result) {
+//				var data = {
+//					labels: result[1],
+//					datasets: [
+//					{
+//						label: '',
+//						data: result[0],
+//						backgroundColor: [
+//							"rgba(253, 91, 29,1)",
+//							"rgba(177, 92, 74, 1)",
+//							"rgba(230, 92, 74, 1)",
+//							"rgba(153, 102, 255,1)",
+//							"rgba(10,20,30,1)"
+//						],
+//						borderColor: [
+//							"rgba(255, 99, 132, 0.2)",
+//							"rgba(54, 162, 235, 0.2)",
+//							"rgba(75, 192, 192, 0.2)",
+//							"rgba(153, 102, 255, 0.2)",
+//							"rgba(10,20,30,0.3)"
+//						],
+//					borderWidth: 1
+//					},
+//					]
+//				};
+//				//options
+//				var options = {
+//					responsive: true,
+//					itle: {
+//					display: false,
+//					position: "top",
+//					text: "INVOICE DETAILS",
+//					fontSize: 18,
+//					fontColor: "#111"
+//					},
+//					legend: {
+//						display: false,
+//						position: "bottom",
+//						labels: {
+//							fontColor: "#333",
+//							fontSize: 16
+//						}
+//					},
+//					scales: {
+//						yAxes: [{
+//						ticks: {
+//							min: 0
+//						}
+//					}]
+//					},
+//					onClick:function(e){
+//                        var activePoints = myCharts.getElementsAtEvent(e);
+//                        if (activePoints.length>0){
+//                            var selectedIndex = activePoints[0]._index;
+//                            var target_id = result[3][selectedIndex]
+//                            self.do_action({
+//                                name: _t("Customer Payment"),
+//                                type: 'ir.actions.act_window',
+//                                res_model: 'account.payment',
+//                                view_mode: 'form',
+//                                views: [[false,'list'],[false, 'form']],
+//                                domain: [['partner_id', '=', target_id]],
+//                                target: 'current',
+//                            });
+//                        }
+//					},
+//					onHover: function(event, chartElement){
+//					    event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+//					},
+//				};
+//
+//				//create Chart class object
+//				// if (window.myCharts != undefined)
+//				//     window.myCharts.destroy();
+//				var myCharts = new Chart(self.$("#customer_payment_graph"), {
+//					type: "bar",
+//					data: data,
+//					options: options
+//					});
+//
+//			});
+//		},
 
-				//create Chart class object
-				// if (window.myCharts != undefined)
-				//     window.myCharts.destroy();
-				var myCharts = new Chart(self.$("#customer_payment_graph"), {
-					type: "bar",
-					data: data,
-					options: options
-					});
-
-			});
-		},
-
-		get_cash_bank_balance_graph:function(){
-			var self = this
-			/*var ctx = self.$("#cash_bank_balance_graph");*/
-			self._rpc({
-				model: "account.move.line",
-				method: "get_cash_bank_balance_graph",
-				args: [],
-				kwargs: {context: session.user_context},
-			}).then(function (result) {
-				var data = {
-					labels: result[1],
-					datasets: [
-					{
-						label: '',
-						data: result[0],
-						backgroundColor: [
-							"rgba(230, 210, 74, 1)",
-							"rgba(230, 255, 234, 1)",
-							"rgba(255, 220, 166, 1)",
-							"rgba(153, 102, 255,1)",
-							"rgba(10,20,30,1)"
-						],
-						borderColor: [
-							"rgba(255, 99, 132, 0.2)",
-							"rgba(54, 162, 235, 0.2)",
-							"rgba(75, 192, 192, 0.2)",
-							"rgba(153, 102, 255, 0.2)",
-							"rgba(10,20,30,0.3)"
-						],
-					borderWidth: 1
-					},
-					]
-				};
-				//options
-				var options = {
-					responsive: true,
-					itle: {
-					display: false,
-					position: "top",
-					text: "INVOICE DETAILS",
-					fontSize: 18,
-					fontColor: "#111"
-					},
-					legend: {
-						display: false,
-						position: "bottom",
-						labels: {
-							fontColor: "#333",
-							fontSize: 16
-						}
-					},
-					scales: {
-						yAxes: [{
-						ticks: {
-							min: 0
-						}
-					}]
-					},
-					onClick:function(e){
-                        var activePoints = myCharts.getElementsAtEvent(e);
-                        if (activePoints.length>0){
-                            var selectedIndex = activePoints[0]._index;
-                            var target_id = result[3][selectedIndex]
-                            self.do_action({
-                                name: _t("Cash and Bank Balance"),
-                                type: 'ir.actions.act_window',
-                                res_model: 'account.move.line',
-                                view_mode: 'form',
-                                views: [[false,'list'],[false, 'form']],
-                                domain: [['partner_id', '=', target_id]],
-                                target: 'current',
-                            });
-                        }
-					},
-					onHover: function(event, chartElement){
-					    event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-					},
-				};
-
-				//create Chart class object
-				// if (window.myCharts != undefined)
-				//     window.myCharts.destroy();
-				var myCharts = new Chart(self.$("#cash_bank_balance_graph"), {
-					type: "bar",
-					data: data,
-					options: options
-					});
-
-			});
-		},
+//		get_cash_bank_balance_graph:function(){
+//			var self = this
+//			/*var ctx = self.$("#cash_bank_balance_graph");*/
+//			self._rpc({
+//				model: "account.move.line",
+//				method: "get_cash_bank_balance_graph",
+//				args: [],
+//				kwargs: {context: session.user_context},
+//			}).then(function (result) {
+//				var data = {
+//					labels: result[1],
+//					datasets: [
+//					{
+//						label: '',
+//						data: result[0],
+//						backgroundColor: [
+//							"rgba(230, 210, 74, 1)",
+//							"rgba(230, 255, 234, 1)",
+//							"rgba(255, 220, 166, 1)",
+//							"rgba(153, 102, 255,1)",
+//							"rgba(10,20,30,1)"
+//						],
+//						borderColor: [
+//							"rgba(255, 99, 132, 0.2)",
+//							"rgba(54, 162, 235, 0.2)",
+//							"rgba(75, 192, 192, 0.2)",
+//							"rgba(153, 102, 255, 0.2)",
+//							"rgba(10,20,30,0.3)"
+//						],
+//					borderWidth: 1
+//					},
+//					]
+//				};
+//				//options
+//				var options = {
+//					responsive: true,
+//					itle: {
+//					display: false,
+//					position: "top",
+//					text: "INVOICE DETAILS",
+//					fontSize: 18,
+//					fontColor: "#111"
+//					},
+//					legend: {
+//						display: false,
+//						position: "bottom",
+//						labels: {
+//							fontColor: "#333",
+//							fontSize: 16
+//						}
+//					},
+//					scales: {
+//						yAxes: [{
+//						ticks: {
+//							min: 0
+//						}
+//					}]
+//					},
+//					onClick:function(e){
+//                        var activePoints = myCharts.getElementsAtEvent(e);
+//                        if (activePoints.length>0){
+//                            var selectedIndex = activePoints[0]._index;
+//                            var target_id = result[3][selectedIndex]
+//                            self.do_action({
+//                                name: _t("Cash and Bank Balance"),
+//                                type: 'ir.actions.act_window',
+//                                res_model: 'account.move.line',
+//                                view_mode: 'form',
+//                                views: [[false,'list'],[false, 'form']],
+//                                domain: [['partner_id', '=', target_id]],
+//                                target: 'current',
+//                            });
+//                        }
+//					},
+//					onHover: function(event, chartElement){
+//					    event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+//					},
+//				};
+//
+//				//create Chart class object
+//				// if (window.myCharts != undefined)
+//				//     window.myCharts.destroy();
+//				var myCharts = new Chart(self.$("#cash_bank_balance_graph"), {
+//					type: "bar",
+//					data: data,
+//					options: options
+//					});
+//
+//			});
+//		},
 
 		renderElement: function (ev) {
 			var self = this;
