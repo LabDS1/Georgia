@@ -40,8 +40,8 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 			self.top_sale_team();
 			self.recent_customer();
 			self.recent_5_sale_order();
-			self.amount_wise_sale_order_ac_to_customer();
-			self.count_wise_customer_sale_order();
+//			self.amount_wise_sale_order_ac_to_customer();
+//			self.count_wise_customer_sale_order();
 			/*self.top_2_sales_person();*/
 		},
 
@@ -387,195 +387,195 @@ odoo.define('bv_modern_dashboard.sale_dashboard', function (require) {
 			});
 		},
 
-		count_wise_customer_sale_order: function(){
-			var self = this
-			/*var ctx = self.$("#count_wise_customer_sale_order");*/
-			var uid = session.user_context.uid
-			self._rpc({
-				model: "sale.order",
-				method: "count_wise_customer_sale_order",
-				args: [],
-				kwargs: {context: session.user_context},
-			}).then(function (result) {
-				var data = {
-					labels: result[1],
-					datasets: [
-					{
-						label: '',
-						data: result[0],
-						backgroundColor: [
-							"rgba(230, 230, 0,1)", "rgba(64, 191, 128, 1)", "rgba(182, 47, 137,1)",
-							"rgba(179, 179, 0,1)", "rgba(179, 0, 89,1)"
-						],
-						borderColor: [
-							"rgba(255, 99, 132, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(75, 192, 192, 0.2)",
-							"rgba(153, 102, 255, 0.2)", "rgba(10,20,30,0.3)"
-						],
-					borderWidth: 1,
-					borderColor: '#000'
-					},
-					]
-				};
-				//options
-				var options = {
-					responsive: true,
-					itle: {
-					display: false,
-					position: "top",
-					text: "",
-					fontSize: 18,
-					fontColor: "#111"
-					},
-					legend: {
-						display: false,
-						position: "bottom",
-						labels: {
-							fontColor: "#333",
-							fontSize: 16
-						}
-					},
-					scales: {
-						yAxes: [{
-						ticks: {
-							min: 0
-						}
-					}]
-					},
-					onClick:function(e){
-                            var activePoints = myCharts.getElementsAtEvent(e);
-                            if (activePoints.length>0){
-                                var selectedIndex = activePoints[0]._index;
-                                var target_id = result[2][selectedIndex]
+//		count_wise_customer_sale_order: function(){
+//			var self = this
+//			/*var ctx = self.$("#count_wise_customer_sale_order");*/
+//			var uid = session.user_context.uid
+//			self._rpc({
+//				model: "sale.order",
+//				method: "count_wise_customer_sale_order",
+//				args: [],
+//				kwargs: {context: session.user_context},
+//			}).then(function (result) {
+//				var data = {
+//					labels: result[1],
+//					datasets: [
+//					{
+//						label: '',
+//						data: result[0],
+//						backgroundColor: [
+//							"rgba(230, 230, 0,1)", "rgba(64, 191, 128, 1)", "rgba(182, 47, 137,1)",
+//							"rgba(179, 179, 0,1)", "rgba(179, 0, 89,1)"
+//						],
+//						borderColor: [
+//							"rgba(255, 99, 132, 0.2)", "rgba(54, 162, 235, 0.2)", "rgba(75, 192, 192, 0.2)",
+//							"rgba(153, 102, 255, 0.2)", "rgba(10,20,30,0.3)"
+//						],
+//					borderWidth: 1,
+//					borderColor: '#000'
+//					},
+//					]
+//				};
+//				//options
+//				var options = {
+//					responsive: true,
+//					itle: {
+//					display: false,
+//					position: "top",
+//					text: "",
+//					fontSize: 18,
+//					fontColor: "#111"
+//					},
+//					legend: {
+//						display: false,
+//						position: "bottom",
+//						labels: {
+//							fontColor: "#333",
+//							fontSize: 16
+//						}
+//					},
+//					scales: {
+//						yAxes: [{
+//						ticks: {
+//							min: 0
+//						}
+//					}]
+//					},
+//					onClick:function(e){
+//                            var activePoints = myCharts.getElementsAtEvent(e);
+//                            if (activePoints.length>0){
+//                                var selectedIndex = activePoints[0]._index;
+//                                var target_id = result[2][selectedIndex]
+//
+//                                var user_id_domain = "";
+//                                if (session.is_admin === true){
+//                                     user_id_domain = [['partner_id', '=', target_id]]
+//                                }else{
+//                                     user_id_domain = [['user_id','=',uid],['partner_id', '=', target_id]]
+//                                }
+//
+//                                self.do_action({
+//                                    name: _t("Sale order"),
+//                                    type: 'ir.actions.act_window',
+//                                    res_model: 'sale.order',
+//                                    view_mode: 'form',
+//                                    views: [[false,'list'],[false, 'form']],
+//                                    domain: user_id_domain,
+//                                    target: 'current',
+//                                });
+//                            }
+//					    },
+//					onHover: function(event, chartElement){
+//					     event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+//					},
+//				};
+//				var ctx = document.getElementById("count_wise_customer_sale_order");
+//				var myCharts = new Chart(ctx, {
+//					type: "bar",
+//					data: data,
+//					options: options
+//					});
+//
+//			});
+//		},
 
-                                var user_id_domain = "";
-                                if (session.is_admin === true){
-                                     user_id_domain = [['partner_id', '=', target_id]]
-                                }else{
-                                     user_id_domain = [['user_id','=',uid],['partner_id', '=', target_id]]
-                                }
-
-                                self.do_action({
-                                    name: _t("Sale order"),
-                                    type: 'ir.actions.act_window',
-                                    res_model: 'sale.order',
-                                    view_mode: 'form',
-                                    views: [[false,'list'],[false, 'form']],
-                                    domain: user_id_domain,
-                                    target: 'current',
-                                });
-                            }
-					    },
-					onHover: function(event, chartElement){
-					     event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-					},
-				};
-				var ctx = document.getElementById("count_wise_customer_sale_order");
-				var myCharts = new Chart(ctx, {
-					type: "bar",
-					data: data,
-					options: options
-					});
-
-			});
-		},
-
-		amount_wise_sale_order_ac_to_customer: function(){
-			var self = this
-			/*var ctx = self.$("#amount_wise_sale_order_ac_to_customer");*/
-			var uid = session.user_context.uid
-			self._rpc({
-				model: "sale.order",
-				method: "amount_wise_sale_order_ac_to_customer",
-				args: [],
-				kwargs: {context: session.user_context},
-			}).then(function (result) {
-				var data = {
-					labels: result[1],
-					datasets: [
-					{
-						label: '',
-						data: result[0],
-						backgroundColor: [
-							"rgba(204, 255, 255,1)",
-							"rgba(255, 204, 204, 1)",
-							"rgba(255, 153, 102,1)",
-							"rgba(255, 102, 102,1)",
-							"rgba(255, 204, 0, 1)"
-						],
-						borderColor: [
-							"rgba(255, 99, 132, 0.2)",
-							"rgba(54, 162, 235, 0.2)",
-							"rgba(75, 192, 192, 0.2)",
-							"rgba(153, 102, 255, 0.2)",
-							"rgba(10,20,30,0.3)"
-						],
-					borderWidth: 1,
-					borderColor: '#000'
-					},
-					]
-				};
-				//options
-				var options = {
-					responsive: true,
-					itle: {
-					display: false,
-					position: "top",
-					text: "",
-					fontSize: 18,
-					fontColor: "#111"
-					},
-					legend: {
-						display: false,
-						position: "bottom",
-						labels: {
-							fontColor: "#333",
-							fontSize: 16
-						}
-					},
-					scales: {
-						yAxes: [{
-						ticks: {
-							min: 0
-						}
-					}]
-					},
-					onClick:function(e){
-                            var activePoints = myCharts.getElementsAtEvent(e);
-                            if (activePoints.length>0){
-                                var selectedIndex = activePoints[0]._index;
-                                var target_id = result[2][selectedIndex]
-
-                                var user_id_domain = "";
-                                if (session.is_admin === true){
-                                     user_id_domain = [['partner_id', '=', target_id]]
-                                }else{
-                                     user_id_domain = [['user_id','=',uid],['partner_id', '=', target_id]]
-                                }
-
-                                self.do_action({
-                                    name: _t("Sale order"),
-                                    type: 'ir.actions.act_window',
-                                    res_model: 'sale.order',
-                                    view_mode: 'form',
-                                    views: [[false,'list'],[false, 'form']],
-                                    domain: user_id_domain,
-                                    target: 'current',
-                                });
-                            }
-					    },
-					onHover: function(event, chartElement){
-					     event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-					},
-				};
-				var ctx = document.getElementById("amount_wise_sale_order_ac_to_customer");
-				var myCharts = new Chart(ctx, {
-					type: "bar",
-					data: data,
-					options: options
-					});
-
-			});
-		},
+//		amount_wise_sale_order_ac_to_customer: function(){
+//			var self = this
+//			/*var ctx = self.$("#amount_wise_sale_order_ac_to_customer");*/
+//			var uid = session.user_context.uid
+//			self._rpc({
+//				model: "sale.order",
+//				method: "amount_wise_sale_order_ac_to_customer",
+//				args: [],
+//				kwargs: {context: session.user_context},
+//			}).then(function (result) {
+//				var data = {
+//					labels: result[1],
+//					datasets: [
+//					{
+//						label: '',
+//						data: result[0],
+//						backgroundColor: [
+//							"rgba(204, 255, 255,1)",
+//							"rgba(255, 204, 204, 1)",
+//							"rgba(255, 153, 102,1)",
+//							"rgba(255, 102, 102,1)",
+//							"rgba(255, 204, 0, 1)"
+//						],
+//						borderColor: [
+//							"rgba(255, 99, 132, 0.2)",
+//							"rgba(54, 162, 235, 0.2)",
+//							"rgba(75, 192, 192, 0.2)",
+//							"rgba(153, 102, 255, 0.2)",
+//							"rgba(10,20,30,0.3)"
+//						],
+//					borderWidth: 1,
+//					borderColor: '#000'
+//					},
+//					]
+//				};
+//				//options
+//				var options = {
+//					responsive: true,
+//					itle: {
+//					display: false,
+//					position: "top",
+//					text: "",
+//					fontSize: 18,
+//					fontColor: "#111"
+//					},
+//					legend: {
+//						display: false,
+//						position: "bottom",
+//						labels: {
+//							fontColor: "#333",
+//							fontSize: 16
+//						}
+//					},
+//					scales: {
+//						yAxes: [{
+//						ticks: {
+//							min: 0
+//						}
+//					}]
+//					},
+//					onClick:function(e){
+//                            var activePoints = myCharts.getElementsAtEvent(e);
+//                            if (activePoints.length>0){
+//                                var selectedIndex = activePoints[0]._index;
+//                                var target_id = result[2][selectedIndex]
+//
+//                                var user_id_domain = "";
+//                                if (session.is_admin === true){
+//                                     user_id_domain = [['partner_id', '=', target_id]]
+//                                }else{
+//                                     user_id_domain = [['user_id','=',uid],['partner_id', '=', target_id]]
+//                                }
+//
+//                                self.do_action({
+//                                    name: _t("Sale order"),
+//                                    type: 'ir.actions.act_window',
+//                                    res_model: 'sale.order',
+//                                    view_mode: 'form',
+//                                    views: [[false,'list'],[false, 'form']],
+//                                    domain: user_id_domain,
+//                                    target: 'current',
+//                                });
+//                            }
+//					    },
+//					onHover: function(event, chartElement){
+//					     event.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+//					},
+//				};
+//				var ctx = document.getElementById("amount_wise_sale_order_ac_to_customer");
+//				var myCharts = new Chart(ctx, {
+//					type: "bar",
+//					data: data,
+//					options: options
+//					});
+//
+//			});
+//		},
 
 		price_wise_products: function(){
 		var self = this
