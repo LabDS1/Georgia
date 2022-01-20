@@ -28,7 +28,9 @@
             'bv_modern_dashboard/static/src/js/accounting_dashboard.js',
         ],
         'web.assets_qweb': [
-            'bv_modern_dashboard/static/src/xml/**/*',
+            'bv_modern_dashboard/static/src/xml/sale_dashboard.xml',
+            'bv_modern_dashboard/static/src/xml/purchase_dashboard.xml',
+            'bv_modern_dashboard/static/src/xml/account_dashboard.xml',
         ],
     }
 }

@@ -28,7 +28,7 @@
             'bv_crm_dashboard/static/src/js/crm_dashboard.js',
         ],
         'web.assets_qweb': [
-            'bv_crm_dashboard/static/src/xml/**/*',
+            'bv_crm_dashboard/static/src/xml/crm_dashboard.xml',
         ],
     }
 }
