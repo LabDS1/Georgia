@@ -60,13 +60,18 @@ class SaleOrder(models.Model):
                 uom=line.product_uom.id,
                 standard_price=line.product_id.standard_price,
             )
+            print ("000000000000000000000000",product._context)
             price_unit = self.env['account.tax']._fix_tax_included_price_company(
                 line._get_display_price(product), line.product_id.taxes_id, line.tax_id, line.company_id)
+            print("44444444444444444444444444",price_unit)
             line.product_id.standard_price = product._context.get('standard_price')
+            print ("5555555555555555555555",line.product_id.standard_price)
             if self.pricelist_id.discount_policy == 'without_discount' and price_unit:
+
                 price_discount_unrounded = self.pricelist_id.get_product_price(product, line.product_uom_qty, self.partner_id, self.date_order, line.product_uom.id)
                 discount = max(0, (price_unit - price_discount_unrounded) * 100 / price_unit)
             else:
+                print ("6666666666666666666")
                 discount = 0
             lines_to_update.append((1, line.id, {'price_unit': price_unit, 'discount': discount}))
         self.update({'order_line': lines_to_update})
@@ -80,6 +85,7 @@ class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
     def _get_display_price(self, product):
+        print("11111111111111111111111",product.name)
         # TO DO: move me in master/saas-16 on sale.order
         # awa: don't know if it's still the case since we need the "product_no_variant_attribute_value_ids" field now
         # to be able to compute the full price
@@ -99,9 +105,13 @@ class SaleOrderLine(models.Model):
             )
 
         if self.order_id.pricelist_id.discount_policy == 'with_discount':
+
             if self.purchase_price:
+                print ("222222222222222222222222",self.purchase_price)
                 product.standard_price = self.purchase_price
+            print ("333333333333333333333333333",product.name,product.standard_price)
             return product.with_context(pricelist=self.order_id.pricelist_id.id, uom=self.product_uom.id).price
+        print ("7777777777777777777777777777",product.name)
         product_context = dict(self.env.context, partner_id=self.order_id.partner_id.id, date=self.order_id.date_order, uom=self.product_uom.id)
 
         final_price, rule_id = self.order_id.pricelist_id.with_context(product_context).get_product_price_rule(product or self.product_id, self.product_uom_qty or 1.0, self.order_id.partner_id)
