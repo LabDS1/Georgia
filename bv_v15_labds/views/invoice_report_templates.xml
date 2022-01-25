@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_document_inherit_invoice" inherit_id="account.report_invoice_document">
+        <xpath expr="//div[@id='informations']/div[@name='invoice_date']" position="before">
+            <div class="col-auto col-3 mw-100 mb-2" name="customer_po_field">
+                <t t-if="o.x_studio_customer_po">
+                    <strong>Customer PO#:</strong>
+                    <p class="m-0" t-field="o.x_studio_customer_po"/>
+                </t>
+                <t t-else="">
+                    <strong>Customer PO#:</strong>
+                    <p class="m-0" t-field="o.customer_po"/>
+                </t>
+            </div>
+        </xpath>
+    </template>
+</odoo>
