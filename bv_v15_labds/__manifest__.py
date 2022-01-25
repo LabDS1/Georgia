@@ -11,6 +11,7 @@
     'data': [
         'views/sale_view.xml',
         'views/account_move_view.xml',
+        'views/invoice_report_templates.xml'
     ],
     'installable': True,
     'auto_install': False,

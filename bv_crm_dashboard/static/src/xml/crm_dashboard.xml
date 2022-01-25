@@ -31,9 +31,9 @@
 			<div class="col-md-3">
 				<div class="card-header mx-sm-1 p-4" style="background-color:#ffcccc;border-color:#ffcccc">
 					<div class="card shadow p-3 my-card" style="color:crimson;border-color:crimson"><i class="fa fa-times-circle-o"/></div>
-					<div class="text-center mt-3"><h4 style="color:crimson">Overdue Opportunities</h4></div>
-					<div class="text-center mt-2"><h1 style="color:crimson" id="overdueOpportunity"/></div>
-					<div class="btn btn-sm overdue-opportunities-info more-info">More Info</div>
+					<div class="text-center mt-3"><h4 style="color:crimson">Overdue Leads</h4></div>
+					<div class="text-center mt-2"><h1 style="color:crimson" id="overdueLeads"/></div>
+					<div class="btn btn-sm overdue-leads-info more-info">More Info</div>
 				</div>
 			</div>
 		</div><br/><br/>

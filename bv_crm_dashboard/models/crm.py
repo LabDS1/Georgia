@@ -108,17 +108,16 @@ class Lead(models.Model):
         return total_open_opportunities
 
     @api.model
-    def get_overdue_opportunity(self):
+    def get_overdue_leads(self):
         today_date = datetime.datetime.now().date()
 
         uid = request.session.uid
         if self.env.user.has_group('base.group_user') and self.env.is_admin():
-            domain = [('type', '=', 'opportunity'), ('date_deadline', '<', today_date), ('date_closed', '=', False), ('company_id', 'in', self._context.get('allowed_company_ids'))]
+            domain = [('type', '=', 'lead'), ('activity_state', '=', 'overdue'), ('date_closed', '=', False)]
         else:
-            domain = [('user_id', '=', uid), ('type', '=', 'opportunity'), ('date_deadline', '<', today_date), ('date_closed', '=', False), ('company_id', 'in', self._context.get('allowed_company_ids'))]
-
-        total_overdue_opportunities = self.env['crm.lead'].sudo().search_count(domain)
-        return total_overdue_opportunities
+            domain = [('user_id', '=', uid), ('type', '=', 'lead'), ('activity_state', '=', 'overdue'), ('date_closed', '=', False)]
+        total_overdue_leads = self.env['crm.lead'].sudo().search_count(domain)
+        return total_overdue_leads
 
     @api.model
     def get_total_won(self):
@@ -497,13 +496,20 @@ class Lead(models.Model):
         company_id = self._context.get('allowed_company_ids')
         result = []
         data = []
+
+        uid = request.session.uid
+        if self.env.user.has_group('base.group_user') and self.env.is_admin():
+            user_id = ""
+        else:
+            user_id = 'AND ru.id =' + str(uid)
+
         try:
             query = """
                 SELECT DISTINCT st.id AS st_id,st.date_from AS date_from, st.date_to AS date_to, 
                 st.target_achieved_amount_hidden AS achieved_amount, st.target_amount AS target_amount,
                 ru.id AS res_user_id, rp.name AS rp_name, extract(year from st.date_from) AS Year
                 FROM sales_target st, crm_team_member ctm, res_users AS ru, res_partner AS rp 
-                WHERE st.crm_team_member_id = ctm.id AND ctm.user_id = ru.id AND rp.id = ru.partner_id AND ru.company_id = ANY (array[%s]) 
+                WHERE st.crm_team_member_id = ctm.id AND ctm.user_id = ru.id AND rp.id = ru.partner_id """ + user_id + """ AND ru.company_id = ANY (array[%s]) 
                 GROUP BY st_id, date_from, date_to, res_user_id, achieved_amount, rp_name 
                 ORDER BY date_from, year DESC
             """%(company_id)

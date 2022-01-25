@@ -10,6 +10,11 @@
             <field name="name">Access Purchase Dashboard</field>
             <field name="category_id" ref="base.module_category_hidden"/>
         </record>
+
+       <record id="group_access_account_dashboard" model="res.groups">
+            <field name="name">Access Accounting Dashboard</field>
+            <field name="category_id" ref="base.module_category_hidden"/>
+        </record>
         
     </data>
 </odoo>

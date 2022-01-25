@@ -12,7 +12,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 		    'click .my-total-leads':'my_total_leads',
 			'click .my-pipeline-info':'my_pipeline_info',
 			'click .open-opportunities-info':'open_opportunity_info',
-			'click .overdue-opportunities-info':'overdue_opportunity_info',
+			'click .overdue-leads-info':'overdue_leads_info',
 			'click .total-won-info':'total_won_info',
 			'click .total-loss-info':'total_loss_info',
 //			'click .to-invoice-info':'to_invoice_info',
@@ -28,7 +28,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			self.get_total_lead_opportunity();
 			self.get_my_pipeline();
 			self.get_open_opportunity();
-			self.get_overdue_opportunity();
+			self.get_overdue_leads();
 			self.get_total_won();
 			self.get_total_loss();
 //			self.get_to_be_invoiced();
@@ -542,15 +542,15 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			});
 		},
 
-		get_overdue_opportunity: function() {
+		get_overdue_leads: function() {
 			var self = this;
 			self._rpc({
 				model: 'crm.lead',
-				method: 'get_overdue_opportunity',
+				method: 'get_overdue_leads',
 				args: [],
 				kwargs: {context: session.user_context},
 			}).then(function(result) {
-				self.$el.find("#overdueOpportunity").html(result);
+				self.$el.find("#overdueLeads").html(result);
 			});
 		},
 
@@ -682,7 +682,7 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 			})
 		},
 
-		overdue_opportunity_info: function(e){
+		overdue_leads_info: function(e){
 		var self = this;
 		var allowed_companies_ids = session.user_context.allowed_company_ids;
 		var today_date = new Date();
@@ -690,9 +690,9 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 		var uid = session.user_context.uid
 		var user_id_domain = "";
 		if (session.is_admin === true){
-		    user_id_domain = [['type', '=', 'opportunity'],['date_deadline', '<', today_date], ['date_closed', '=', false],['company_id','in',allowed_companies_ids]]
+		    user_id_domain = [['type', '=', 'lead'], ['activity_state', '=', 'overdue'], ['date_closed', '=', false]]
 		}else{
-		    user_id_domain = [['user_id','=',uid],['type', '=', 'opportunity'],['date_deadline', '<', today_date], ['date_closed', '=', false],['company_id','in',allowed_companies_ids]]
+		    user_id_domain = [['user_id','=',uid], ['type', '=', 'lead'], ['activity_state', '=', 'overdue'], ['date_closed', '=', false]]
 		}
 
 		this.do_action({

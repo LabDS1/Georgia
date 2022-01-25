@@ -81,6 +81,12 @@ class PurchaseOrder(models.Model):
         return purchase_orders
 
     @api.model
+    def get_to_be_billed_count(self):
+        purchase_orders = self.env['purchase.order'].search_count(
+            [('state', '=', 'purchase'), ('invoice_status', '=', 'to invoice')])
+        return purchase_orders
+
+    @api.model
     def get_fully_billed_count(self):
         uid = request.session.uid
         if self.env.user.has_group('base.group_user') and self.env.is_admin():

@@ -105,48 +105,48 @@
 			</div>
 		</div>
 		<br/><br/>
-		<div class="row">
-			<div class="col-md-6">
-				<div class="card">
-					<div class="card-header" style="border-top: solid green">
-						<div class="card-title">
-							<b>
-								<h3>Amount wise Sale order a/c to customer</h3>
-							</b>
-						</div>
-					</div>
-					<div class="card-body mt-3">
-						<div class="row">
-							<div class="col-md-12">
-								<div class="chart">
-									<canvas id="amount_wise_sale_order_ac_to_customer" style="height:fit-content;width:fit-content"> </canvas>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-6">
-				<div class="card">
-					<div class="card-header" style="border-top: solid green">
-						<div class="card-title">
-							<b>
-								<h3>Count Wise Customer Sale Order</h3>
-							</b>
-						</div>
-					</div>
-					<div class="card-body mt-3">
-						<div class="row">
-							<div class="col-md-12">
-								<div class="chart">
-									<canvas id="count_wise_customer_sale_order" style="height:fit-content;width:fit-content"> </canvas>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div><br/><br/>
+<!--		<div class="row">-->
+<!--			<div class="col-md-6">-->
+<!--				<div class="card">-->
+<!--					<div class="card-header" style="border-top: solid green">-->
+<!--						<div class="card-title">-->
+<!--							<b>-->
+<!--								<h3>Amount wise Sale order a/c to customer</h3>-->
+<!--							</b>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--					<div class="card-body mt-3">-->
+<!--						<div class="row">-->
+<!--							<div class="col-md-12">-->
+<!--								<div class="chart">-->
+<!--									<canvas id="amount_wise_sale_order_ac_to_customer" style="height:fit-content;width:fit-content"> </canvas>-->
+<!--								</div>-->
+<!--							</div>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--				</div>-->
+<!--			</div>-->
+<!--			<div class="col-md-6">-->
+<!--				<div class="card">-->
+<!--					<div class="card-header" style="border-top: solid green">-->
+<!--						<div class="card-title">-->
+<!--							<b>-->
+<!--								<h3>Count Wise Customer Sale Order</h3>-->
+<!--							</b>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--					<div class="card-body mt-3">-->
+<!--						<div class="row">-->
+<!--							<div class="col-md-12">-->
+<!--								<div class="chart">-->
+<!--									<canvas id="count_wise_customer_sale_order" style="height:fit-content;width:fit-content"> </canvas>-->
+<!--								</div>-->
+<!--							</div>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--				</div>-->
+<!--			</div>-->
+<!--		</div><br/><br/>-->
 		<div class="row">
 			<div class="col-md-6">
 				<div class="card border-success">
