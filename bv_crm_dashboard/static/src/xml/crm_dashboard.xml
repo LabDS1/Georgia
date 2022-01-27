@@ -112,6 +112,7 @@
 											</tr>
 										</thead>
 										<tbody id="target-vs-achieved"/>
+										<tfoot id="target-vs-achieved-foot" class="text-warning"/>
 								  </table>
 								</div>
 							</div>

@@ -799,6 +799,9 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 				}).then(function(result) {
 				var i;
 				var body_html = "";
+				var foot_html = "";
+				var qt1=0, qt2=0, qt3=0, qt4=0, yt=0;
+				var qa1=0, qa2=0, qa3=0, qa4=0, ya=0;
 				for (i = 0; i < result.length; i++) {
 					var data = result[i]
 					data['q1_target_amount'] = (data['q1_target_amount'] !== undefined) ? data['q1_target_amount']:0;
@@ -824,8 +827,33 @@ odoo.define('bv_crm_dashboard.crm_dashboard', function (require) {
 					"</td><td>"+data['yearly_target_total'].toLocaleString()+
 					"</td><td>"+data['yearly_achieved_total'].toLocaleString()+
 					"</td></tr>"
+					qt1 +=data['q1_target_amount'];
+					qa1 +=data['q1_achieved_amount'];
+					qt2 +=data['q2_target_amount'];
+					qa2 +=data['q2_achieved_amount'];
+					qt3 +=data['q3_target_amount'];
+					qa3 +=data['q3_achieved_amount'];
+					qt4 +=data['q4_target_amount'];
+					qa4 +=data['q4_achieved_amount'];
+					yt +=data['yearly_target_total'];
+					ya +=data['yearly_achieved_total'];
 				}
+				foot_html +=
+					"<tr>"+
+					    "<th colspan='2' class='text-center'>Total</th>"+
+					    "<th>"+qt1.toLocaleString()+"</th>"+
+					    "<th>"+qa1.toLocaleString()+"</th>"+
+					    "<th>"+qt2.toLocaleString()+"</th>"+
+					    "<th>"+qa2.toLocaleString()+"</th>"+
+					    "<th>"+qt3.toLocaleString()+"</th>"+
+					    "<th>"+qa3.toLocaleString()+"</th>"+
+					    "<th>"+qt4.toLocaleString()+"</th>"+
+					    "<th>"+qa4.toLocaleString()+"</th>"+
+					    "<th>"+yt.toLocaleString()+"</th>"+
+					    "<th>"+ya.toLocaleString()+"</th>"+
+					"</tr>"
 				self.$el.find('tbody#target-vs-achieved').html(body_html);
+				self.$el.find('tfoot#target-vs-achieved-foot').html(foot_html);
 			});
 		},
 
