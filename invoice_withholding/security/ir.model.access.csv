@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_withholding_line_public_user,withholding_line,model_withholding_line,,1,1,1,1
+access_withholding_wiz_line,access_withholding_wiz_line,model_withholding_wiz_line,base.group_user,1,1,1,1
+access_withholding_payment_inv,access_withholding_payment_inv,model_withholding_payment_inv,base.group_user,1,1,1,1

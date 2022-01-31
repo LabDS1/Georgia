@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Withholding -->
+    <record id="withholding_line_search" model="ir.ui.view">
+        <field name="name">withholding.line.search</field>
+        <field name="model">withholding.line</field>
+        <field name="arch" type="xml">
+            <search string="Withholdings">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="invoice_id"/>
+                <field name="project_id"/>
+                <group expand="1" string="Group By">
+                    <filter string="Customer" name="partner_id" context="{'group_by':'partner_id'}"/>
+                    <filter string="Invoice" name="invoice_id" context="{'group_by':'invoice_id'}"/>
+                    <filter string="Project" name="project_id" context="{'group_by':'project_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="withholding_line_list_view" model="ir.ui.view">
+        <field name="name">withholding.line.list</field>
+        <field name="model">withholding.line</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <tree string="Withholding" decoration-info="state=='to_invoice'" decoration-muted="state=='invoiced'">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="invoice_id"/>
+                <field name="project_id"/>
+                <field name="product_id"/>
+                <field name="amount"/>
+                <field name="payment_invoice_id"/>
+                <field name="state" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="withholding_line_form_view" model="ir.ui.view">
+        <field name="name">withholding.line.form</field>
+        <field name="model">withholding.line</field>
+        <field name="priority">1</field>
+        <field name="arch" type="xml">
+            <form string="Withholding">
+                <header>
+                    <field name="state" widget="statusbar" nolabel="1"/>
+                </header>
+                <sheet string="Invoice">
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="product_id"/>
+                            <field name="invoice_id"/>
+                            <field name="payment_invoice_id"/>
+                        </group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="project_id"/>
+                            <field name="amount"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="withholding_line_action" model="ir.actions.act_window">
+        <field name="name">Withholdings</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">withholding.line</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            Click to define a new withholding.
+          </p><p>
+            Withholdings are used to Manage withholding amount for ongoing project and once project get completed can create Invoice and pay it.
+          </p>
+        </field>
+    </record>
+
+    <menuitem id="menu_withholding_line" name="Withholdings"
+        sequence="90" parent="account.menu_finance_receivables" action="withholding_line_action"/>
+
+    <!-- Project View -->
+    <record id="edit_project_form" model="ir.ui.view">
+        <field name="name">project.project.form</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project"/>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" type="object" name="project_withholding_action" icon="fa-pencil-square-o"> 
+                    <field name="witholding_count" widget="statinfo"/>
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <!-- Partner View -->
+    <record id="view_partner_form" model="ir.ui.view">
+        <field name="name">res.partner.form</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
+            <div name="button_box" position="inside">
+                <button class="oe_stat_button" type="object"  name="partner_withholding_action" icon="fa-pencil-square-o"> 
+                    <field name="witholding_count" widget="statinfo"/>
+                </button>
+            </div>
+        </field>
+    </record>
+
+    <!-- Invoice View -->
+    <record id="view_move_form" model="ir.ui.view">
+        <field name="name">account.move.form.withholding</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='journal_div']" position="after">
+                <label for="add_withholding"/>
+                <div name='add_withholding'>
+                    <div>
+                        <field name='add_withholding' class="oe_inline" nolabel="1" attrs="{'invisible': [('state','!=', 'draft')]}"/>
+                        <field name='withholding_percentage' class="oe_inline" nolabel="1" attrs="{'required': [('add_withholding','=', True)], 'invisible': [('add_withholding','=', False)]}"/> %
+                        <button name="create_withholding" string="Add Line" type="object" class="oe_inline fa fa-arrow-right oe_link" attrs="{'invisible': ['|',('add_withholding','=', False), ('state','!=', 'draft')]}"/>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
