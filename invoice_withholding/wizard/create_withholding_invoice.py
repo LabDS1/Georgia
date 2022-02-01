@@ -71,6 +71,7 @@ class WithholdingPayment(models.TransientModel):
             'move_type': 'out_invoice',
             # 'name': '-',
             'currency_id': self.env.user.company_id.currency_id.id,
+            'is_withholding': True,
         })
         for line in self.line_ids:
             account_id = False

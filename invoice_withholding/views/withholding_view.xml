@@ -128,6 +128,7 @@
                         <button name="create_withholding" string="Add Line" type="object" class="oe_inline fa fa-arrow-right oe_link" attrs="{'invisible': ['|',('add_withholding','=', False), ('state','!=', 'draft')]}"/>
                     </div>
                 </div>
+                <field name="is_withholding" invisible="1"/>
             </xpath>
         </field>
     </record>

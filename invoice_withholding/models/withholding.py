@@ -73,6 +73,7 @@ class InvoiceMove(models.Model):
     withholding_ids = fields.One2many('withholding.line', 'invoice_id', string='Withholding Lines', copy=False)
     add_withholding = fields.Boolean("Add withholding Amount", readonly=True, states={'draft': [('readonly', False)]})
     withholding_percentage = fields.Float(string='Withholding Percentage', default=lambda self: self.env.user.company_id.withholding_percentage)
+    is_withholding = fields.Boolean(default=False)
 
     def action_invoice_open(self):
         res = super(InvoiceMove, self).action_invoice_open()
