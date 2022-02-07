@@ -86,6 +86,12 @@ class ReportAccountAgedPartner(models.AbstractModel):
         res.insert(len(res)-1, self._field_column('withholding_amount', sortable=True))
         return res
 
+    def _get_hierarchy_details(self, options):
+        return [
+            self._hierarchy_level('partner_id', foldable=True, namespan=len(self._get_column_details(options)) - 8),
+            self._hierarchy_level('id'),
+        ]
+
     def _format_id_line(self, res, value_dict, options):
         res['name'] = value_dict['move_name']
         res['title_hover'] = value_dict['move_ref']
