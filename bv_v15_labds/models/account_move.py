@@ -42,7 +42,7 @@ class AccountMove(models.Model):
         # do not modify without syncing the other method
         raise_warning = False
         taxes_to_set = []
-        for index, line in enumerate(self.invoice_line_ids.filtered(lambda l: l.display_type not in ('line_section', 'line_note'))):
+        for index, line in enumerate(self.invoice_line_ids.filtered(lambda l: not l.display_type)):
             if line._get_taxcloud_price() >= 0.0 and line.quantity >= 0.0:
                 price = line.price_unit * (1 - (line.discount or 0.0) / 100.0) * line.quantity
                 if not price:
@@ -78,7 +78,8 @@ class AccountMove(models.Model):
             for index, tax in taxes_to_set:
                 with move_form.invoice_line_ids.edit(index) as line_form:
                     line_form.tax_ids.clear()
-                    line_form.tax_ids.add(tax)
+                    if not line_form.display_type:
+                        line_form.tax_ids.add(tax)
 
         if self.env.context.get('taxcloud_authorize_transaction'):
             reporting_date = self.get_taxcloud_reporting_date()
