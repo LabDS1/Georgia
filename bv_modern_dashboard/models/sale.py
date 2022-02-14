@@ -276,16 +276,16 @@ class SaleOrder(models.Model):
                 quarter_no = int(record.get('quarter'))
                 start_dt = ''
                 end_dt = ''
-                if quarter_no is 1:
+                if quarter_no == 1:
                     start_dt = record.get('year') + "-01-01"
                     end_dt = record.get('year') + "-03-31"
-                if quarter_no is 2:
+                if quarter_no == 2:
                     start_dt = record.get('year') + '-04-01'
                     end_dt = record.get('year') + '-06-30'
-                if quarter_no is 3:
+                if quarter_no == 3:
                     start_dt = record.get('year') + '-07-01'
                     end_dt = record.get('year') + '-09-30'
-                if quarter_no is 4:
+                if quarter_no == 4:
                     start_dt = record.get('year') + '-10-01'
                     end_dt = record.get('year') + '-12-31'
                 year_quarter_start_dt.append(start_dt)
