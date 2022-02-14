@@ -112,3 +112,12 @@ class AccountMove(models.Model):
             return {'warning': _('The tax rates have been updated, you may want to check it before validation')}
         else:
             return True
+
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    account_id = fields.Many2one('account.account', string='Account',
+                                 index=True, ondelete="cascade",
+                                 domain="[('deprecated', '=', False), ('company_id', '=', 'company_id'),('is_off_balance', '=', False)]",
+                                 check_company=True,
+                                 tracking=True,required=False)
