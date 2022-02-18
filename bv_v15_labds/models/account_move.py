@@ -12,7 +12,7 @@ _logger = logging.getLogger(__name__)
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    customer_po = fields.Char(string='Customer PO#')
+    # customer_po = fields.Char(string='Customer PO#')
 
     def validate_taxes_on_invoice(self):
         self.ensure_one()
