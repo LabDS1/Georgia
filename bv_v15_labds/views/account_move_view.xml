@@ -11,7 +11,7 @@
                 </field>
                 <field name="payment_reference" position="after">
                     <field name="customer_po" attrs="{'invisible': [('move_type', 'not in', ('out_invoice', 'out_refund','out_receipt'))]}"/>
-                    <button name="action_customer_po_update" string="Update Customer PO" type="object"/>
+                    <button name="action_customer_po_update" string="Update Customer PO" type="object" invisible="1"/>
                 </field>
 
             </field>
