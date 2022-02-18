@@ -14,6 +14,11 @@ class AccountMove(models.Model):
 
     customer_po = fields.Char(string='Customer PO#')
 
+    def action_customer_po_update(self):
+        account_move_ids = self.env['account.move'].search([('x_studio_customer_po', '!=', False),('move_type', 'in', ('out_invoice', 'out_refund','out_receipt'))])
+        for rec in account_move_ids:
+            rec.customer_po = rec.x_studio_customer_po
+
     def validate_taxes_on_invoice(self):
         self.ensure_one()
         company = self.company_id
