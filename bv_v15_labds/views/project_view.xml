@@ -25,6 +25,10 @@
                 <field name="name" position="before">
                     <field name="project_id" optional="show" readonly="1"/>
                 </field>
+                <field name="stage_id" position="after">
+                    <field name="project_description" readonly="1"/>
+                </field>
+
             </field>
         </record>
 
