@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_task_form2_inherit_labds" model="ir.ui.view">
+            <field name="name">project.task.form.inherit</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.view_task_form2"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='description_page']" position="attributes">
+                    <attribute name="string">Task Description</attribute>
+                </xpath>
+                <page name="description_page" position="before">
+                    <page name="project_description" string="Project Description">
+                        <field name="project_description" readonly="1"/>
+                    </page>
+                </page>
+            </field>
+        </record>
+
+        <record id="project_sharing_project_task_view_tree_inherit_labds" model="ir.ui.view">
+            <field name="name">project.sharing.project.task.tree</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="project.project_sharing_project_task_view_tree"/>
+            <field name="arch" type="xml">
+                <field name="name" position="before">
+                    <field name="project_id" optional="show" readonly="1"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</odoo>
