@@ -7,8 +7,8 @@ class ProjectTask(models.Model):
     project_description = fields.Html(compute='_project_description',string='Project Description')
 
     def _project_description(self):
-        if self.project_id:
-            self.project_description = self.project_id.description
+        if self.sudo().project_id:
+            self.sudo().project_description = self.sudo().project_id.description
         else:
-            self.project_description = False
+            self.sudo().project_description = False
 
