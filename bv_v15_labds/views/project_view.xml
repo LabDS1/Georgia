@@ -39,11 +39,11 @@
                 <xpath expr="//page[@name='description_page']" position="attributes">
                     <attribute name="string">Task Description</attribute>
                 </xpath>
-                <page name="description_page" position="before">
-                    <page name="project_description" string="Project Description">
-                        <field name="project_description" readonly="1"/>
-                    </page>
-                </page>
+<!--                <page name="description_page" position="before">-->
+<!--                    <page name="project_description" string="Project Description">-->
+<!--                        <field name="project_description" readonly="1"/>-->
+<!--                    </page>-->
+<!--                </page>-->
             </field>
         </record>
 
