@@ -33,6 +33,9 @@
             <field name="model">project.task</field>
             <field name="inherit_id" ref="project.project_sharing_project_task_view_form"/>
             <field name="arch" type="xml">
+                <field name="project_id" position="replace">
+                    <field name="project_id" readonly="1"/>
+                </field>
                 <xpath expr="//page[@name='description_page']" position="attributes">
                     <attribute name="string">Task Description</attribute>
                 </xpath>
