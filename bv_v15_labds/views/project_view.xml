@@ -47,7 +47,7 @@
                 </xpath>
                 <page name="description_page" position="before">
                     <page name="project_description" string="Project Description">
-                        <field name="project_description" readonly="1"/>
+                        <field name="project_description" type="html"/>
                     </page>
                 </page>
             </field>
