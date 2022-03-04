@@ -35,7 +35,7 @@
         <record id="project_sharing_project_task_view_form_inherit_labds" model="ir.ui.view">
             <field name="name">project.sharing.project.task.form</field>
             <field name="model">project.task</field>
-            <field name="priority">999</field>
+<!--            <field name="priority">999</field>-->
             <field name="groups_id" eval="[(4, ref('base.group_portal')), (4, ref('base.group_user'))]"/>
             <field name="inherit_id" ref="project.project_sharing_project_task_view_form"/>
             <field name="arch" type="xml">
@@ -47,7 +47,7 @@
                 </xpath>
                 <page name="description_page" position="before">
                     <page name="project_description" string="Project Description">
-                        <field name="project_description" type="html" options="{'collaborative': true}"/>
+                        <field name="project_description" readonly="1" groups="base.group_portal"/>
                     </page>
                 </page>
             </field>
