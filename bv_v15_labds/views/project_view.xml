@@ -11,7 +11,7 @@
                 </xpath>
                 <page name="description_page" position="before">
                     <page name="project_description" string="Project Description">
-                        <field name="project_description" readonly="1" groups="base.group_portal"/>
+                        <field name="project_description" readonly="1"/>
                     </page>
                 </page>
             </field>
