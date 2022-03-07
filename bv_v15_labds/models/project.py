@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 from odoo import models, api, fields, _
-import logging
-
-logger = logging.getLogger(__name__)
 
 PROJECT_TASK_READABLE_FIELDS = {
     'id',
@@ -54,6 +51,6 @@ class ProjectTask(models.Model):
 
     @property
     def SELF_READABLE_FIELDS(self):
-        logger.info("Project task READABLE fields ==  %s", PROJECT_TASK_READABLE_FIELDS)
-        logger.info("Project task WRITEABLE fields  == %s", self.SELF_WRITABLE_FIELDS)
+        if 'project_description' in PROJECT_TASK_READABLE_FIELDS:
+            PROJECT_TASK_READABLE_FIELDS.remove('project_description')
         return PROJECT_TASK_READABLE_FIELDS | self.SELF_WRITABLE_FIELDS
