@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <record id="view_task_form2_inherit_labds" model="ir.ui.view">
+        <record id="view_task_form2_inherit_labds1" model="ir.ui.view">
             <field name="name">project.task.form.inherit</field>
             <field name="model">project.task</field>
             <field name="inherit_id" ref="project.view_task_form2"/>
@@ -17,7 +17,7 @@
             </field>
         </record>
 
-        <record id="project_sharing_project_task_view_tree_inherit_labds" model="ir.ui.view">
+        <record id="project_sharing_project_task_view_tree_inherit_labds1" model="ir.ui.view">
             <field name="name">project.sharing.project.task.tree</field>
             <field name="model">project.task</field>
             <field name="groups_id" eval="[(4, ref('base.group_portal')), (4, ref('base.group_user'))]"/>
@@ -33,7 +33,7 @@
             </field>
         </record>
 
-        <record id="project_sharing_project_task_view_form_inherit_labds" model="ir.ui.view">
+        <record id="project_sharing_project_task_view_form_inherit_labds1" model="ir.ui.view">
             <field name="name">project.sharing.project.task.form</field>
             <field name="model">project.task</field>
             <field name="groups_id" eval="[(4, ref('base.group_portal')), (4, ref('base.group_user'))]"/>
