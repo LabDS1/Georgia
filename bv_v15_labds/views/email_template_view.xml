@@ -3,7 +3,7 @@
     <record id="so_confirm_mail_template" model="mail.template">
         <field name="name">Job Confirmed</field>
         <field name="model_id" ref="bv_v15_labds.model_sale_order"/>
-        <field name="subject">Job Confirmed for {{ object.name }}</field>
+        <field name="subject">Job Confirmed for {{ object.analytic_account_id.name }}</field>
         <field name="email_from">{{ (object.env.user.email or '') }}</field>
         <field name="email_to">wbrown@labds.com</field>
         <field name="body_html" type="html">
@@ -13,7 +13,7 @@
             Thank you,
             <t t-if="object.env.user.signature">
                 <br />
-                <t t-out="object.env.user.signature or ''">=<br/></t>
+                <t t-out="object.env.user.signature or ''"><br/></t>
             </t>
             </div></field>
     </record>
