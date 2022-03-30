@@ -87,6 +87,25 @@ class SaleOrder(models.Model):
             if line.purchase_price:
                 line.product_id.update({'standard_price': line.purchase_price})
 
+    def action_confirm(self):
+        res = super(SaleOrder, self).action_confirm()
+        # subject = "Job Confirmed"
+        # body = """ Hey here is your job confirmed""",
+        # email = self.env['ir.mail_server'].build_email(
+        #     email_from=self.env.user.email,
+        #     email_to='wbrown@labds.com',
+        #     subject=subject, body=body,
+        # )
+        # self.env['ir.mail_server'].send_email(email)
+        ir_model_data = self.env['ir.model.data']
+        try:
+            template_id = ir_model_data._xmlid_lookup('bv_v15_labds.so_confirm_mail_template')[2]
+        except ValueError:
+            template_id = False
+        if template_id:
+            self.env['mail.template'].browse(template_id).send_mail(self.id)
+        return res
+
 
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
