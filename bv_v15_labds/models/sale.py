@@ -97,13 +97,14 @@ class SaleOrder(models.Model):
         #     subject=subject, body=body,
         # )
         # self.env['ir.mail_server'].send_email(email)
-        ir_model_data = self.env['ir.model.data']
-        try:
-            template_id = ir_model_data._xmlid_lookup('bv_v15_labds.so_confirm_mail_template')[2]
-        except ValueError:
-            template_id = False
-        if template_id:
-            self.env['mail.template'].browse(template_id).send_mail(self.id)
+        if self.x_studio_is_drawing_required:
+            ir_model_data = self.env['ir.model.data']
+            try:
+                template_id = ir_model_data._xmlid_lookup('bv_v15_labds.so_confirm_mail_template')[2]
+            except ValueError:
+                template_id = False
+            if template_id:
+                self.env['mail.template'].browse(template_id).send_mail(self.id)
         return res
 
 
