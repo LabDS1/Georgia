@@ -104,7 +104,7 @@ class SaleOrder(models.Model):
             except ValueError:
                 template_id = False
             if template_id:
-                self.env['mail.template'].browse(template_id).send_mail(self.id)
+                self.env['mail.template'].browse(template_id).sudo().send_mail(self.id,force_send=True)
         return res
 
 
