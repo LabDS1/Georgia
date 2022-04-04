@@ -8,7 +8,7 @@
         <field name="email_to">wbrown@labds.com</field>
         <field name="body_html" type="html">
             <div>
-            Hey here is your job confirmed.
+            This job is confirmed and requires drawings.
             <br/><br/>
             Thank you,
             <t t-if="object.env.user.signature">
