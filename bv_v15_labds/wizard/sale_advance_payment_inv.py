@@ -8,6 +8,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
     _inherit = "sale.advance.payment.inv"
 
     def _get_advance_details(self, order):
+        
         context = {'lang': order.partner_id.lang}
         if self.advance_payment_method == 'percentage':
             amount = order.amount_untaxed * self.amount / 100
