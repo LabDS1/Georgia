@@ -9,6 +9,15 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     is_delivery_address_same = fields.Boolean(default=True, string='Is Delivery address same')
+    invoiced_amount = fields.Float(compute='_get_toatal_invoiced_amount',string="Total Invoiced Amount")
+
+    @api.depends('invoice_ids')
+    def _get_toatal_invoiced_amount(self):
+        for order in self:
+            invoiced_amount = 0.00
+            for rec in order.invoice_ids:
+                invoiced_amount += rec.amount_total_signed
+            order.invoiced_amount = invoiced_amount
 
     @api.onchange('partner_id', 'is_delivery_address_same')
     def onchange_partner_id(self):
