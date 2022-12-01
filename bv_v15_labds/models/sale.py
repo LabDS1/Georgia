@@ -10,6 +10,20 @@ class SaleOrder(models.Model):
 
     is_delivery_address_same = fields.Boolean(default=True, string='Is Delivery address same')
     invoiced_amount = fields.Float(compute='_get_toatal_invoiced_amount',string="Total Invoiced Amount")
+    invoice_count_filter = fields.Integer(string='Invoice Count')
+
+    @api.depends('order_line.invoice_lines')
+    def _get_invoiced(self):
+        # The invoice_ids are obtained thanks to the invoice lines of the SO
+        # lines, and we also search for possible refunds created directly from
+        # existing invoices. This is necessary since such a refund is not
+        # directly linked to the SO.
+        for order in self:
+            invoices = order.order_line.invoice_lines.move_id.filtered(
+                lambda r: r.move_type in ('out_invoice', 'out_refund'))
+            order.invoice_ids = invoices
+            order.invoice_count = len(invoices)
+            order.invoice_count_filter = len(invoices)
 
     @api.depends('invoice_ids')
     def _get_toatal_invoiced_amount(self):
