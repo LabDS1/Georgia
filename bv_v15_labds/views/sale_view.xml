@@ -6,6 +6,7 @@
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='amount_total']" position="before">
+                <field name="invoice_count_filter" invisible="1"/>
                 <field name="invoice_count"/>
                 <field name="invoiced_amount"/>
             </xpath>
@@ -32,6 +33,31 @@
         </field>
     </record>
 
+
+        <record id="sale.sale_order_view_search_inherit_sale" model="ir.ui.view">
+            <field name="name">sale.order.search.inherit.sale</field>
+            <field name="model">sale.order</field>
+            <field name="mode">primary</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="//search//field[@name='user_id']" position="after">
+                    <field name="invoice_count_filter"/>
+                </xpath>
+
+                <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                    <separator/>
+                    <filter string="To Invoice" name="to_invoice" domain="[('invoice_status','=','to invoice')]" />
+                    <filter string="To Upsell" name="upselling" domain="[('invoice_status','=','upselling')]" />
+                    <separator/>
+                    <filter string="Invoice Count" name="invoice_count" domain="[('invoice_count_filter','=',0)]"/>
+                    <filter string="Order Date" name="order_date" date="date_order"/>
+                </xpath>
+            </field>
+        </record>
+
+
+
+
     <record model="ir.ui.view" id="sale_margin.sale_margin_sale_order_line_form">
         <field name="name">sale.order.line.tree.margin.view.form</field>
         <field name="model">sale.order</field>
@@ -44,4 +70,6 @@
             </xpath>
         </field>
     </record>
+
+
 </odoo>
