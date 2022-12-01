@@ -33,7 +33,8 @@
         </field>
     </record>
 
-        <record id="sale_order_view_search_inherit_sale_labds" model="ir.ui.view">
+
+        <record id="sale.sale_order_view_search_inherit_sale" model="ir.ui.view">
             <field name="name">sale.order.search.inherit.sale</field>
             <field name="model">sale.order</field>
             <field name="mode">primary</field>
@@ -42,11 +43,20 @@
                 <xpath expr="//search//field[@name='user_id']" position="after">
                     <field name="invoice_count_filter"/>
                 </xpath>
+
                 <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
-                    <filter string="Invoice Count" name="invoice_count" domain="[('invoice_count_filter','=',0)]" context="{'group_by':'invoice_count_filter'}"/>
+                    <separator/>
+                    <filter string="To Invoice" name="to_invoice" domain="[('invoice_status','=','to invoice')]" />
+                    <filter string="To Upsell" name="upselling" domain="[('invoice_status','=','upselling')]" />
+                    <separator/>
+                    <filter string="Invoice Count" name="invoice_count_group_by" domain="[]" context="{'group_by':'invoice_count_filter'}"/>
+                    <filter string="Invoice Count" name="invoice_count" domain="[('invoice_count_filter','=',0)]"/>
+                    <filter string="Order Date" name="order_date" date="date_order"/>
                 </xpath>
             </field>
         </record>
+
+
 
 
     <record model="ir.ui.view" id="sale_margin.sale_margin_sale_order_line_form">
