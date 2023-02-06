@@ -15,6 +15,7 @@
         'views/invoice_report_templates.xml',
         'views/project_portal_template.xml',
         'views/email_template_view.xml',
+        'views/product_view.xml',
     ],
     'installable': True,
     'auto_install': False,
