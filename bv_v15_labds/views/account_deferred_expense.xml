@@ -11,13 +11,17 @@
                         type="object"
                         string="Related Bills"
                         class="oe_link bg-info-light"
+                        attrs="{'invisible': True}"
                 />
                 <button
                         name="view_po"
                         type="object"
                         string="Related PO"
                         class="oe_link bg-info-light"
+                        attrs="{'invisible': True}"
                 />
+                <field name="bv_related_bills" string="Related Bill"/>
+                <field name="bv_related_po" string="Related PO"/>
             </xpath>
         </field>
     </record>
