@@ -13,6 +13,69 @@ class AccountMove(models.Model):
     _inherit = 'account.move'
 
     customer_po = fields.Char(string='Customer PO#')
+    purchase_vendor_bill_id = fields.Many2one('purchase.bill.union', store=True, readonly=True,
+                                              states={'draft': [('readonly', False)]},
+                                              string='Auto-complete',
+                                              help="Auto-complete from a past bill / purchase order.")
+    purchase_id = fields.Many2one('purchase.order', store=True, readonly=True,
+                                  states={'draft': [('readonly', False)]},
+                                  string='Purchase Order',
+                                  help="Auto-complete from a past purchase order.")
+
+    @api.onchange('purchase_vendor_bill_id', 'purchase_id')
+    def _onchange_purchase_auto_complete(self):
+        ''' Load from either an old purchase order, either an old vendor bill.
+
+        When setting a 'purchase.bill.union' in 'purchase_vendor_bill_id':
+        * If it's a vendor bill, 'invoice_vendor_bill_id' is set and the loading is done by '_onchange_invoice_vendor_bill'.
+        * If it's a purchase order, 'purchase_id' is set and this method will load lines.
+
+        /!\ All this not-stored fields must be empty at the end of this function.
+        '''
+        if self.purchase_vendor_bill_id.vendor_bill_id:
+            self.invoice_vendor_bill_id = self.purchase_vendor_bill_id.vendor_bill_id
+            self._onchange_invoice_vendor_bill()
+        elif self.purchase_vendor_bill_id.purchase_order_id:
+            self.purchase_id = self.purchase_vendor_bill_id.purchase_order_id
+        # self.purchase_vendor_bill_id = False
+
+        if not self.purchase_id:
+            return
+
+        # Copy data from PO
+        invoice_vals = self.purchase_id.with_company(self.purchase_id.company_id)._prepare_invoice()
+        invoice_vals['currency_id'] = self.line_ids and self.currency_id or invoice_vals.get('currency_id')
+        del invoice_vals['ref']
+        self.update(invoice_vals)
+
+        # Copy purchase lines.
+        po_lines = self.purchase_id.order_line - self.line_ids.mapped('purchase_line_id')
+        new_lines = self.env['account.move.line']
+        sequence = max(self.line_ids.mapped('sequence')) + 1 if self.line_ids else 10
+        for line in po_lines.filtered(lambda l: not l.display_type):
+            line_vals = line._prepare_account_move_line(self)
+            line_vals.update({'sequence': sequence})
+            new_line = new_lines.new(line_vals)
+            sequence += 1
+            new_line.account_id = new_line._get_computed_account()
+            new_line._onchange_price_subtotal()
+            new_lines += new_line
+        new_lines._onchange_mark_recompute_taxes()
+
+        # Compute invoice_origin.
+        origins = set(self.line_ids.mapped('purchase_line_id.order_id.name'))
+        self.invoice_origin = ','.join(list(origins))
+
+        # Compute ref.
+        refs = self._get_invoice_reference()
+        self.ref = ', '.join(refs)
+
+        # Compute payment_reference.
+        if len(refs) == 1:
+            self.payment_reference = refs[0]
+
+        # self.purchase_id = False
+        self._onchange_currency()
 
     def action_customer_po_update(self):
         account_move_ids = self.env['account.move'].search([('x_studio_customer_po', '!=', False),('move_type', 'in', ('out_invoice', 'out_refund','out_receipt'))])

@@ -6,4 +6,5 @@ from . import account_aged_partner_balance
 from . import project
 from . import mail_thread
 from . import product
+from . import account_asset
 
