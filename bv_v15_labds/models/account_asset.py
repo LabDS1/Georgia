@@ -4,12 +4,12 @@ from odoo import api, fields, models, _
 class AccountAsset(models.Model):
     _inherit = 'account.asset'
 
-    bv_related_bills = fields.Char(compute='_compute_related_bills_po')
+    bv_related_bills = fields.Many2many('account.move', compute='_compute_related_bills_po', store=True)
     bv_related_po = fields.Char(compute='_compute_related_bills_po')
 
     def _compute_related_bills_po(self):
         for rec in self:
-            rec.bv_related_bills = rec.original_move_line_ids.mapped('move_id').name if rec.original_move_line_ids.mapped(
+            rec.bv_related_bills = rec.original_move_line_ids.mapped('move_id').ids if rec.original_move_line_ids.mapped(
                 'move_id') else False
             rec.bv_related_po = rec.original_move_line_ids.mapped('move_id').mapped(
                 'purchase_id').name if rec.original_move_line_ids.mapped('move_id').mapped('purchase_id') else False
