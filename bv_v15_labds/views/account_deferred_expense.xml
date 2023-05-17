@@ -20,18 +20,19 @@
                         class="oe_link bg-info-light"
                         attrs="{'invisible': True}"
                 />
+                <field name="bv_related_po" string="Related PO"/>
                 <field name="bv_related_bills"
                        string="Related Bills"
+                       widget='many2many_tags'
+                />
+                <field name="bv_related_so"
+                       string="Related SO"
                        widget='many2many_tags'
                 />
                 <field name="bv_related_invoices"
                        string="Related Invoices"
                        widget='many2many_tags'
-                />
-                <field name="bv_related_po" string="Related PO"/>
-                <field name="bv_related_so"
-                       string="Related SO"
-                       widget='many2many_tags'
+                       invisible="1"
                 />
             </xpath>
         </field>
