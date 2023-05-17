@@ -65,6 +65,7 @@ class InvoiceMoveLine(models.Model):
     _inherit = "account.move.line"
 
     withholding_id = fields.Many2one('withholding.line', string='Withholding Line', copy=False)
+    is_withholding = fields.Boolean(default=False)
 
 
 class InvoiceMove(models.Model):
@@ -74,6 +75,7 @@ class InvoiceMove(models.Model):
     add_withholding = fields.Boolean("Add withholding Amount", readonly=True, states={'draft': [('readonly', False)]})
     withholding_percentage = fields.Float(string='Withholding Percentage', default=lambda self: self.env.user.company_id.withholding_percentage)
     is_withholding = fields.Boolean(default=False)
+    retainage_amount = fields.Monetary()
 
     def action_invoice_open(self):
         res = super(InvoiceMove, self).action_invoice_open()
@@ -109,7 +111,7 @@ class InvoiceMove(models.Model):
             amount = -(invoice.amount_total * invoice.withholding_percentage)/100
 
             # Create the Invoice line
-            self.env['account.move.line'].with_context(check_move_validity=False).create({
+            move_line = self.env['account.move.line'].with_context(check_move_validity=False).create({
                 'name':  str(invoice.withholding_percentage) + '% Withholding of Invoice',
                 'price_unit': amount,
                 'account_id': account_id,
@@ -119,7 +121,10 @@ class InvoiceMove(models.Model):
                 'product_id': product_id.id,
                 'move_id': invoice.id,
                 'tax_ids': [(6, 0, taxes_ids)],
+                'is_withholding': True,
             })
+            self.write({'retainage_amount': abs(move_line.amount_currency)})
+        self.write({'is_withholding': True})
         return True
 
     def action_post(self):

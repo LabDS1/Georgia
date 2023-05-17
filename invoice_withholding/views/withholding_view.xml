@@ -31,7 +31,7 @@
                 <field name="invoice_id"/>
                 <field name="project_id"/>
                 <field name="product_id"/>
-                <field name="amount"/>
+                <field name="amount" widget="monetary" sum="Total Amount"/>
                 <field name="payment_invoice_id"/>
                 <field name="state" readonly="1"/>
             </tree>
@@ -129,6 +129,7 @@
                     </div>
                 </div>
                 <field name="is_withholding" invisible="1"/>
+                <field name="retainage_amount" invisible="1"/>
             </xpath>
         </field>
     </record>

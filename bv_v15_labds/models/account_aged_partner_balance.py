@@ -25,7 +25,7 @@ class ReportAccountAgedPartner(models.AbstractModel):
                     move.name AS move_name,
                     move.ref AS move_ref,
                     CASE WHEN move.is_withholding IS TRUE
-                    THEN move.amount_total
+                    THEN move.retainage_amount
                     ELSE 0 END AS withholding_amount,
                     account.code || ' ' || account.name AS account_name,
                     account.code AS account_code,""" + ','.join([("""

@@ -107,7 +107,7 @@ class SaleOrder(models.Model):
 
     def update_product_standard_price(self):
         for line in self.order_line.filtered(lambda line: not line.display_type):
-            if line.purchase_price:
+            if line.purchase_price and not line.product_id.cost_not_to_update:
                 line.product_id.update({'standard_price': line.purchase_price})
 
     def action_confirm(self):
