@@ -129,6 +129,7 @@
                     </div>
                 </div>
                 <field name="is_withholding" invisible="1"/>
+                <field name="retainage_amount" invisible="1"/>
             </xpath>
         </field>
     </record>

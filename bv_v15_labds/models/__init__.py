@@ -7,4 +7,5 @@ from . import project
 from . import mail_thread
 from . import product
 from . import account_asset
+from . import purchase_order
 
