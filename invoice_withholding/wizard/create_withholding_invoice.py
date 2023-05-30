@@ -95,7 +95,7 @@ class WithholdingPayment(models.TransientModel):
                 'state': 'invoiced',
                 'payment_invoice_id': invoice.id
             })
-            self.write({'retainage_amount': abs(line.amount_currency)})
+            inv_line_obj.move_id.write({'retainage_amount': abs(inv_line_obj.amount_currency)})
         return invoice
     
     def create_and_view_invoice(self):
