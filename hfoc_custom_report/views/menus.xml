@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <menuitem 
+                id="menu_hr_report_root_view"
+                name="Quarterly Work in Progress"
+                sequence="3"
+                action="action_quarterly_work_report_wizard"
+                parent="sale.menu_sale_report" />
+
+
+</odoo>
