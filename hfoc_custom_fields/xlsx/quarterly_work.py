@@ -158,7 +158,7 @@ class QuarterlyWorkReport(models.TransientModel):
                         cost_to_date = sum(purchase_order_ids.mapped('amount_total'))
                     
                         for po in purchase_order_ids:
-                            vendor_bill_total += sum(po.invoice_ids.filtered(lambda r: r.state == 'posted').mapped('amount_total')) # amount_untaxed
+                            vendor_bill_total = sum(po.invoice_ids.filtered(lambda r: r.state == 'posted').mapped('amount_total')) # amount_untaxed
 
                     estimated_costs = sale.amount_untaxed-sale.margin
 
