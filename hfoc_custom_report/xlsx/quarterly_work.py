@@ -149,11 +149,12 @@ class QuarterlyWorkReport(models.TransientModel):
                         billed_to_date = sum(invoice_ids.mapped('amount_untaxed_signed'))
                         
 
-                    purchase_order_line_ids = self.env['purchase.order.line'].search([('sale_order_id', '=', sale.id),('state','in', ['purchase','done'])])
+                    # purchase_order_line_ids = self.env['purchase.order.line'].search([('sale_order_id', '=', sale.id),('state','in', ['purchase','done'])])
+                    purchase_order_ids = self.env['purchase.order'].search([('x_studio_field_esSHX', '=', sale.id),('state','in', ['purchase','done'])])
                     cost_to_date = 0.00
-                    if purchase_order_line_ids:
+                    if purchase_order_ids:
                         # cost_to_date = sum(purchase_order_line_ids.mapped('price_total'))
-                        cost_to_date = sum(purchase_order_line_ids.mapped('price_subtotal'))
+                        cost_to_date = sum(purchase_order_ids.mapped('amount_total'))
                     
                     estimated_costs = sale.amount_untaxed-sale.margin
 
