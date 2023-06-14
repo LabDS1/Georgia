@@ -112,6 +112,7 @@ class QuarterlyWorkReport(models.TransientModel):
             sheet.write(0, 12, '%', header_format_center)
             sheet.write(0, 13, 'GROSS PROFIT TO DATE', header_format_center)#Formula
             sheet.write(0, 14, 'OVER/UNDER BILLED', header_format_center)#Formula
+            sheet.write(0, 15, 'VENDOR BILLS', header_format_center)#Formula
 
 
             timezone = pytz.timezone(self.env.user.tz)
@@ -148,7 +149,7 @@ class QuarterlyWorkReport(models.TransientModel):
                         # billed_to_date = sum(invoice_ids.mapped('amount_total_signed'))
                         billed_to_date = sum(invoice_ids.mapped('amount_untaxed_signed'))
                         
-
+                    vendor_bill_total = 0.00
                     # purchase_order_line_ids = self.env['purchase.order.line'].search([('sale_order_id', '=', sale.id),('state','in', ['purchase','done'])])
                     purchase_order_ids = self.env['purchase.order'].search([('x_studio_field_esSHX', '=', sale.id),('state','in', ['purchase','done'])])
                     cost_to_date = 0.00
@@ -156,6 +157,9 @@ class QuarterlyWorkReport(models.TransientModel):
                         # cost_to_date = sum(purchase_order_line_ids.mapped('price_total'))
                         cost_to_date = sum(purchase_order_ids.mapped('amount_total'))
                     
+                        for po in purchase_order_ids:
+                            vendor_bill_total = sum(po.invoice_ids.filtered(lambda r: r.state == 'posted').mapped('amount_total')) # amount_untaxed
+
                     estimated_costs = sale.amount_untaxed-sale.margin
 
                     sheet.write(row, col, int(sale.name.replace('SO','').replace('S','').replace('O','')), num_format_list)
@@ -173,6 +177,7 @@ class QuarterlyWorkReport(models.TransientModel):
                     sheet.write(row, col+12, sale.margin_percent , num_percent)
                     sheet.write_formula(row, col+13, '=F%s-G%s' % (row+1,row+1), num_format)#Formula
                     sheet.write_formula(row, col+14, '=F%s-E%s' % (row+1,row+1), num_format)#Formula
+                    sheet.write(row, col+15, vendor_bill_total , num_format)
                     row += 1
             
                 sheet.write(row, col, 'TOTAL', text_left_red_size)
@@ -190,6 +195,7 @@ class QuarterlyWorkReport(models.TransientModel):
                 sheet.write(row, col+12, '' , num_percent)
                 sheet.write_formula(row, col+13, '=SUM(N2:N%s)' % str(row) , num_format_red_size)#Formula
                 sheet.write_formula(row, col+14, '=SUM(O2:O%s)' % str(row) , num_format_red_size)#Formula
+                sheet.write_formula(row, col+15, '=SUM(P2:P%s)' % str(row) , num_format_red_size)#Formula
             
             sheet.set_zoom(85)
             sheet.set_row(0, 51)
