@@ -106,13 +106,14 @@ class QuarterlyWorkReport(models.TransientModel):
             sheet.write(0, 6, 'COST TO DATE', header_format_center_2)
             sheet.write(0, 7, 'ESTIMATED COSTS', header_format_center_2)
             sheet.write(0, 8, 'VENDOR BILLS', header_format_center_2)
-            sheet.write(0, 9, 'COST EXCEEDED', header_format_center) #Formula
-            sheet.write(0, 10, 'REVIEW/NO REVIEW', header_format_center) #Formula
-            sheet.write(0, 11, '% COMPLETE', header_format_center) #Formula
-            sheet.write(0, 12, 'PROJECTED GROSS PROFIT', header_format_center)
-            sheet.write(0, 13, '%', header_format_center)
-            sheet.write(0, 14, 'GROSS PROFIT TO DATE', header_format_center)#Formula
-            sheet.write(0, 15, 'OVER/UNDER BILLED', header_format_center)#Formula
+            sheet.write(0, 9, 'VENDOR BILLS - BILLED TO DATE', header_format_center_2)
+            sheet.write(0, 10, 'COST EXCEEDED', header_format_center) #Formula
+            sheet.write(0, 11, 'REVIEW/NO REVIEW', header_format_center) #Formula
+            sheet.write(0, 12, '% COMPLETE', header_format_center) #Formula
+            sheet.write(0, 13, 'PROJECTED GROSS PROFIT', header_format_center)
+            sheet.write(0, 14, '%', header_format_center)
+            sheet.write(0, 15, 'GROSS PROFIT TO DATE', header_format_center)#Formula
+            sheet.write(0, 16, 'OVER/UNDER BILLED', header_format_center)#Formula
             #Formula
 
 
@@ -172,13 +173,14 @@ class QuarterlyWorkReport(models.TransientModel):
                     sheet.write(row, col+6, cost_to_date , num_format_color)
                     sheet.write(row, col+7, estimated_costs , num_format_color)
                     sheet.write(row, col+8, vendor_bill_total , num_format_color)
-                    sheet.write_formula(row, col+9, '=IF(G%s>H%s,G%s-H%s,"")' % (row+1,row+1,row+1,row+1) , num_format)#Formula
-                    sheet.write_formula(row, col+10, '=IF(G%s>H%s,"REVIEW","")' % (row+1,row+1), text_left_red)#Formula
-                    sheet.write_formula(row, col+11, '=F%s/E%s'  % (row+1,row+1) , num_percent)#Formula
-                    sheet.write(row, col+12, sale.margin , num_format)
-                    sheet.write(row, col+13, sale.margin_percent , num_percent)
-                    sheet.write_formula(row, col+14, '=F%s-G%s' % (row+1,row+1), num_format)#Formula
-                    sheet.write_formula(row, col+15, '=F%s-E%s' % (row+1,row+1), num_format)#Formula
+                    sheet.write_formula(row, col+9, '=IF(I%s-F%s<=0,"",I%s-F%s)' % (row+1,row+1,row+1,row+1) , num_format_color)
+                    sheet.write_formula(row, col+10, '=IF(G%s>H%s,G%s-H%s,"")' % (row+1,row+1,row+1,row+1) , num_format)#Formula
+                    sheet.write_formula(row, col+11, '=IF(G%s>H%s,"REVIEW","")' % (row+1,row+1), text_left_red)#Formula
+                    sheet.write_formula(row, col+12, '=F%s/E%s'  % (row+1,row+1) , num_percent)#Formula
+                    sheet.write(row, col+13, sale.margin , num_format)
+                    sheet.write(row, col+14, sale.margin_percent , num_percent)
+                    sheet.write_formula(row, col+15, '=F%s-G%s' % (row+1,row+1), num_format)#Formula
+                    sheet.write_formula(row, col+16, '=F%s-E%s' % (row+1,row+1), num_format)#Formula
                     
                     row += 1
             
@@ -191,13 +193,14 @@ class QuarterlyWorkReport(models.TransientModel):
                 sheet.write_formula(row, col+6, '=SUM(G2:G%s)' % str(row)  , num_format_red_size)
                 sheet.write_formula(row, col+7, '=SUM(H2:H%s)' % str(row)  , num_format_red_size)
                 sheet.write_formula(row, col+8, '=SUM(I2:I%s)' % str(row)  , num_format_red_size)#Formula
-                sheet.write_formula(row, col+9, '=SUM(J2:J%s)' % str(row)  , num_format_red_size)#Formula
-                sheet.write_formula(row, col+10, '=COUNTIF(K2:K%s, "REVIEW")' % str(row) , text_left_red_size)#Formula
-                sheet.write(row, col+11, '' , num_percent)
-                sheet.write_formula(row, col+12, '=SUM(M2:M%s)' % str(row) , num_format_red_size)
-                sheet.write(row, col+13, '' , num_percent)#Formula
-                sheet.write_formula(row, col+14, '=SUM(O2:O%s)' % str(row) , num_format_red_size)#Formula
+                sheet.write_formula(row, col+9, '=SUM(J2:J%s)' % str(row)  , num_format_red_size)
+                sheet.write_formula(row, col+10, '=SUM(K2:K%s)' % str(row)  , num_format_red_size)#Formula
+                sheet.write_formula(row, col+11, '=COUNTIF(L2:L%s, "REVIEW")' % str(row) , text_left_red_size)#Formula
+                sheet.write(row, col+12, '' , num_percent)
+                sheet.write_formula(row, col+13, '=SUM(N2:N%s)' % str(row) , num_format_red_size)
+                sheet.write(row, col+14, '' , num_percent)#Formula
                 sheet.write_formula(row, col+15, '=SUM(P2:P%s)' % str(row) , num_format_red_size)#Formula
+                sheet.write_formula(row, col+16, '=SUM(Q2:Q%s)' % str(row) , num_format_red_size)#Formula
             
             sheet.set_zoom(85)
             sheet.set_row(0, 51)
