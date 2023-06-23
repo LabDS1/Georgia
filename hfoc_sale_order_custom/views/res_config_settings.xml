@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">Sale orden custom</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="15"/>
+        <field name="inherit_id" ref="sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//div[@id='proforma_configuration']" position="after">
+                
+                <div class="col-12 col-lg-6 o_setting_box" id="hfoc_date_expiration">
+                    <div class="o_setting_left_pane">
+                        <field name="hfoc_date_expiration"/>
+                    </div>
+                    
+                    <div class="o_setting_right_pane">
+                        <label for="group_warning_sale" string=" Default Date Expiration"/>
+                        <div class="text-muted">
+                            The expiration date will be equal to the Listing Date plus the determined range.
+                        </div>
+                        <div class="mt8" attrs="{'invisible': [('hfoc_date_expiration', '=', False)]}">
+                            <field name="hfoc_num" attrs="{'required': [('hfoc_date_expiration', '!=', False)]}" />
+                            <field name="hfoc_range_date" attrs="{'required': [('hfoc_date_expiration', '!=', False)]}" />
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+
+
+
+
+        </field>
+    </record>
+
+</odoo>
