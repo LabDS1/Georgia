@@ -11,9 +11,9 @@
                         <group attrs="{'invisible': [('xls_filename','!=',False)]}">
                             <field name="qwm_ids" nolabel="1">
                                 <tree editable="top" >
-                                    <field name="name" />
-                                    <field name="start_date" />
-                                    <field name="end_date" />
+                                    <field name="name" autocomplete="off" />
+                                    <field name="start_date"  autocomplete="off" />
+                                    <field name="end_date" autocomplete="off" />
                                 </tree>
                             </field>
                         </group>
