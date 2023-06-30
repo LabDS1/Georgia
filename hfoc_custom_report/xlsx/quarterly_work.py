@@ -119,7 +119,7 @@ class QuarterlyWorkReport(models.TransientModel):
             sheet.write(0, 9, 'VENDOR BILLS LESS INVOICE TO DATE', header_format_center_3)
             sheet.write(0, 10, 'CUSTOMER INVOICE LESS VENDOR BILLS TO DATE', header_format_center_3)
             sheet.write(0, 11, 'COST EXCEEDED', header_format_center) #Formula
-            sheet.write(0, 12, 'COST SAVINGS', header_format_center) #Formula
+            sheet.write(0, 12, 'COST SAVINGS', header_format_center_4) #Formula
             sheet.write(0, 13, 'REVIEW/NO REVIEW', header_format_center) #Formula
             sheet.write(0, 14, '% COMPLETE', header_format_center) #Formula
             sheet.write(0, 15, 'PROJECTED GROSS PROFIT', header_format_center)
