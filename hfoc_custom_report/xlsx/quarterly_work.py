@@ -233,7 +233,7 @@ class QuarterlyWorkReport(models.TransientModel):
             
             sheet.set_column(9, 9, 16)
             sheet.set_column(10, 10, 19)
-            sheet.freeze_panes(0, 2)
+            sheet.freeze_panes(1, 2)
 
         workbook.close()
         excel.seek(0)
