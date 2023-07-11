@@ -196,7 +196,7 @@ class QuarterlyWorkReport(models.TransientModel):
                     sheet.write_formula(row, col+14, '=F%s/E%s'  % (row+1,row+1) , num_percent)#Formula
                     sheet.write(row, col+15, sale.margin , num_format)
                     sheet.write(row, col+16, sale.margin_percent , num_percent)
-                    sheet.write_formula(row, col+17, '=F%s-G%s' % (row+1,row+1), num_format)#Formula
+                    sheet.write_formula(row, col+17, '=F%s-I%s' % (row+1,row+1), num_format)#Formula
                     sheet.write_formula(row, col+18, '=F%s-E%s' % (row+1,row+1), num_format)#Formula
                     
                     row += 1
