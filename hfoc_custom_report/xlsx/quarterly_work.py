@@ -190,8 +190,9 @@ class QuarterlyWorkReport(models.TransientModel):
                     
                     sheet.write_formula(row, col+11, '=IF(G%s>H%s,G%s-H%s,"")' % (row+1,row+1,row+1,row+1) , num_format)#Formula
                     
-                    sheet.write_formula(row, col+12, '=IF(O%s>=1,IF(I%s<H%s,H%s-I%s,""),"")' % (row+1,row+1,row+1,row+1,row+1) , num_format_color_3)#Formula
-                                        
+                    # sheet.write_formula(row, col+12, '=IF(O%s>=1,IF(I%s<H%s,H%s-I%s,""),"")' % (row+1,row+1,row+1,row+1,row+1) , num_format_color_3)#Formula
+                    sheet.write_formula(row, col+12, '=IF(AND(I%s>0,O%s>=1),IF(I%s<H%s,H%s-I%s,""),"")' % (row+1,row+1,row+1,row+1,row+1,row+1) , num_format_color_3)#Formula
+                    
                     sheet.write_formula(row, col+13, '=IF(G%s>H%s,"REVIEW","")' % (row+1,row+1), text_left_red)#Formula
                     sheet.write_formula(row, col+14, '=F%s/E%s'  % (row+1,row+1) , num_percent)#Formula
                     sheet.write(row, col+15, sale.margin , num_format)
