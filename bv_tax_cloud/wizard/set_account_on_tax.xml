@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="set_account_on_tax_form_view" model="ir.ui.view">
+        <field name="name">Set Account On Tax</field>
+        <field name="model">set.account.tax</field>
+        <field name="arch" type="xml">
+            <form string="Invoice Withholdings">
+                <p class="oe_grey">
+                    Select Account to add it on Tax lines, Selected account will be set on the tax lines if tax lines don't contain any account. Also this will effect only on Sales tax
+                </p>
+                <group>
+                    <group>
+                        <field name="account_id"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="set_account_on_tax_lines" string="SET" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-default" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="set_account_tax_action" model="ir.actions.act_window">
+        <field name="name">Set Account On tax</field>
+        <field name="res_model">set.account.tax</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="set_account_on_tax_form_view"/>
+    </record>
+</odoo>
