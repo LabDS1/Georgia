@@ -7,7 +7,7 @@
     'website': "http://www.brainvire.com",
     'category': 'Uncategorized',
     'version': '15.0.0.1',
-    'depends': ['account'],
+    'depends': ['account','sale_account_taxcloud'],
     'data': [
         'security/ir.model.access.csv',
         'views/account_tax.xml',
