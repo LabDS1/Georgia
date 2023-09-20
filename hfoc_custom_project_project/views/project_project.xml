@@ -1,0 +1,56 @@
+<odoo>
+    <data>
+
+        <record id="custom_project_project_view" model="ir.ui.view">
+            <field name="name">Custom project.project</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                        <field name="currency_id" invisible="1" />
+                        <field name="so_amount_total" widget="monetary" />
+                </xpath>
+                       
+            </field>
+        </record> 
+
+        <record id="custom_project_project_kanban_view" model="ir.ui.view">
+            <field name="name">Custom project.project</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.view_project_kanban"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='privacy_visibility']" position="after">
+                    <field name="so_amount_total"/>
+                    <field name="sale_order_id"/>
+                    <field name="currency_id"/>
+                </xpath>
+                       
+                <xpath expr="//div/field[@name='tag_ids']" position="after">
+                    <div style="font-weight: 800;"  class="mw-100 badge rounded-pill text-primary border border-primary" t-if="record.sale_order_id.value">                                                
+                        <span class="fa fa-money"/>  <field name="so_amount_total" widget="monetary"/>                
+                    </div>
+                </xpath>
+
+                       
+            </field>
+        </record> 
+
+        <record id="custom_project_project_tree_view" model="ir.ui.view">
+            <field name="name">Custom project.project</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.view_project"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='stage_id']" position="before">
+                    <field name="currency_id" invisible="1" />
+                    <field name="so_amount_total"  sum="Total SO" widget="monetary"/>   
+                </xpath>
+                       
+            </field>
+        </record> 
+
+
+    </data>
+</odoo>
+
+
+ 
