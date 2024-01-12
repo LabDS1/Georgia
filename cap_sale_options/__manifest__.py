@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 {
-    'name': '',
-    'category': 'Accounting',
+    'name': 'Cap Sales Options',
+    'category': 'Sales',
     'version': '1.0.1',
-    'author' : 'Almighty Consulting Solutions Pvt. Ltd.',
-    'support': 'info@almightycs.com',
-    'website': 'https://www.almightycs.com',
+    'author' : 'Captivea',
+    'support': 'captivea.com',
+    'website': 'https://www.captivea.com',
     'license': 'OPL-1',
-    'summary': """Invoice Withholding management for Projects or Retainage Management.""",
-    'description': """Invoice Withholding management for Projects or Retainage Management.""",
+    'summary': """Display extra fields on the tab Optional Products""",
+    'description': """Display extra fields on the tab Optional Products""",
     'depends': ['base', 'sale_management'],
     'data': [
-        # 'views/withholding_view.xml',
+        'views/sale_order.xml',
     ],
     'installable': True,
     
