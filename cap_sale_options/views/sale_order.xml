@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+   <record id="sale_order_form_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+          <xpath expr="//field[@name='sale_order_option_ids']/tree[1]/field[@name='price_unit']" position="after">
+              <field name="company_id" optional="hide"/>
+              <field name="tax_id" optional="show" widget="many2many_tags"/>
+              <field name="price_subtotal" optional="show"/>
+              <field name="price_total" optional="show"/>
+            </xpath>
+      </field>
+   </record>
+</odoo>
+
