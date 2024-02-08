@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<record id="jeu_pnl" model="account.financial.html.report">
+			<field name="name">Profit and Loss</field>
+			<field name="analytic" eval="True"/>
+			<field name="unfold_all_filter" eval="True"/>
+			<field name="show_journal_filter" eval="True"/>
+			<field name='parent_id' ref='account.account_reports_legal_statements_menu'/>
+		</record>
+
+		<!-- REVENUE LINES -->
+
+        <record id="jeu_revenue" model="account.financial.html.report.line">
+            <field name="name">Revenue</field>
+			<field name="code">REV</field>
+            <field name="sequence" eval="5"/>
+            <field name="financial_report_id" ref="jeu_pnl"/>
+			<field name="formulas">-sum</field>
+            <field name="domain" eval="[('account_id.user_type_id', '=', ref('account.data_account_type_revenue'))]" />
+            <field name="level" eval="0" />
+			<field name="show_domain">foldable</field>
+			<field name="groupby">account_id</field>
+        </record>
+
+		<record id="jeu_cost_of_revenue" model="account.financial.html.report.line">
+            <field name="name">Cost of Revenue</field>
+			<field name="code">COR</field>
+            <field name="sequence" eval="5"/>
+            <field name="financial_report_id" ref="jeu_pnl"/>
+            <field name="level" eval="1" />
+			<field name="formulas">sum</field>
+			<field name="domain" eval="[('account_id.user_type_id', '=', ref('account.data_account_type_direct_costs'))]" />
+			<field name="show_domain">foldable</field>
+			<field name="groupby">account_id</field>
+		</record>
+
+		<record id="jeu_gross_profit" model="account.financial.html.report.line">
+			<field name="name">Total Gross Profit</field>
+			<field name="sequence" eval="5"/>
+			<field name="financial_report_id" ref="jeu_pnl"/>
+			<field name="level" eval="1" />
+			<field name="formulas">REV - COR</field>
+		</record>
+
+
+		<!-- EXPENSES LINES -->
+
+        <record id="jeu_expenses" model="account.financial.html.report.line">
+            <field name="name">Expenses</field>
+			<field name="code">EXPE</field>
+            <field name="sequence" eval="5"/>
+            <field name="financial_report_id" ref="jeu_pnl"/>
+			<field name="formulas">sum</field>
+            <field name="domain" eval="[('account_id.user_type_id', '=', ref('account.data_account_type_expenses')),('account_id.code', 'not in', [447001,452000,453000,454000,455000])]" />
+            <field name="level" eval="0" />
+			<field name="show_domain">foldable</field>
+			<field name="groupby">account_id</field>
+        </record>
+
+        <record id="jeu_other_income" model="account.financial.html.report.line">
+            <field name="name">Other Income</field>
+            <field name="code">OINC</field>
+            <field name="sequence" eval="5"/>
+            <field name="level" eval="1" />
+            <field name="formulas">-sum</field>
+            <field name="domain" eval="[('account_id.user_type_id', '=', ref('account.data_account_type_other_income'))]" />
+            <field name="groupby">account_id</field>
+			<field name="show_domain">foldable</field>
+			<field name="financial_report_id" ref="jeu_pnl"/>
+        </record>
+
+		<record id="jeu_other_expenses" model="account.financial.html.report.line">
+			<field name="name">Other Expenses</field>
+			<field name="code">OE</field>
+            <field name="sequence" eval="5"/>
+            <field name="financial_report_id" ref="jeu_pnl"/>
+            <field name="level" eval="1" />
+			<field name="formulas">sum</field>
+			<field name="domain" eval="[('account_id.code', 'in', [447001,452000,453000,454000,455000])]" />
+			<field name="show_domain">foldable</field>
+			<field name="groupby">account_id</field>
+		</record>
+
+        <record id="jeu_depreciation" model="account.financial.html.report.line">
+            <field name="name">Depreciation</field>
+            <field name="code">DEPR</field>
+            <field name="formulas">sum</field>
+            <field name="financial_report_id" ref='jeu_pnl'/>
+            <field name="domain" eval="[('account_id.user_type_id', '=', ref('account.data_account_type_depreciation'))]" />
+            <field name="groupby">account_id</field>
+            <field name="sequence" eval="5"/>
+            <field name="green_on_positive" eval="False"/>
+            <field name="level" eval="1" />
+        </record>
+
+
+		<!-- NET PROFIT -->
+
+        <record id="jeu_net_profit" model="account.financial.html.report.line">
+            <field name="name">Net Profit</field>
+            <field name="code">NET</field>
+            <field name="financial_report_id" ref="jeu_pnl"/>
+            <field name="formulas">REV + OINC - COR - EXPE - DEPR - OE</field>
+            <field name="sequence" eval="5"/>
+            <field name="level" eval="0" />
+        </record>
+
+		<!-- ACTION -->
+
+        <record id="account_reports.action_account_report_pnl" model="ir.actions.client">
+            <field name="name">Profit And Loss</field>
+            <field name="tag">account_report</field>
+            <field name="context" eval="{'model': 'account.financial.html.report', 'id': ref('jeu_pnl')}" />
+        </record>
+
+	</data>
+</odoo>

@@ -1,0 +1,285 @@
+<odoo>
+	<data>
+		<record id="jeu_balance_sheet" model="account.financial.html.report" >
+            <field name="name">Balance Sheet</field>
+            <field name="date_range" eval="False"/>
+            <field name="analytic" eval="True"/>
+            <field name="unfold_all_filter" eval="True"/>
+            <field name="show_journal_filter" eval="True"/>
+            <field name='parent_id' ref='account.account_reports_legal_statements_menu'/>
+		</record>
+
+		<!-- ASSETS LINES -->
+
+		<record id="jeu_assets" model="account.financial.html.report.line">
+			<field name="name">ASSETS</field>
+			<field name="financial_report_id" ref="jeu_balance_sheet"/>
+			<field name="sequence" eval="5"/>
+			<field name="level" eval="0" />
+		</record>
+
+		<record id="jeu_current_assets" model="account.financial.html.report.line">
+			<field name="name">Current Assets</field>
+			<field name="code">CASS</field>
+			<field name="sequence" eval="5"/>
+			<field name="financial_report_id" ref="jeu_balance_sheet"/>
+			<field name="level" eval="1" />
+			<field name="formulas">BAC + RECE + OCAS + PRE</field>
+		</record>
+
+        <record id="jeu_bank_and_cash_accounts" model="account.financial.html.report.line">
+            <field name="name">Bank and Cash Accounts</field>
+            <field name="code">BAC</field>
+            <field name="parent_id" ref='jeu_current_assets'/>
+			<field name="domain" eval="['|',('account_id.user_type_id', '=', ref('account.data_account_type_liquidity')),('account_id.code','in',[1014010,1014011,1014012,1014020,1014021])]" />
+            <field name="groupby">account_id</field>
+            <field name="formulas">sum</field>
+            <field name="sequence" eval="5"/>
+            <field name="level" eval="2" />
+        </record>
+
+        <record id="jeu_receivables" model="account.financial.html.report.line">
+            <field name="name">Receivables</field>
+            <field name="code">RECE</field>
+            <field name="parent_id" ref='jeu_current_assets'/>
+            <field name="domain" eval="[('account_id.user_type_id.type', '=', 'receivable'), ('account_id.exclude_from_aged_reports', '=', False)]" />
+            <field name="groupby">account_id</field>
+            <field name="formulas">sum</field>
+            <field name="sequence" eval="5"/>
+            <field name="level" eval="2" />
+        </record>
+
+        <record id="jeu_other_current_assets" model="account.financial.html.report.line">
+            <field name="name">Other Current Assets</field>
+            <field name="code">OCAS</field>
+            <field name="parent_id" ref='jeu_current_assets'/>
+<field name="domain" eval="['|', ('account_id.user_type_id', '=', 5),'&amp;', ('account_id.user_type_id.type', '=', 'receivable'), ('account_id.exclude_from_aged_reports', '=', True), ('account_id.code', 'not in', [1014010, 1014011, 1014012, 1014020, 1014021])]" />
+            <field name="groupby">account_id</field>
+            <field name="formulas">sum</field>
+            <field name="sequence" eval="5"/>
+            <field name="level" eval="2" />
+        </record>
+
+        <record id="jeu_prepayments" model="account.financial.html.report.line">
+            <field name="name">Prepayments</field>
+            <field name="code">PREP</field>
+            <field name="parent_id" ref='jeu_current_assets'/>
+            <field name="domain" eval="[('account_id.user_type_id', '=', ref('account.data_account_type_prepayments'))]" />
+            <field name="groupby">account_id</field>
+            <field name="formulas">sum</field>
+            <field name="sequence" eval="5"/>
+            <field name="level" eval="2" />
+        </record>
+
+        <record id="jeu_fixed_assets" model="account.financial.html.report.line">
+            <field name="name">Fixed Assets</field>
+            <field name="code">FASS</field>
+			<field name="financial_report_id" ref="jeu_balance_sheet"/>
+            <field name="domain" eval="[('account_id.user_type_id', '=', ref('account.data_account_type_fixed_assets'))]" />
+            <field name="groupby">account_id</field>
+            <field name="formulas">sum</field>
+            <field name="sequence" eval="5"/>
+            <field name="level" eval="1" />
+        </record>
+
+        <record id="jeu_non_current_assets" model="account.financial.html.report.line">
+            <field name="name">Non-current Assets</field>
+            <field name="code">NCA</field>
+			<field name="financial_report_id" ref="jeu_balance_sheet"/>
+            <field name="domain" eval="[('account_id.user_type_id', '=', ref('account.data_account_type_non_current_assets'))]" />
+            <field name="groupby">account_id</field>
+            <field name="formulas">sum</field>
+            <field name="sequence" eval="5"/>
+            <field name="level" eval="1" />
+        </record>
+
+		<record id="jeu_total_assets" model="account.financial.html.report.line">
+			<field name="name">Total ASSETS</field>
+			<field name="sequence" eval="5"/>
+			<field name="financial_report_id" ref="jeu_balance_sheet"/>
+			<field name="level" eval="1" />
+			<field name="formulas">CASS + FASS + NCA</field>
+		</record>
+
+		<!-- LIABILITY LINES -->
+
+		<record id="jeu_liabilities" model="account.financial.html.report.line">
+			<field name="name">LIABILITIES</field>
+			<field name="code">LI</field>
+			<field name="financial_report_id" ref="jeu_balance_sheet"/>
+			<field name="sequence" eval="5"/>
+			<field name="level" eval="0" />
+			<field name="formulas">CLI + NCL</field>
+		</record>
+
+        <record id="jeu_current_liabilities" model="account.financial.html.report.line">
+            <field name="name">Current Liabilities</field>
+            <field name="code">CLI</field>
+            <field name="parent_id" ref='jeu_liabilities'/>
+            <field name="sequence" eval="1"/>
+            <field name="green_on_positive" eval="False"/>
+            <field name="level" eval="1" />
+			<field name="formulas">AP + CLI1</field>
+        </record>
+
+        <record id="jeu_account_payables" model="account.financial.html.report.line">
+            <field name="name">Account Payables</field>
+            <field name="code">AP</field>
+            <field name="parent_id" ref='jeu_current_liabilities'/>
+            <field name="domain" eval="['|','&amp;',('account_id.user_type_id.type', '=', 'payable'),('account_id.exclude_from_aged_reports', '=', False),('account_id.code','in',[410000,410100,410500])]"/>
+            <field name="groupby">account_id</field>
+            <field name="formulas">-sum</field>
+            <field name="sequence" eval="1"/>
+            <field name="green_on_positive" eval="False"/>
+            <field name="level" eval="2" />
+        </record>
+
+        <record id="jeu_other_current_liabilities" model="account.financial.html.report.line">
+            <field name="name">Other Current Liabilities</field>
+            <field name="code">CLI1</field>
+            <field name="parent_id" ref='jeu_current_liabilities'/>
+            <field name="domain" eval="['|', ('account_id.user_type_id', 'in', [ref('account.data_account_type_current_liabilities'), ref('account.data_account_type_credit_card')]), '&amp;', ('account_id.user_type_id.type', '=', 'payable'), ('account_id.exclude_from_aged_reports', '=', True),('account_id.code','not in',[410000,410100,410500])]"/>
+            <field name="groupby">account_id</field>
+            <field name="formulas">-sum</field>
+            <field name="sequence" eval="2"/>
+            <field name="green_on_positive" eval="False"/>
+            <field name="level" eval="2" />
+        </record>
+
+        <record id="jeu_non_current_liabilities" model="account.financial.html.report.line">
+            <field name="name">Non-current Liabilities</field>
+            <field name="code">NCL</field>
+            <field name="parent_id" ref='jeu_liabilities'/>
+            <field name="domain" eval="[('account_id.user_type_id', '=', ref('account.data_account_type_non_current_liabilities'))]" />
+            <field name="groupby">account_id</field>
+            <field name="formulas">-sum</field>
+            <field name="sequence" eval="5"/>
+            <field name="green_on_positive" eval="False"/>
+            <field name="level" eval="2" />
+        </record>
+
+        <record id="jeu_equity" model="account.financial.html.report.line">
+            <field name="name">EQUITY</field>
+            <field name="code">EQU</field>
+			<field name="formulas">UE + RE</field>
+            <field name="sequence" eval="5"/>
+            <field name="financial_report_id" ref="jeu_balance_sheet"/>
+            <field name="level" eval="0" />
+        </record>
+
+        <record id="jeu_unallocated_earnings" model="account.financial.html.report.line">
+            <field name="name">Retained Earnings</field>
+            <field name="code">UE</field>
+            <field name="formulas">CYE + PYE</field>
+            <field name="sequence" eval="1"/>
+            <field name="special_date_changer">normal</field>
+            <field name="parent_id" ref='jeu_equity'/>
+            <field name="level" eval="1" />
+        </record>
+
+        <record id="jeu_current_year_unallocated_earnings" model="account.financial.html.report.line">
+            <field name="name">Current Year Unallocated Earnings</field>
+            <field name="code">CYE</field>
+            <field name="formulas">CYE_PNL + CYE_ALLOC</field>
+            <field name="sequence" eval="1"/>
+            <field name="parent_id" ref='jeu_unallocated_earnings'/>
+            <field name="level" eval="2" />
+        </record>
+
+        <record id="jeu_current_year_earnings" model="account.financial.html.report.line">
+            <field name="name">Current Year Earnings</field>
+            <field name="code">CYE_PNL</field>
+            <field name="domain" eval="[]" />
+            <field name="formulas">NEP</field>
+            <field name="sequence" eval="1"/>
+            <field name="parent_id" ref='jeu_current_year_unallocated_earnings'/>
+            <field name="special_date_changer">normal</field>
+			<field name="hide_if_zero" eval="True"/>
+            <field name="level" eval="3" />
+        </record>
+
+        <record id="jeu_current_year_allocated_earnings" model="account.financial.html.report.line">
+            <field name="name">Current Year Allocated Earnings</field>
+            <field name="code">CYE_ALLOC</field>
+            <field name="domain" eval="[('account_id.user_type_id', '=', ref('account.data_unaffected_earnings'))]" />
+            <field name="formulas">-sum</field>
+            <field name="sequence" eval="2"/>
+            <field name="parent_id" ref='jeu_current_year_unallocated_earnings'/>
+            <field name="special_date_changer">from_fiscalyear</field>
+			<field name="hide_if_zero" eval="True"/>
+            <field name="level" eval="3" />
+        </record>
+
+        <record id="jeu_previous_years_unallocated_earnings" model="account.financial.html.report.line">
+            <field name="name">Previous Years Unallocated Earnings</field>
+            <field name="code">PYE</field>
+            <field name="domain" eval="[('account_id.user_type_id', 'in', [
+                ref('account.data_account_type_revenue'),
+                ref('account.data_account_type_other_income'),
+                ref('account.data_account_type_direct_costs'),
+                ref('account.data_account_type_expenses'),
+                ref('account.data_account_type_depreciation')
+            ])]" />
+            <field name="formulas">-sum + AE - CYE</field>
+            <field name="sequence" eval="2"/>
+            <field name="special_date_changer">from_beginning</field>
+            <field name="parent_id" ref='jeu_unallocated_earnings'/>
+            <field name="level" eval="2" />
+        </record>
+
+        <record id="jeu_allocated_earnings" model="account.financial.html.report.line">
+            <field name="name">Allocated Earnings</field>
+            <field name="code">AE</field>
+            <field name="domain" eval="[('account_id.user_type_id', '=', ref('account.data_unaffected_earnings'))]"/>
+            <field name="formulas">-sum</field>
+            <field name="sequence" eval="2"/>
+            <field name="special_date_changer">from_beginning</field>
+            <field name="level" eval="2" />
+        </record>
+
+        <record id="jeu_retained_earnings" model="account.financial.html.report.line">
+            <field name="name">Capital</field>
+            <field name="code">RE</field>
+            <field name="domain" eval="[('account_id.user_type_id', '=', ref('account.data_account_type_equity'))]" />
+            <field name="groupby">account_id</field>
+            <field name="formulas">-sum</field>
+            <field name="sequence" eval="2"/>
+            <field name="parent_id" ref='jeu_equity'/>
+            <field name="level" eval="1" />
+        </record>
+
+        <record id="jeu_liability_equity" model="account.financial.html.report.line">
+            <field name="name">LIABILITIES + EQUITY</field>
+            <field name="code">LIEQU</field>
+            <field name="financial_report_id" ref="jeu_balance_sheet"/>
+            <field name="groupby">account_id</field>
+            <field name="formulas">LI + EQU</field>
+            <field name="sequence" eval="5"/>
+            <field name="green_on_positive" eval="False"/>
+            <field name="level" eval="0" />
+        </record>
+
+        <record id="jeu_off_balance_sheet_accounts" model="account.financial.html.report.line">
+            <field name="name">OFF BALANCE SHEET ACCOUNTS</field>
+            <field name="code">OBSA</field>
+            <field name="financial_report_id" ref="jeu_balance_sheet"/>
+            <field name="domain" eval="[('account_id.user_type_id', '=', ref('account.data_account_off_sheet'))]"/>
+            <field name="control_domain" eval="[('account_id.user_type_id.internal_group', '=', 'off_balance')]"/>
+            <field name="groupby">account_id</field>
+            <field name="formulas">-sum</field>
+            <field name="sequence" eval="5"/>
+            <field name="level" eval="0"/>
+            <field name="hide_if_empty" eval="1"/>
+        </record>
+
+
+		<!-- ACTIONS -->
+		
+        <record id="account_reports.action_account_report_bs" model="ir.actions.client">
+            <field name="name">Balance Sheet</field>
+            <field name="tag">account_report</field>
+            <field name="context" eval="{'model': 'account.financial.html.report', 'id': ref('jeu_balance_sheet')}" />
+        </record>
+
+	</data>
+</odoo>
