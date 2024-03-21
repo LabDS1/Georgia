@@ -14,5 +14,73 @@
             </xpath>
       </field>
    </record>
+
+   <template id="sale_order_portal_content_inherit_sale_management_inherit" name="Order Options" inherit_id="sale.sale_order_portal_content">
+      <xpath expr="//t[@t-if='any((not option.is_present) for option in sale_order.sale_order_option_ids)']" position="replace">
+           <t t-if="any((not option.is_present) for option in sale_order.sale_order_option_ids)">
+                <section>
+                    <h3>Options</h3>
+                    <t t-set="display_discount" t-value="True in [option.discount &gt; 0 for option in sale_order.sale_order_option_ids]"/>
+                    
+            <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Product</th>
+                                <th t-if="display_discount" class="text-right">Disc.%
+                                </th>
+                                <th>Unit Price</th>
+                                <th>Qty</th>
+                                <th>tax</th>
+                                <th>Sub total</th>
+                                <th>Total</th>
+                                <th t-if="sale_order.state in ['draft', 'sent'] and report_type == 'html'"/>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="sale_order.sale_order_option_ids" t-as="option">
+                                <t t-if="not option.is_present">
+                                    <td>
+                                        <div t-field="option.name"/>
+                                    </td>
+                                    <td t-if="display_discount" class="text-right">
+                                        <strong t-if="option.discount" class="text-info">
+                                            <t t-esc="((option.discount % 1) and '%s' or '%d') % option.discount"/>%
+                                        </strong>
+                                    </td>
+                                    <td>
+                                        <strong >
+                                            <div t-field="option.price_unit" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: sale_order.pricelist_id.currency_id}" t-att-style="option.discount and 'text-decoration: line-through' or None" t-att-class="option.discount and 'text-danger' or None"/>
+                                            <div t-if="option.discount">
+                                                <t t-esc="(1-option.discount / 100.0) * option.price_unit" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: sale_order.pricelist_id.currency_id}"/>
+                                            </div>
+                                        </strong>
+                                    </td>
+                                    <td>
+                                       <div t-field="option.quantity" t-att-style="option.discount and 'text-decoration: line-through' or None" t-att-class="option.discount and 'text-danger' or None"/>
+                                    </td>
+                                    <td>
+                                       <div t-field="option.price_tax" />
+                                    </td>
+                                    <td>
+                                       <div t-field="option.price_subtotal" t-att-style="option.discount and 'text-decoration: line-through' or None" t-att-class="option.discount and 'text-danger' or None"/>
+                                    </td>
+                                    <td>
+                                       <div t-field="option.price_total" t-att-style="option.discount and 'text-decoration: line-through' or None" t-att-class="option.discount and 'text-danger' or None"/>
+                                    </td>
+                                    <td class="text-center" t-if="sale_order.state in ['draft', 'sent'] and report_type == 'html'">
+                                        <a t-att-data-option-id="option.id" href="#" class="mb8 js_add_optional_products d-print-none" aria-label="Add to cart" title="Add to cart">
+                                            <span class="fa fa-shopping-cart"/>
+                                        </a>
+                                    </td>
+                                </t>
+                            </tr>
+                        </tbody>
+                    </table>
+                  </section>
+            </t>
+         </xpath> 
+
+    </template>
+
 </odoo>
 
