@@ -134,6 +134,11 @@ class SaleOrder(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = "sale.order.line"
 
+    purchase_price = fields.Float(
+        string='Cost', compute="_compute_purchase_price",
+        digits='Product Price', store=True, readonly=False, copy=True,
+        groups="base.group_user")
+    
     def _get_display_price(self, product):
         # TO DO: move me in master/saas-16 on sale.order
         # awa: don't know if it's still the case since we need the "product_no_variant_attribute_value_ids" field now
