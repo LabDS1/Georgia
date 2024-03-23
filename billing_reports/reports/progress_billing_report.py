@@ -41,7 +41,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
             if rec['complete'] >= 100:
                 rec['revenue'] = so['amount_untaxed']
             else:
-                rec['revenue'] = round((sum(bills.mapped('amount_total'))/rec['total_budget_cost'])*so['untaxed_amount'], 2)
+                rec['revenue'] = round((sum(bills.mapped('amount_total'))/rec['total_budget_cost'])*so['amount_untaxed'], 2)
 
             rec_count = 0
             for inv in lines:
