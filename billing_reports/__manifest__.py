@@ -5,11 +5,11 @@
     "description": """
             This module allows users to generate the billing reports
     """,
-    "version": "1.0.1",
+    "version": "1.0.2",
     "category": "Accounting",
     "author": "Ranga Dharmapriya",
     "support": "rangadharmapriya@gmail.com",
-    "depends": ['account', 'sale', 'project', 'purchase', 'account_reports', 'report_xlsx_helper'],
+    "depends": ['account', 'sale', 'project', 'purchase', 'account_reports'],
     "data": [
         'security/ir.model.access.csv',
         'wizard/progress_billing_wizard_views.xml'
