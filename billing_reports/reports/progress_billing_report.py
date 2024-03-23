@@ -30,7 +30,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                    'bill_date': '',
                    'bill_amount': '',
                    'total_budget_cost': so['amount_untaxed'] - so['margin'],
-                   'complete': round((so['invoiced_amount']/so['amount_untaxed'])*100, 2),
+                   'complete': round((so['invoiced_amount']/so['amount_untaxed'])*100, 2) if so['amount_untaxed'] != 0 else 0,
                    'revenue': 0
                    }
             data.append(rec)
@@ -41,7 +41,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
             if rec['complete'] >= 100:
                 rec['revenue'] = so['amount_untaxed']
             else:
-                rec['revenue'] = round((sum(bills.mapped('amount_total'))/rec['total_budget_cost'])*so['amount_untaxed'], 2)
+                rec['revenue'] = round((sum(bills.mapped('amount_total'))/rec['total_budget_cost'])*so['amount_untaxed'], 2) if so['amount_untaxed'] != 0 and rec['total_budget_cost'] != 0 else 0
 
             rec_count = 0
             for inv in lines:
