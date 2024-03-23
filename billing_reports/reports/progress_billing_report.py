@@ -13,7 +13,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         """
             @private - Get data for progress billing report
         """
-        orders = self.env['sale.order'].search_read([('analytic_account_id', '!=', False), ('create_date', '>=', start_date), ('create_date', '<=', end_date)], ['name', 'analytic_account_id', 'date_order', 'amount_untaxed', 'margin', 'invoiced_amount', 'invoice_ids'])
+        orders = self.env['sale.order'].search_read([('analytic_account_id', '!=', False), ('state', '=', 'sale'), ('create_date', '>=', start_date), ('create_date', '<=', end_date)], ['name', 'analytic_account_id', 'date_order', 'amount_untaxed', 'margin', 'invoiced_amount', 'invoice_ids'])
         data = []
         count = 0
         for so in orders:
