@@ -17,6 +17,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         data = []
         count = 0
         for so in orders:
+            start = count
             rec = {'pro_no': so['name'],
                    'pro_name': so['analytic_account_id'][1],
                    'date_confirmed': so['date_order'],
@@ -35,27 +36,24 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                    }
             data.append(rec)
             invoices = self.env['account.move'].browse(so['invoice_ids'])
-            bills = self.env['purchase.order'].search([('x_studio_field_esSHX', '=', so['id'])]).invoice_ids
-            lines = invoices + bills
+            # bills = self.env['purchase.order'].search([('x_studio_field_esSHX', '=', so['id'])]).invoice_ids
+            bills = self.env['purchase.order'].search([('so_id', '=', so['id'])]).invoice_ids
 
             if rec['complete'] >= 100:
                 rec['revenue'] = so['amount_untaxed']
             else:
                 rec['revenue'] = round((sum(bills.mapped('amount_total'))/rec['total_budget_cost'])*so['amount_untaxed'], 2) if so['amount_untaxed'] != 0 and rec['total_budget_cost'] != 0 else 0
 
-            rec_count = 0
-            for inv in lines:
-                if rec_count == 0:
+            inv_count = 0
+            for inv in invoices:
+                if inv_count == 0:
                     rec = data[count]
                     rec.update({
-                        'inv_date': inv.invoice_date if inv.move_type == 'out_invoice' else '',
-                        'inv_no': inv.name if inv.move_type == 'out_invoice' else '',
-                        'inv_amount': inv.amount_total if inv.move_type == 'out_invoice' else '',
-                        'bill_no': inv.name if inv.move_type == 'in_invoice' else '',
-                        'bill_date': inv.invoice_date if inv.move_type == 'in_invoice' else '',
-                        'bill_amount': inv.amount_total if inv.move_type == 'in_invoice' else ''
+                        'inv_date': inv.invoice_date,
+                        'inv_no': inv.name,
+                        'inv_amount': inv.amount_total,
                     })
-                    rec_count += 1
+                    inv_count += 1
                 else:
                     rec = {
                         'pro_no': '',
@@ -75,6 +73,39 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                         'bill_amount': inv.amount_total if inv.move_type == 'in_invoice' else ''
                     }
                     data.append(rec)
+
+            bill_count = 0
+            bill_start = start
+            for bill in bills:
+                if bill_count <= len(bills):
+                    rec = data[bill_start]
+                    rec.update({
+                        'bill_no': bill.name,
+                        'bill_date': bill.invoice_date,
+                        'bill_amount': bill.amount_total
+                    })
+                    bill_count += 1
+                    bill_start += 1
+                else:
+                    rec = {
+                        'pro_no': '',
+                        'pro_name': '',
+                        'date_confirmed': '',
+                        'untaxed_amount': '',
+                        'margin': '',
+                        'inv_total': '',
+                        'total_budget_cost': '',
+                        'complete': '',
+                        'revenue': 0,
+                        'inv_date': '',
+                        'inv_no': '',
+                        'inv_amount': '',
+                        'bill_no': bill.name,
+                        'bill_date': bill.invoice_date,
+                        'bill_amount': bill.amount_total
+                    }
+                    data.append(rec)
+                bill_start += 1
             count += 1
         return data
 
