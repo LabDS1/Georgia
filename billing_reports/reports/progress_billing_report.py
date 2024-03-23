@@ -35,7 +35,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                    }
             data.append(rec)
             invoices = self.env['account.move'].browse(so['invoice_ids'])
-            bills = self.env['purchase.order'].search([('so_id', '=', so['id'])]).invoice_ids
+            bills = self.env['purchase.order'].search([('x_studio_field_esSHX', '=', so['id'])]).invoice_ids
             lines = invoices + bills
 
             if rec['complete'] >= 100:
