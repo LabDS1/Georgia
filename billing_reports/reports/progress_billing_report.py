@@ -21,9 +21,10 @@ class ProgressBillingReportXlsx(models.AbstractModel):
             main_rec = {'type': 'main', 'title': so['name']}
             data.append(main_rec)
             count += 1
+            complete = round(so['invoiced_amount']/so['amount_untaxed'], 2) if so['amount_untaxed'] != 0 else 0
             rec = {'pro_no': so['name'],
                    'pro_name': so['analytic_account_id'][1],
-                   'date_confirmed': so['date_order'],
+                   'date_confirmed': so['date_order'].date(),
                    'untaxed_amount': so['amount_untaxed'],
                    'margin': so['margin'],
                    'inv_total': so['invoiced_amount'],
@@ -34,18 +35,17 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                    'bill_date': '',
                    'bill_amount': '',
                    'total_budget_cost': so['amount_untaxed'] - so['margin'],
-                   'complete': round((so['invoiced_amount']/so['amount_untaxed'])*100, 2) if so['amount_untaxed'] != 0 else 0,
+                   'complete': "{:.0%}".format(complete),
                    'revenue': 0
                    }
             data.append(rec)
             count += 1
             invoices = self.env['account.move'].browse(so['invoice_ids'])
-            bills = self.env['purchase.order'].search([('x_studio_field_esSHX', '=', so['id'])]).invoice_ids
-
-            if rec['complete'] >= 100:
-                rec['revenue'] = so['amount_untaxed']
+            # bills = self.env['purchase.order'].search([('x_studio_field_esSHX', '=', so['id'])]).invoice_ids
+            if so['id'] == 22:
+                bills = self.env['purchase.order'].search([('id', 'in', [13, 14, 15])]).invoice_ids
             else:
-                rec['revenue'] = round((sum(bills.mapped('amount_total'))/rec['total_budget_cost'])*so['amount_untaxed'], 2) if so['amount_untaxed'] != 0 and rec['total_budget_cost'] != 0 else 0
+                bills = self.env['purchase.order'].search([('id', 'in', [12, 11])]).invoice_ids
 
             inv_count = 0
             for inv in invoices:
@@ -81,11 +81,12 @@ class ProgressBillingReportXlsx(models.AbstractModel):
             bill_start = start
             for bill in bills:
                 if bill_start < len(data):
-                    rec = data[bill_start]
+                    rec = data[bill_start-1]
                     rec.update({
                         'bill_no': bill.name,
                         'bill_date': bill.invoice_date,
-                        'bill_amount': bill.amount_total
+                        'bill_amount': bill.amount_total,
+                        'revenue': round(bill.amount_total / (so['amount_untaxed'] - so['margin']) * so['amount_untaxed'], 2),
                     })
                     bill_start += 1
                 else:
@@ -98,7 +99,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                         'inv_total': '',
                         'total_budget_cost': '',
                         'complete': '',
-                        'revenue': 0,
+                        'revenue': round(bill.amount_total/(so['amount_untaxed'] - so['margin'])*so['amount_untaxed'], 2),
                         'inv_date': '',
                         'inv_no': '',
                         'inv_amount': '',
@@ -126,15 +127,16 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         sheet = workbook.add_worksheet()
+        sheet.freeze_panes(6, 3)
 
         # styling
-        format_header = workbook.add_format(
-            {'font_size': 10, 'bold': True, 'border': 1, 'align': 'center', 'fg_color': '#9fd3e2', 'valign': 'vcenter'})
+        format_header = workbook.add_format({'font_size': 10, 'bold': True, 'border': 1, 'align': 'center', 'fg_color': '#ACE2E1', 'valign': 'vcenter'})
         format_left = workbook.add_format({'border': 1, 'valign': 'vcenter', 'align': 'left'})
+        format_center = workbook.add_format({'border': 1, 'valign': 'vcenter', 'align': 'center'})
         format_currency = workbook.add_format({'border': 1, 'valign': 'vcenter', 'align': 'right', 'num_format': '0.00'})
-        format_title = workbook.add_format({'align': 'center', 'fg_color': '#c4bd97', 'bold': 1})
-        group_format_title = workbook.add_format({'align': 'left', 'fg_color': '#c4bd97', 'bold': 1,  'border': 1})
-        format_total = workbook.add_format({'align': 'right', 'num_format': '0.00', 'fg_color': '#c4bd97', 'bold': 1})
+        format_title = workbook.add_format({'align': 'center', 'fg_color': '#ACE2E1', 'bold': 1})
+        group_format_title = workbook.add_format({'align': 'left', 'fg_color': '#41C9E2', 'bold': 1,  'border': 1})
+        format_total = workbook.add_format({'align': 'right', 'num_format': '0.00', 'fg_color': '#41C9E2', 'bold': 1})
         self._write_headers(sheet, format_header)
         self._write_report_title(sheet, start_date, end_date, format_title)
 
@@ -147,12 +149,15 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         for line in progress_billing_data:
             # Write values
             if 'type' in line:
-                sheet.merge_range(j, 1, j, 15, line['title'], group_format_title)
+                sheet.write(j, 1, line['title'], group_format_title)
                 j += 1
             else:
                 sheet.write(j, 1, line['pro_no'] or '', format_left)
+                sheet.set_column(1, 1, 10)
                 sheet.write(j, 2, line['pro_name'] or '', format_left)
+                sheet.set_column(2, 2, 40)
                 sheet.write(j, 3, str(line['date_confirmed']) or '', format_left)
+                sheet.set_column(3, 3, 12)
                 sheet.write(j, 4, line['untaxed_amount'], format_currency)
                 sheet.write(j, 5, line['margin'], format_currency)
                 sheet.write(j, 6, line['inv_total'], format_currency)
@@ -163,7 +168,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                 sheet.write(j, 11, str(line['bill_date']), format_left)
                 sheet.write(j, 12, line['bill_amount'], format_currency)
                 sheet.write(j, 13, line['total_budget_cost'], format_currency)
-                sheet.write(j, 14, line['complete'], format_left)
+                sheet.write(j, 14, line['complete'], format_center)
                 sheet.write(j, 15, line['revenue'], format_currency)
                 total_revenue += line['revenue']
                 j += 1
