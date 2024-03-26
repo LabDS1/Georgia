@@ -179,7 +179,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                 sheet.write(j, 13, f'{line["total_budget_cost"]:,}', format_left)
                 sheet.write(j, 14, line['complete'], format_center)
                 sheet.write(j, 15, f'{line["revenue"]:,}', format_left)
-                sheet.write(j, 16, f'{line["total_revenue"]:,}', format_left_red if line['total_revenue'] > line['inv_total'] else format_left)
+                sheet.write(j, 16, f'{round(line["total_revenue"],2):,}', format_left_red if line['total_revenue'] > line['inv_total'] else format_left)
                 total_revenue += line['revenue']
                 j += 1
             count += 1
