@@ -1,0 +1,18 @@
+<odoo>
+    <data>
+
+        <record id="cap_view_project_project_form_inherit" model="ir.ui.view">
+        <!-- If the project is a job template, every field in the header except job_type_id and user_id are readonly and not required -->
+            <field name="name">project.project.form.inherit</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='tag_ids']" position="after">
+                    <field name="move_to_done_stage" readonly="1"/>
+                </xpath>
+            </field>
+        </record>
+
+     
+    </data>
+</odoo>

@@ -12,6 +12,7 @@
     'depends': ['base', 'sale_management'],
     'data': [
         'views/sale_order.xml',
+        'views/project_project.xml',
     ],
     'installable': True,
     
