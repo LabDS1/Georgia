@@ -5,7 +5,7 @@
     "description": """
             This module allows users to generate the billing reports
     """,
-    "version": "1.0.4",
+    "version": "1.0.5",
     "category": "Accounting",
     "author": "Ranga Dharmapriya",
     "support": "rangadharmapriya@gmail.com",
