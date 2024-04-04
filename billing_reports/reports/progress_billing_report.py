@@ -79,8 +79,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                     data.append(rec)
                     count += 1
 
-            # bills = self.env['account.move'].search([('move_type', '=', 'in_invoice'), ('x_studio_related_so', '=', so['id'])], order='invoice_date asc')
-            bills = []
+            bills = self.env['account.move'].search([('move_type', '=', 'in_invoice'), ('x_studio_related_so', '=', so['id'])], order='invoice_date asc')
             bill_start = start+1
             total_revenue = 0
             for bill in bills:
