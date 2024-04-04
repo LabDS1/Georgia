@@ -182,7 +182,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                 sheet.write(j, 9, line['inv_no'], format_left)
                 sheet.write(j, 10, line["inv_amount"], format_currency)
                 sheet.write(j, 11, line['bill_no'], format_left)
-                sheet.write(j, 12, line['bill_total'], format_left)
+                sheet.write(j, 12, line['bill_total'], format_currency)
                 sheet.write(j, 13, str(line['bill_date']), format_left)
                 sheet.write(j, 14, line["bill_amount"] if line['bill_amount'] != 0 else '', format_currency)
                 sheet.write(j, 15, line["total_budget_cost"], format_currency)
