@@ -24,9 +24,8 @@ class ProgressBillingReportXlsx(models.AbstractModel):
             count += 1
             complete = round(so['invoiced_amount']/so['amount_untaxed'], 2) if so['amount_untaxed'] != 0 else 0
             total_budget_cost = so['amount_untaxed'] - so['margin']
-            # bills = self.env['account.move'].search(
-            #     [('move_type', '=', 'in_invoice'), ('x_studio_related_so', '=', so['id'])], order='invoice_date asc')
-            bills = []
+            bills = self.env['account.move'].search(
+                [('move_type', '=', 'in_invoice'), ('x_studio_related_so', '=', so['id'])], order='invoice_date asc')
             rec = {'pro_no': so['name'],
                    'pro_name': so['analytic_account_id'][1],
                    'date_confirmed': so['date_order'].date(),
