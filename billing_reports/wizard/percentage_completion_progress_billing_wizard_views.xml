@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="percentage_completion_progress_billing_wizard_form_view" model="ir.ui.view">
+        <field name="name">percentage.completion.progress.billing.wizard.form.view</field>
+        <field name="model">percentage.completion.progress.billing.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Percentage Completion Progress Billing Report">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="start_date" required="True"/>
+                            <field name="end_date"  required="True"/>
+                        </group>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Generate Report" name="generate_xls_report" type="object" class="oe_highlight"/>
+                    <button string="Discard" class="btn-secondary" special="cancel" style="border-radius: 25px;"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!--Action for open pnl report wizard-->
+    <record model="ir.actions.act_window" id="action_view_percentage_completion_progress_billing_wizard">
+        <field name="name">Percentage Completion Progress Billing Report</field>
+        <field name="res_model">percentage.completion.progress.billing.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!--Menuitem for npl pnl report wizard-->
+    <menuitem id="menu_percentage_completion_progress_billing_report_wizard"
+              sequence="50"
+              parent="account_reports.account_reports_audit_reports_menu"
+              name="Percentage Completion Progress Billing Report"
+              action="action_view_percentage_completion_progress_billing_wizard"
+    />
+
+</odoo>
