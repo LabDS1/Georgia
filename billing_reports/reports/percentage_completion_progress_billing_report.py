@@ -17,13 +17,13 @@ class PercentageCompletionProgressBillingReportXlsx(models.AbstractModel):
         data = []
         for bill in bills:
             total_budget_cost = round(bill.x_studio_related_so.amount_untaxed - bill.x_studio_related_so.margin)
-            associated_revenue = round(bill.amount_total/total_budget_cost)
+            associated_revenue = round((bill.amount_total/total_budget_cost) * bill.x_studio_related_so.amount_total)
             rec = {'bill_no': bill.name,
                    'bill_date': bill.invoice_date,
                    'bill_amount': bill.amount_total,
                    'project': bill.x_studio_related_so.name,
                    'total_budget_cost': total_budget_cost,
-                   'contract_amount': bill.amount_total,
+                   'contract_amount': bill.x_studio_related_so.amount_total,
                    'associated_revenue': associated_revenue,
                    }
             data.append(rec)
