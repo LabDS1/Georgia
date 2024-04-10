@@ -13,7 +13,7 @@ class PercentageCompletionProgressBillingReportXlsx(models.AbstractModel):
         """
             @private - Get data for percentage completion progress billing report
         """
-        bills = self.env['account.move'].search([('move_type', '=', 'in_invoice'), ('x_studio_related_so', '!=', False), ('invoice_date', '>=', start_date), ('invoice_date', '<=', end_date)], order='invoice_date asc')
+        bills = self.env['account.move'].search([('move_type', '=', 'in_invoice'), ('x_studio_related_so', '!=', False), ('date', '>=', start_date), ('date', '<=', end_date)], order='date asc')
         data = []
         for bill in bills:
             total_budget_cost = round(bill.x_studio_related_so.amount_untaxed - bill.x_studio_related_so.margin)
