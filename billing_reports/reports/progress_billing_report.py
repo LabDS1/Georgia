@@ -2,12 +2,23 @@
 import io
 import base64
 import xlsxwriter
+from datetime import datetime
+from calendar import monthrange
+
 from odoo import models
 
 
 class ProgressBillingReportXlsx(models.AbstractModel):
     _name = "progress.billing.report"
     _description = "Progress Billing Report"
+
+    def get_month_start_end(self, order_date):
+        year = order_date.year
+        month = order_date.month
+        first_day = datetime(year, month, 1)
+        last_day = datetime(year, month, monthrange(year, month)[1])
+
+        return first_day.date(), last_day.date()
 
     def _generate_report_data(self, start_date, end_date):
         """
@@ -21,11 +32,13 @@ class ProgressBillingReportXlsx(models.AbstractModel):
             main_rec = {'type': 'main', 'title': so['name']}
             data.append(main_rec)
 
+            month_start, month_end = self.get_month_start_end(so['date_order'])
+
             count += 1
             complete = round(so['invoiced_amount']/so['amount_untaxed'], 2) if so['amount_untaxed'] != 0 else 0
             total_budget_cost = so['amount_untaxed'] - so['margin']
             bills = self.env['account.move'].search(
-                [('move_type', '=', 'in_invoice'), ('x_studio_related_so', '=', so['id']), ('invoice_date', '>=', start_date), ('invoice_date', '<=', end_date)], order='invoice_date asc')
+                [('move_type', '=', 'in_invoice'), ('x_studio_related_so', '=', so['id']), ('invoice_date', '>=', month_start), ('invoice_date', '<=', month_end)], order='invoice_date asc')
             rec = {'pro_no': so['name'],
                    'pro_name': so['analytic_account_id'][1],
                    'date_confirmed': so['date_order'].date(),
@@ -48,7 +61,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
             data.append(rec)
             count += 1
 
-            invoices = self.env['account.move'].browse(so['invoice_ids']).filtered(lambda x: x.invoice_date >= start_date and x.invoice_date <= end_date)
+            invoices = self.env['account.move'].browse(so['invoice_ids']).filtered(lambda x: x.invoice_date >= month_start and x.invoice_date <= month_end)
 
             inv_count = 0
             for inv in invoices:
