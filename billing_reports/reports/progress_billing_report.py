@@ -182,11 +182,8 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                 inv_total = 0 if line['inv_total'] == '' else line['inv_total']
                 total_revenue = 0 if line['total_revenue'] == '' else line['total_revenue']
                 sheet.write(j, 1, line['pro_no'] or '', format_left)
-                sheet.set_column(1, 1, 10)
                 sheet.write(j, 2, line['pro_name'] or '', format_left)
-                sheet.set_column(2, 2, 40)
                 sheet.write(j, 3, str(line['date_confirmed']) or '', format_left)
-                sheet.set_column(3, 3, 12)
                 sheet.write(j, 4, line["untaxed_amount"], format_currency) #f'{line["untaxed_amount"]:,}'
                 sheet.write(j, 5, line["total_contract_amount"], format_currency) #f'{line["untaxed_amount"]:,}'
                 sheet.write(j, 6, line["margin"], format_currency)
@@ -218,11 +215,11 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         @private - Writing headers to the spreadsheet
         """
         # setting cell width
-        sheet.set_column('B5:B5', 35)
-        sheet.set_column('C5:C5', 15)
-        sheet.set_column('D5:D5', 20)
+        sheet.set_column('B5:B5', 10)
+        sheet.set_column('C5:C5', 40)
+        sheet.set_column('D5:D5', 25)
         sheet.set_column('E5:E5', 25)
-        sheet.set_column('F5:F5', 20)
+        sheet.set_column('F5:F5', 25)
         sheet.set_column('G5:G5', 30)
         sheet.set_column('H5:H5', 20)
         sheet.set_column('I5:I5', 20)
