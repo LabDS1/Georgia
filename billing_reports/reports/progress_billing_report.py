@@ -161,7 +161,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         format_left = workbook.add_format({'border': 1, 'valign': 'vcenter', 'align': 'left'})
         format_currency = workbook.add_format({'border': 1, 'valign': 'vcenter', 'align': 'right', 'num_format': '#,##0.00'})
         percent_format = workbook.add_format({'border': 1, 'valign': 'vcenter', 'align': 'right', 'num_format': "0%"})
-        format_left_red = workbook.add_format({'border': 1, 'valign': 'vcenter', 'align': 'left', 'fg_color': '#E72929'})
+        format_left_yellow = workbook.add_format({'border': 1, 'valign': 'vcenter', 'align': 'left', 'fg_color': '#FFF455'})
         format_currency_red = workbook.add_format({'border': 1, 'valign': 'vcenter', 'align': 'right', 'num_format': '#,##0.00'})
         format_title = workbook.add_format({'align': 'center', 'fg_color': '#ACE2E1', 'bold': 1})
         group_format_title = workbook.add_format({'align': 'left', 'fg_color': '#41C9E2', 'bold': 1,  'border': 1})
@@ -198,7 +198,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                 sheet.write(j, 15, line["total_budget_cost"], format_currency)
                 sheet.write(j, 16, line['complete'], percent_format)
                 sheet.write(j, 17, line["revenue"], format_currency)
-                sheet.write(j, 18, line["total_revenue"], format_left_red if total_revenue > inv_total else format_currency)
+                sheet.write(j, 18, line["total_revenue"], format_left_yellow if total_revenue > inv_total else format_currency)
                 revenue_total += 0 if line['revenue'] == '' else line['revenue']
                 j += 1
             count += 1
