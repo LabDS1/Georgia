@@ -24,7 +24,12 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         """
             @private - Get data for progress billing report
         """
-        orders = self.env['sale.order'].search_read([('analytic_account_id', '!=', False), ('state', '=', 'sale'), ('date_order', '>=', start_date), ('date_order', '<=', end_date)], ['name', 'analytic_account_id', 'date_order', 'amount_untaxed', 'amount_total', 'margin', 'invoiced_amount', 'invoice_ids'])
+        in_invoice = self.env['account.move'].search([('move_type', '=', 'in_invoice'), ('invoice_date', '>=', start_date), ('invoice_date', '<=', end_date)]).x_studio_related_so.ids
+        out_invoice = self.env['account.move'].search([('move_type', '=', 'out_invoice'), ('invoice_date', '>=', start_date), ('invoice_date', '<=', end_date)]).ids
+
+        in_orders = self.env['sale.order'].search_read([('analytic_account_id', '!=', False), ('state', '=', 'sale'), ('id', 'in', in_invoice)], ['name', 'analytic_account_id', 'date_order', 'amount_untaxed', 'amount_total', 'margin', 'invoiced_amount', 'invoice_ids'])
+        out_orders = self.env['sale.order'].search_read([('analytic_account_id', '!=', False), ('state', '=', 'sale'), ('invoice_ids', 'in', out_invoice)], ['name', 'analytic_account_id', 'date_order', 'amount_untaxed', 'amount_total', 'margin', 'invoiced_amount', 'invoice_ids'])
+        orders = in_orders+out_orders
         data = []
         count = 0
         for so in orders:
@@ -38,7 +43,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
             complete = round(so['invoiced_amount']/so['amount_untaxed'], 2) if so['amount_untaxed'] != 0 else 0
             total_budget_cost = so['amount_untaxed'] - so['margin']
             bills = self.env['account.move'].search(
-                [('move_type', '=', 'in_invoice'), ('x_studio_related_so', '=', so['id']), ('invoice_date', '>=', month_start), ('invoice_date', '<=', month_end)], order='invoice_date asc')
+                [('move_type', '=', 'in_invoice'), ('x_studio_related_so', '=', so['id']), ('invoice_date', '>=', start_date), ('invoice_date', '<=', end_date)], order='invoice_date asc')
             rec = {'pro_no': so['name'],
                    'pro_name': so['analytic_account_id'][1],
                    'date_confirmed': so['date_order'].date(),
@@ -61,7 +66,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
             data.append(rec)
             count += 1
 
-            invoices = self.env['account.move'].browse(so['invoice_ids']).filtered(lambda x: x.invoice_date >= month_start and x.invoice_date <= month_end)
+            invoices = self.env['account.move'].browse(so['invoice_ids']).filtered(lambda x: x.invoice_date >= start_date and x.invoice_date <= end_date)
 
             inv_count = 0
             for inv in invoices:
