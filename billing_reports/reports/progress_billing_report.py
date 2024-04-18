@@ -40,7 +40,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
             month_start, month_end = self.get_month_start_end(so['date_order'])
 
             count += 1
-            complete = round(so['invoiced_amount']/so['amount_untaxed'], 2) if so['amount_untaxed'] != 0 else 0
+            complete = round(so['invoiced_amount']/so['amount_total'], 2) if so['amount_total'] != 0 else 0
             total_budget_cost = so['amount_untaxed'] - so['margin']
             bills = self.env['account.move'].search(
                 [('move_type', '=', 'in_invoice'), ('x_studio_related_so', '=', so['id']), ('invoice_date', '>=', start_date), ('invoice_date', '<=', end_date)], order='invoice_date asc')
