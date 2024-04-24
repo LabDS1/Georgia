@@ -201,14 +201,14 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                 sheet.write(j, 13, str(line['bill_date']), format_left)
                 sheet.write(j, 14, line["bill_amount"] if line['bill_amount'] != 0 else '', format_currency)
                 sheet.write(j, 15, line["total_budget_cost"], format_currency)
-                sheet.write(j, 16, line['complete'], percent_format)
-                sheet.write(j, 17, line["revenue"], format_currency)
-                sheet.write(j, 18, line["total_revenue"], format_left_yellow if total_revenue > inv_total else format_currency)
-                revenue_total += 0 if line['revenue'] == '' else line['revenue']
+                # sheet.write(j, 16, line['complete'], percent_format)
+                # sheet.write(j, 17, line["revenue"], format_currency)
+                # sheet.write(j, 18, line["total_revenue"], format_left_yellow if total_revenue > inv_total else format_currency)
+                # revenue_total += 0 if line['revenue'] == '' else line['revenue']
                 j += 1
             count += 1
-        sheet.merge_range(j, 13, j, 14, 'Total', format_title)
-        sheet.write(j, 15, f'{round(revenue_total, 2):,}', format_currency_red)
+        # sheet.merge_range(j, 13, j, 14, 'Total', format_title)
+        # sheet.write(j, 15, f'{round(revenue_total, 2):,}', format_currency_red)
         workbook.close()
         # generating name and encoding xlsx file
         file = base64.encodebytes(output.getvalue())
@@ -237,9 +237,9 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         sheet.set_column('O5:O5', 20)
         sheet.set_column('O5:O5', 20)
         sheet.set_column('P5:P5', 20)
-        sheet.set_column('Q5:Q5', 22)
-        sheet.set_column('R5:R5', 22)
-        sheet.set_column('S5:S5', 22)
+        # sheet.set_column('Q5:Q5', 22)
+        # sheet.set_column('R5:R5', 22)
+        # sheet.set_column('S5:S5', 22)
 
         # Headings for the table
         sheet.merge_range('B5:B6', 'PROJECT #', format_header)
@@ -257,6 +257,6 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         sheet.merge_range('N5:N6', 'VENDOR BILL DATE', format_header)
         sheet.merge_range('O5:O6', 'VENDOR BILL AMOUNT', format_header)
         sheet.merge_range('P5:P6', 'TOTAL BUDGETED COSTS', format_header)
-        sheet.merge_range('Q5:Q6', '% COMPLETE', format_header)
-        sheet.merge_range('R5:R6', 'ASSOCIATED REVENUE', format_header)
-        sheet.merge_range('S5:S6', 'TOTAL ASSOCIATED REVENUE', format_header)
+        # sheet.merge_range('Q5:Q6', '% COMPLETE', format_header)
+        # sheet.merge_range('R5:R6', 'ASSOCIATED REVENUE', format_header)
+        # sheet.merge_range('S5:S6', 'TOTAL ASSOCIATED REVENUE', format_header)
