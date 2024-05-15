@@ -156,8 +156,9 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         # write table body
         for line in progress_billing_data:
             if 'type' in line:
-                sheet.write(j, 1, line['title'], group_format_title)
-                j += 1
+                # sheet.write(j, 1, line['title'], group_format_title)
+                # j += 1
+                pass
             else:
                 inv_total = 0 if line['inv_total'] == '' else line['inv_total']
                 total_revenue = 0 if line['total_revenue'] == '' else line['total_revenue']
