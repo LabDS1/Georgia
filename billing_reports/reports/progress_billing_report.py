@@ -20,8 +20,8 @@ class ProgressBillingReportXlsx(models.AbstractModel):
 
         users_tz = pytz.timezone(self.env.user.tz)
 
-        start_date = start_date.astimezone(users_tz)
-        end_date = end_date.astimezone(users_tz)
+        start_date = start_date.astimezone(users_tz).date()
+        end_date = end_date.astimezone(users_tz).date()
 
         orders = self.env['sale.order'].search_read([('analytic_account_id', '!=', False), ('state', '=', 'sale'), ('date_order', '>=', start_date), ('date_order', '<=', end_date)], ['name', 'analytic_account_id', 'date_order', 'amount_untaxed', 'margin', 'invoiced_amount', 'invoice_ids'])
 
