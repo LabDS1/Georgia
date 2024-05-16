@@ -23,115 +23,117 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         start_date = start_date.astimezone(users_tz).date()
         end_date = end_date.astimezone(users_tz).date()
 
-        orders = self.env['sale.order'].search_read([('analytic_account_id', '!=', False), ('state', '=', 'sale'), ('date_order', '>=', start_date), ('date_order', '<=', end_date)], ['name', 'analytic_account_id', 'date_order', 'amount_untaxed', 'margin', 'invoiced_amount', 'invoice_ids'])
+        orders = self.env['sale.order'].search_read([('analytic_account_id', '!=', False), ('state', '=', 'sale'), ('date_order', '<=', end_date)], ['name', 'analytic_account_id', 'date_order', 'amount_untaxed', 'margin', 'invoiced_amount', 'invoice_ids'])
 
         data = []
         count = 0
         for so in orders:
-            start = count
-            main_rec = {'type': 'main', 'title': so['name']}
-            data.append(main_rec)
-            count += 1
-            complete = round(so['invoiced_amount']/so['amount_untaxed'], 2) if so['amount_untaxed'] != 0 else 0
-            total_budget_cost = so['amount_untaxed'] - so['margin']
-            rec = {'pro_no': so['name'],
-                   'pro_name': so['analytic_account_id'][1],
-                   'date_confirmed': so['date_order'].date(),
-                   'untaxed_amount': round(so["amount_untaxed"]),
-                   'margin': round(so["margin"]),
-                   'inv_total': round(so["invoiced_amount"]),
-                   'inv_date': '',
-                   'inv_no': '',
-                   'inv_amount': '',
-                   'bill_no': '',
-                   'bill_date': '',
-                   'bill_amount': '',
-                   'total_budget_cost': round(total_budget_cost, 2),
-                   'complete': complete,
-                   'revenue': '',
-                   'total_revenue': ''
-                   }
-            data.append(rec)
-            count += 1
 
             invoices = self.env['account.move'].browse(so['invoice_ids'])
-            filtered_invoices = invoices.filtered(lambda item: start_date <= item.invoice_date <= end_date)
-
-            inv_count = 0
-            for inv in filtered_invoices:
-                if inv_count == 0:
-                    rec = data[count-1]
-                    rec.update({
-                        'inv_date': inv.invoice_date,
-                        'inv_no': inv.name,
-                        'inv_amount':  round(inv.amount_total_signed, 2),
-                    })
-                    inv_count += 1
-                else:
-                    rec = {
-                        'pro_no': '',
-                        'pro_name': '',
-                        'date_confirmed': '',
-                        'untaxed_amount': '',
-                        'margin': '',
-                        'inv_total': '',
-                        'total_budget_cost': '',
-                        'complete': '',
-                        'revenue': '',
-                        'total_revenue': '',
-                        'inv_date': inv.invoice_date,
-                        'inv_no': inv.name,
-                        'inv_amount':  round(inv.amount_total_signed, 2),
-                        'bill_no': '',
-                        'bill_date': '',
-                        'bill_amount': ''
-                    }
-                    data.append(rec)
-                    count += 1
+            filtered_invoices = invoices.filtered(lambda item: item.invoice_date and item.invoice_date <= end_date)
 
             bills = self.env['account.move'].search(
                 [('move_type', '=', 'in_invoice'), ('x_studio_related_so', '=', so['id'])], order='invoice_date asc')
-            filtered_bills = bills.filtered(lambda item: start_date <= item.invoice_date <= end_date)
+            filtered_bills = bills.filtered(lambda item: item.invoice_date and item.invoice_date <= end_date)
 
-            bill_start = start+1
-            total_revenue = 0
-            for bill in filtered_bills:
-                revenue = round(bill.amount_total / (so['amount_untaxed'] - so['margin']) * so['amount_untaxed'], 2)
-                total_revenue += revenue
-                if bill_start < len(data):
-                    rec = data[bill_start]
-                    rec.update({
-                        'bill_no': bill.name,
-                        'bill_date': bill.invoice_date,
-                        'bill_amount':  round(bill.amount_total, 2),
-                        'revenue':  round(revenue, 2),
-                    })
-                    bill_start += 1
-                else:
-                    rec = {
-                        'pro_no': '',
-                        'pro_name': '',
-                        'date_confirmed': '',
-                        'untaxed_amount': '',
-                        'margin': '',
-                        'inv_total': '',
-                        'total_budget_cost': '',
-                        'complete': '',
-                        'revenue':  round(revenue, 2),
-                        'total_revenue': '',
-                        'inv_date': '',
-                        'inv_no': '',
-                        'inv_amount': '', #(format (test_num, ',d'))
-                        'bill_no': bill.name,
-                        'bill_date': bill.invoice_date,
-                        'bill_amount': round(bill.amount_total, 2)
-                    }
-                    data.append(rec)
-                    bill_start += 1
-                    count += 1
-            if total_revenue > 0:
-                rec = data[start+1]
-                rec.update({'total_revenue': round(total_revenue, 2)})
+            if filtered_invoices or filtered_bills:
+                start = count
+                main_rec = {'type': 'main', 'title': so['name']}
+                data.append(main_rec)
+                count += 1
+                complete = round(so['invoiced_amount']/so['amount_untaxed'], 2) if so['amount_untaxed'] != 0 else 0
+                total_budget_cost = so['amount_untaxed'] - so['margin']
+                rec = {'pro_no': so['name'],
+                       'pro_name': so['analytic_account_id'][1],
+                       'date_confirmed': so['date_order'].date(),
+                       'untaxed_amount': round(so["amount_untaxed"]),
+                       'margin': round(so["margin"]),
+                       'inv_total': round(so["invoiced_amount"]),
+                       'inv_date': '',
+                       'inv_no': '',
+                       'inv_amount': '',
+                       'bill_no': '',
+                       'bill_date': '',
+                       'bill_amount': '',
+                       'total_budget_cost': round(total_budget_cost, 2),
+                       'complete': complete,
+                       'revenue': '',
+                       'total_revenue': ''
+                       }
+                data.append(rec)
+                count += 1
+
+                inv_count = 0
+                for inv in filtered_invoices:
+                    if inv_count == 0:
+                        rec = data[count-1]
+                        rec.update({
+                            'inv_date': inv.invoice_date,
+                            'inv_no': inv.name,
+                            'inv_amount':  round(inv.amount_total_signed, 2),
+                        })
+                        inv_count += 1
+                    else:
+                        rec = {
+                            'pro_no': '',
+                            'pro_name': '',
+                            'date_confirmed': '',
+                            'untaxed_amount': '',
+                            'margin': '',
+                            'inv_total': '',
+                            'total_budget_cost': '',
+                            'complete': '',
+                            'revenue': '',
+                            'total_revenue': '',
+                            'inv_date': inv.invoice_date,
+                            'inv_no': inv.name,
+                            'inv_amount':  round(inv.amount_total_signed, 2),
+                            'bill_no': '',
+                            'bill_date': '',
+                            'bill_amount': ''
+                        }
+                        data.append(rec)
+                        count += 1
+
+                bill_start = start+1
+                total_revenue = 0
+                for bill in filtered_bills:
+                    revenue = round(bill.amount_total / (so['amount_untaxed'] - so['margin']) * so['amount_untaxed'], 2) if so['amount_untaxed'] != 0 else 0
+                    total_revenue += revenue
+                    if bill_start < len(data):
+                        rec = data[bill_start]
+                        rec.update({
+                            'bill_no': bill.name,
+                            'bill_date': bill.invoice_date,
+                            'bill_amount':  round(bill.amount_total, 2),
+                            'revenue':  round(revenue, 2),
+                        })
+                        bill_start += 1
+                    else:
+                        rec = {
+                            'pro_no': '',
+                            'pro_name': '',
+                            'date_confirmed': '',
+                            'untaxed_amount': '',
+                            'margin': '',
+                            'inv_total': '',
+                            'total_budget_cost': '',
+                            'complete': '',
+                            'revenue':  round(revenue, 2),
+                            'total_revenue': '',
+                            'inv_date': '',
+                            'inv_no': '',
+                            'inv_amount': '', #(format (test_num, ',d'))
+                            'bill_no': bill.name,
+                            'bill_date': bill.invoice_date,
+                            'bill_amount': round(bill.amount_total, 2)
+                        }
+                        data.append(rec)
+                        bill_start += 1
+                        count += 1
+                if total_revenue > 0:
+                    rec = data[start+1]
+                    rec.update({'total_revenue': round(total_revenue, 2)})
         return data
 
     def _write_report_title(self, sheet, start_date, end_date, format_subtitle):
