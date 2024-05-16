@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 import io
+import pytz
 import base64
+import datetime
 import xlsxwriter
 from odoo import models
 
@@ -13,7 +15,16 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         """
             @private - Get data for progress billing report
         """
+        start_date = datetime.datetime.combine(start_date, datetime.time.min)
+        end_date = datetime.datetime.combine(end_date, datetime.time.max)
+
+        users_tz = pytz.timezone(self.env.user.tz)
+
+        start_date = start_date.astimezone(users_tz)
+        end_date = end_date.astimezone(users_tz)
+
         orders = self.env['sale.order'].search_read([('analytic_account_id', '!=', False), ('state', '=', 'sale'), ('date_order', '>=', start_date), ('date_order', '<=', end_date)], ['name', 'analytic_account_id', 'date_order', 'amount_untaxed', 'margin', 'invoiced_amount', 'invoice_ids'])
+
         data = []
         count = 0
         for so in orders:
@@ -44,9 +55,10 @@ class ProgressBillingReportXlsx(models.AbstractModel):
             count += 1
 
             invoices = self.env['account.move'].browse(so['invoice_ids'])
+            filtered_invoices = invoices.filtered(lambda item: start_date <= item.invoice_date <= end_date)
 
             inv_count = 0
-            for inv in invoices:
+            for inv in filtered_invoices:
                 if inv_count == 0:
                     rec = data[count-1]
                     rec.update({
@@ -77,11 +89,13 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                     data.append(rec)
                     count += 1
 
-            bills = self.env['account.move'].search([('move_type', '=', 'in_invoice'), ('x_studio_related_so', '=', so['id'])], order='invoice_date asc')
+            bills = self.env['account.move'].search(
+                [('move_type', '=', 'in_invoice'), ('x_studio_related_so', '=', so['id'])], order='invoice_date asc')
+            filtered_bills = bills.filtered(lambda item: start_date <= item.invoice_date <= end_date)
 
             bill_start = start+1
             total_revenue = 0
-            for bill in bills:
+            for bill in filtered_bills:
                 revenue = round(bill.amount_total / (so['amount_untaxed'] - so['margin']) * so['amount_untaxed'], 2)
                 total_revenue += revenue
                 if bill_start < len(data):
