@@ -41,18 +41,20 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                 main_rec = {'type': 'main', 'title': so['name']}
                 data.append(main_rec)
                 count += 1
-                complete = round(so['invoiced_amount']/so['amount_untaxed'], 2) if so['amount_untaxed'] != 0 else 0
+                bill_total = round(sum(filtered_bills.mapped('amount_total')), 2) if filtered_bills else 0
                 total_budget_cost = so['amount_untaxed'] - so['margin']
+                complete = round(bill_total/total_budget_cost, 2) if total_budget_cost != 0 else 0
                 rec = {'pro_no': so['name'],
                        'pro_name': so['analytic_account_id'][1],
                        'date_confirmed': so['date_order'].date(),
-                       'untaxed_amount': round(so["amount_untaxed"]),
-                       'margin': round(so["margin"]),
-                       'inv_total': round(so["invoiced_amount"]),
+                       'untaxed_amount': round(so["amount_untaxed"], 2),
+                       'margin': round(so["margin"], 2),
+                       'inv_total': round(so["invoiced_amount"], 2),
                        'inv_date': '',
                        'inv_no': '',
                        'inv_amount': '',
                        'bill_no': '',
+                       'bill_total': bill_total if bill_total != 0 else '',
                        'bill_date': '',
                        'bill_amount': '',
                        'total_budget_cost': round(total_budget_cost, 2),
@@ -89,6 +91,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                             'inv_no': inv.name,
                             'inv_amount':  round(inv.amount_total_signed, 2),
                             'bill_no': '',
+                            'bill_total': '',
                             'bill_date': '',
                             'bill_amount': ''
                         }
@@ -125,6 +128,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                             'inv_no': '',
                             'inv_amount': '', #(format (test_num, ',d'))
                             'bill_no': bill.name,
+                            'bill_total': '',
                             'bill_date': bill.invoice_date,
                             'bill_amount': round(bill.amount_total, 2)
                         }
@@ -176,8 +180,8 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                 # j += 1
                 pass
             else:
-                inv_total = 0 if line['inv_total'] == '' else line['inv_total']
-                total_revenue = 0 if line['total_revenue'] == '' else line['total_revenue']
+                # inv_total = 0 if line['inv_total'] == '' else line['inv_total']
+                # total_revenue = 0 if line['total_revenue'] == '' else line['total_revenue']
                 sheet.write(j, 1, line['pro_no'] or '', format_left)
                 sheet.set_column(1, 1, 10)
                 sheet.write(j, 2, line['pro_name'] or '', format_left)
@@ -186,22 +190,24 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                 sheet.set_column(3, 3, 12)
                 sheet.write(j, 4, line["untaxed_amount"], format_currency) #f'{line["untaxed_amount"]:,}'
                 sheet.write(j, 5, line["margin"], format_currency)
+
                 sheet.write(j, 6, line["inv_total"], format_currency)
                 sheet.write(j, 7, str(line['inv_date']), format_left)
                 sheet.write(j, 8, line['inv_no'], format_left)
                 sheet.write(j, 9, line["inv_amount"], format_currency)
                 sheet.write(j, 10, line['bill_no'], format_left)
-                sheet.write(j, 11, str(line['bill_date']), format_left)
-                sheet.write(j, 12, line["bill_amount"] if line['bill_amount'] != 0 else '', format_currency)
-                sheet.write(j, 13, line["total_budget_cost"], format_currency)
-                sheet.write(j, 14, line['complete'], percent_format)
-                sheet.write(j, 15, line["revenue"], format_currency)
-                sheet.write(j, 16, line["total_revenue"], format_left_red if total_revenue > inv_total else format_currency)
-                revenue_total += 0 if line['revenue'] == '' else line['revenue']
+                sheet.write(j, 11, line['bill_total'], format_left)
+                sheet.write(j, 12, str(line['bill_date']), format_left)
+                sheet.write(j, 13, line["bill_amount"] if line['bill_amount'] != 0 else '', format_currency)
+                sheet.write(j, 14, line["total_budget_cost"], format_currency)
+                sheet.write(j, 15, line['complete'], percent_format)
+                # sheet.write(j, 15, line["revenue"], format_currency)
+                # sheet.write(j, 16, line["total_revenue"], format_left_red if total_revenue > inv_total else format_currency)
+                # revenue_total += 0 if line['revenue'] == '' else line['revenue']
                 j += 1
             count += 1
-        sheet.merge_range(j, 13, j, 14, 'Total', format_title)
-        sheet.write(j, 15, f'{round(revenue_total, 2):,}', format_currency_red)
+        # sheet.merge_range(j, 13, j, 14, 'Total', format_title)
+        # sheet.write(j, 15, f'{round(revenue_total, 2):,}', format_currency_red)
         workbook.close()
         # generating name and encoding xlsx file
         file = base64.encodebytes(output.getvalue())
@@ -229,8 +235,8 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         sheet.set_column('O5:O5', 20)
         sheet.set_column('O5:O5', 20)
         sheet.set_column('O5:O5', 20)
-        sheet.set_column('P5:P5', 20)
-        sheet.set_column('Q5:Q5', 22)
+        # sheet.set_column('P5:P5', 20)
+        # sheet.set_column('Q5:Q5', 22)
 
         # Headings for the table
         sheet.merge_range('B5:B6', 'PROJECT #', format_header)
@@ -242,10 +248,12 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         sheet.merge_range('H5:H6', 'INVOICE DATE', format_header)
         sheet.merge_range('I5:I6', 'INVOICE NUMBER', format_header)
         sheet.merge_range('J5:J6', 'INVOICE AMOUNT', format_header)
+
         sheet.merge_range('K5:K6', 'VENDOR BILL NUMBER', format_header)
-        sheet.merge_range('L5:L6', 'VENDOR BILL DATE', format_header)
-        sheet.merge_range('M5:M6', 'VENDOR BILL AMOUNT', format_header)
-        sheet.merge_range('N5:N6', 'TOTAL BUDGETED COSTS', format_header)
-        sheet.merge_range('O5:O6', '% COMPLETE', format_header)
-        sheet.merge_range('P5:P6', 'ASSOCIATED REVENUE', format_header)
-        sheet.merge_range('Q5:Q6', 'TOTAL ASSOCIATED REVENUE', format_header)
+        sheet.merge_range('L5:L6', 'VENDOR BILL TOTAL', format_header)
+        sheet.merge_range('M5:M6', 'VENDOR BILL DATE', format_header)
+        sheet.merge_range('N5:N6', 'VENDOR BILL AMOUNT', format_header)
+        sheet.merge_range('O5:O6', 'TOTAL BUDGETED COSTS', format_header)
+        sheet.merge_range('P5:P6', '% COMPLETE', format_header)
+        # sheet.merge_range('P5:P6', 'ASSOCIATED REVENUE', format_header)
+        # sheet.merge_range('Q5:Q6', 'TOTAL ASSOCIATED REVENUE', format_header)
