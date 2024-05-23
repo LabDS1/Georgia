@@ -49,7 +49,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                 complete = round(bill_total/total_budget_cost, 2) if total_budget_cost != 0 else 0
                 rec = {'pro_no': so['name'],
                        'pro_name': so['analytic_account_id'][1],
-                       'date_confirmed': so['date_order'].date(),
+                       'date_confirmed': datetime.datetime.strftime(so['date_order'].date(), '%m-%d-%Y'),
                        'untaxed_amount': round(so["amount_untaxed"], 2),
                        'margin': round(so["margin"], 2),
                        'inv_total': inv_total,
@@ -73,7 +73,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                     if inv_count == 0:
                         rec = data[count-1]
                         rec.update({
-                            'inv_date': inv.invoice_date,
+                            'inv_date': datetime.datetime.strftime(inv.invoice_date, '%m-%d-%Y'),
                             'inv_no': inv.name,
                             'inv_amount':  round(inv.amount_total_signed, 2),
                         })
@@ -90,7 +90,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                             'complete': '',
                             'revenue': '',
                             'total_revenue': '',
-                            'inv_date': inv.invoice_date,
+                            'inv_date': datetime.datetime.strftime(inv.invoice_date, '%m-%d-%Y'),
                             'inv_no': inv.name,
                             'inv_amount':  round(inv.amount_total_signed, 2),
                             'bill_no': '',
@@ -110,7 +110,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                         rec = data[bill_start]
                         rec.update({
                             'bill_no': bill.name,
-                            'bill_date': bill.invoice_date,
+                            'bill_date': datetime.datetime.strftime(bill.invoice_date, '%m-%d-%Y'),
                             'bill_amount':  round(bill.amount_total, 2),
                             'revenue':  round(revenue, 2),
                         })
@@ -132,7 +132,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                             'inv_amount': '', #(format (test_num, ',d'))
                             'bill_no': bill.name,
                             'bill_total': '',
-                            'bill_date': bill.invoice_date,
+                            'bill_date': datetime.datetime.strftime(bill.invoice_date, '%m-%d-%Y'),
                             'bill_amount': round(bill.amount_total, 2)
                         }
                         data.append(rec)
