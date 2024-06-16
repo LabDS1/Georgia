@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
           <xpath expr="//field[@name='sale_order_option_ids']/tree[1]/field[@name='price_unit']" position="after">
               <field name="company_id" optional="hide"/>
-              <field name="tax_id" optional="show" widget="many2many_tags"/>
+              <field name="tax_id" optional="show" widget="many2many_tags" invisible="1"/>
               <field name="price_tax" optional="show" />
               <field name="price_subtotal" optional="show"/>
               <field name="price_total" optional="show"/>
