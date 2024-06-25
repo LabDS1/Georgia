@@ -9,8 +9,17 @@
               <field name="company_id" optional="hide"/>
               <field name="tax_id" optional="show" widget="many2many_tags"/>
               <field name="price_tax" optional="show" />
-              <field name="price_subtotal" optional="show"/>
               <field name="price_total" optional="show"/>
+            </xpath>
+
+            <!-- Add new 'cost' column to Optional product lines -->
+            <xpath expr="//field[@name='sale_order_option_ids']/tree[1]/field[@name='price_unit']" position="before">
+                <field name="purchase_price" optional="show"/>
+            </xpath>
+
+            <!-- Insert button for updating product prices on optional product lines -->
+            <xpath expr="//header" position="inside">
+                <button name="update_optional_product_prices" string="Update Optional Product Prices" type="object" class="btn-primary" attrs="{'invisible': [('state', 'in', ['sale', 'done', 'cancel'])]}"/>
             </xpath>
       </field>
    </record>
