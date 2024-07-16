@@ -9,7 +9,7 @@
     'license': 'OPL-1',
     'summary': """Display extra fields on the tab Optional Products""",
     'description': """Display extra fields on the tab Optional Products""",
-    'depends': ['base', 'sale_management'],
+    'depends': ['base', 'sale_management', 'account', 'sale', 'sale_crm'],
     'data': [
         'views/sale_order.xml',
         'views/project_project.xml',

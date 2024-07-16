@@ -1,0 +1,21 @@
+<odoo>
+    <record id="inherit_withholding_line_form_view" model="ir.ui.view">
+        <field name="name">inherit.withholding.line.form</field>
+        <field name="model">withholding.line</field>
+        <field name="inherit_id" ref="invoice_withholding.withholding_line_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount']" position="after">
+                <field name="sale_order_id"/>
+            </xpath>
+
+            <xpath expr="//sheet" position="after">
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </xpath>
+            
+        </field>
+    </record>
+</odoo>
