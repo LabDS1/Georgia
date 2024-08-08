@@ -58,6 +58,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                        'inv_date': '',
                        'inv_no': '',
                        'inv_amount': '',
+                       'withholding_amount':'',
                        'bill_no': '',
                        'bill_total': bill_total if bill_total != 0 else '',
                        'bill_date': '',
@@ -72,12 +73,14 @@ class ProgressBillingReportXlsx(models.AbstractModel):
 
                 inv_count = 0
                 for inv in filtered_invoices:
+                    withholding = self.env['withholding.line'].search([('invoice_id','=',inv.id)],limit=1)
                     if inv_count == 0:
                         rec = data[count-1]
                         rec.update({
                             'inv_date': datetime.datetime.strftime(inv.invoice_date, '%m-%d-%Y'),
                             'inv_no': inv.name,
                             'inv_amount':  round(inv.amount_total_signed, 2),
+                            'withholding_amount': round(withholding.amount, 2) if withholding else '',
                         })
                         inv_count += 1
                     else:
@@ -96,6 +99,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                             'inv_date': datetime.datetime.strftime(inv.invoice_date, '%m-%d-%Y'),
                             'inv_no': inv.name,
                             'inv_amount':  round(inv.amount_total_signed, 2),
+                            'withholding_amount': round(withholding.amount, 2) if withholding else '',
                             'bill_no': '',
                             'bill_total': '',
                             'bill_date': '',
@@ -134,6 +138,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                             'inv_date': '',
                             'inv_no': '',
                             'inv_amount': '', #(format (test_num, ',d'))
+                            'withholding_amount':'',
                             'bill_no': bill.name,
                             'bill_total': '',
                             'bill_date': datetime.datetime.strftime(bill.invoice_date, '%m-%d-%Y'),
@@ -203,13 +208,13 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                 sheet.write(j, 8, str(line['inv_date']), format_left)
                 sheet.write(j, 9, line['inv_no'], format_left)
                 sheet.write(j, 10, line["inv_amount"], format_currency)
-                # new info
+                sheet.write(j, 11, line["withholding_amount"], format_currency) # new info
                 sheet.write(j, 12, line['bill_no'], format_left)
                 sheet.write(j, 13, line['bill_total'], format_currency)
                 sheet.write(j, 14, str(line['bill_date']), format_left)
                 sheet.write(j, 15, line["bill_amount"] if line['bill_amount'] != 0 else '', format_currency)
                 sheet.write(j, 16, line["total_budget_cost"], format_currency)
-                sheet.write(j, 1, line['complete'], percent_format)
+                sheet.write(j, 17, line['complete'], percent_format)
                 # sheet.write(j, 15, line["revenue"], format_currency)
                 # sheet.write(j, 16, line["total_revenue"], format_left_red if total_revenue > inv_total else format_currency)
                 # revenue_total += 0 if line['revenue'] == '' else line['revenue']
@@ -265,6 +270,6 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         sheet.merge_range('O5:O6', 'VENDOR BILL DATE', format_header)
         sheet.merge_range('P5:P6', 'VENDOR BILL AMOUNT', format_header)
         sheet.merge_range('Q5:Q6', 'TOTAL BUDGETED COSTS', format_header)
-        sheet.merge_range('Q5:Q6', '% COMPLETE', format_header)
+        sheet.merge_range('R5:R6', '% COMPLETE', format_header)
         # sheet.merge_range('P5:P6', 'ASSOCIATED REVENUE', format_header)
         # sheet.merge_range('Q5:Q6', 'TOTAL ASSOCIATED REVENUE', format_header)
