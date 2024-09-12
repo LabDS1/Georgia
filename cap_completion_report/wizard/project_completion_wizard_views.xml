@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="project_completion_wizard_form_view" model="ir.ui.view">
+        <field name="name">project.completion.wizard.form.view</field>
+        <field name="model">project.completion.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Project Completion Report">
+                <sheet>
+                    <group>
+                        <field name="start_date" required="True"/>
+                        <field name="end_date" required="True"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Generate Report" name="generate_xls_report" type="object" class="oe_highlight"/>
+                    <button string="Discard" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_view_project_completion_wizard">
+        <field name="name">Project Completion Report</field>
+        <field name="res_model">project.completion.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_project_completion_report_wizard"
+          sequence="99"  
+          parent="project.menu_project_report"
+          name="Project Completion Report"
+          action="action_view_project_completion_wizard"
+/>
+
+</odoo>
