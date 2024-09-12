@@ -27,9 +27,10 @@
     </record>
 
     <menuitem id="menu_project_completion_report_wizard"
-              sequence="50"
-              parent="project.menu_projects"
-              name="Project Completion Report"
-              action="action_view_project_completion_wizard"
-    />
+          sequence="99"  
+          parent="project.menu_project_report"
+          name="Project Completion Report"
+          action="action_view_project_completion_wizard"
+/>
+
 </odoo>
