@@ -7,8 +7,7 @@
     """,
     "version": "1.0.0",
     "category": "Project Management",
-    "author": "Your Name",
-    "support": "youremail@example.com",
+    "author": "Captivea",
     "depends": ['account', 'sale', 'project'],
     "data": [
         'security/ir.model.access.csv',
