@@ -9,10 +9,9 @@ class ProjectProject(models.Model):
         compute="_compute_vendor_bill_ids"
     )
 
-    @api.depends(
-        'x_studio_sales_order',
-        'x_studio_sales_order.order_line.purchase_line_ids.move_ids'
-    )
+    # @api.depends(
+    #     'x_studio_sales_order.order_line.purchase_line_ids.move_ids'
+    # )
     def _compute_vendor_bill_ids(self):
         for project in self:
             vendor_bills = self.env['account.move']
