@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="done_date_report_wizard_form_view" model="ir.ui.view">
+        <field name="name">done.date.report.wizard.form.view</field>
+        <field name="model">done.date.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Done Date Report">
+                <sheet>
+                    <group>
+                        <field name="start_date" required="True"/>
+                        <field name="end_date" required="True"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button string="Generate Report" name="generate_xls_report" type="object" class="oe_highlight"/>
+                    <button string="Discard" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_view_done_date_report_wizard">
+        <field name="name">Done Date Report</field>
+        <field name="res_model">done.date.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_done_date_report_wizard"
+              sequence="98"
+              parent="project.menu_project_report"
+              name="Done Date Report"
+              action="action_view_done_date_report_wizard"/>
+</odoo>

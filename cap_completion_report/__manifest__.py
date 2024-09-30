@@ -12,6 +12,7 @@
     "data": [
         'security/ir.model.access.csv',
         'wizard/project_completion_wizard_views.xml',
+        'wizard/done_date_wizard_views.xml'
     ],
     "installable": True,
     "application": False,
