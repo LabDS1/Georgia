@@ -38,10 +38,17 @@ class DoneDateReportXlsx(models.AbstractModel):
 
                 invoices = sale_order.invoice_ids.filtered(lambda inv: inv.state not in ['cancel'])
                 inv_total = sum(invoices.mapped('amount_total_signed'))
+
+                # Fetch all purchase orders related to this sale order via x_studio_field_esSHX
+                purchase_orders = self.env['purchase.order'].search([
+                    ('x_studio_field_esSHX', '=', sale_order.id)
+                ])
+                issued_po_total = sum(po.amount_total for po in purchase_orders)
             else:
                 untaxed_amount = 0
                 total_contract_amount = 0
                 inv_total = 0
+                issued_po_total = 0
 
             if sales_rep not in salesperson_groups:
                 salesperson_groups[sales_rep] = []
@@ -50,6 +57,10 @@ class DoneDateReportXlsx(models.AbstractModel):
             bill_total = sum(abs(vb.amount_total_signed) for vb in vendor_bills)
 
             actual_margin = inv_total - bill_total
+
+            # Calculate percentages based on untaxed amount
+            projected_margin_percentage = (project.x_studio_projected_margin / untaxed_amount) * 100 if untaxed_amount else 0
+            actual_margin_percentage = (actual_margin / untaxed_amount) * 100 if untaxed_amount else 0
 
             # Modify customer name to include company if available
             customer_name = project.partner_id.name
@@ -67,6 +78,9 @@ class DoneDateReportXlsx(models.AbstractModel):
                 'projected_margin': project.x_studio_projected_margin,
                 'vendor_bill_total': bill_total,
                 'actual_margin': actual_margin,
+                'projected_margin_percentage': projected_margin_percentage,
+                'actual_margin_percentage': actual_margin_percentage,
+                'issued_po_total': issued_po_total,
             })
 
         # Group by salesperson
@@ -93,13 +107,15 @@ class DoneDateReportXlsx(models.AbstractModel):
 
         # Write headers
         headers = ['Sales Rep', 'SO Number', 'Customer', 'Project Name', 'Untaxed Contract Amount', 'Total Contract Amount',
-                   'Invoice Total', 'Projected Margin', 'Vendor Bill Total', 'Actual Margin']
+                   'Invoice Total', 'Projected Margin', 'Projected Margin %', 'Vendor Bill Total', 
+                   'Actual Margin', 'Actual Margin %', 'Issued PO Total']
 
         header_format = workbook.add_format({'bold': True, 'align': 'center', 'border': 1})
         for col_num, header in enumerate(headers):
             sheet.write(3, col_num, header, header_format)
 
         currency_format = workbook.add_format({'num_format': '$#,##0.00'})
+        percent_format = workbook.add_format({'num_format': '0%'})
 
         row = 4  # Data starts from the 5th row
         for sales_rep, orders in grouped_data.items():
@@ -113,8 +129,17 @@ class DoneDateReportXlsx(models.AbstractModel):
                 sheet.write(row, 5, order['total_contract_amount'], currency_format)
                 sheet.write(row, 6, order['invoice_total'], currency_format)
                 sheet.write(row, 7, order['projected_margin'], currency_format)
-                sheet.write(row, 8, order['vendor_bill_total'], currency_format)
-                sheet.write(row, 9, order['actual_margin'], currency_format)
+                sheet.write(row, 8, order['projected_margin_percentage'] / 100, percent_format)
+                sheet.write(row, 9, order['vendor_bill_total'], currency_format)
+                sheet.write(row, 10, order['actual_margin'], currency_format)
+                sheet.write(row, 11, order['actual_margin_percentage'] / 100, percent_format)
+                sheet.write(row, 12, order['issued_po_total'], currency_format)
+
+                # Apply Conditional Formatting per row
+                if order['actual_margin_percentage'] >= order['projected_margin_percentage']:
+                    sheet.write(row, 11, order['actual_margin_percentage'] / 100, workbook.add_format({'bg_color': '#C6EFCE', 'font_color': '#006100', 'num_format': '0%'}))  # Green
+                else:
+                    sheet.write(row, 11, order['actual_margin_percentage'] / 100, workbook.add_format({'bg_color': '#FFC7CE', 'font_color': '#9C0006', 'num_format': '0%'}))  # Red
 
                 row += 1
 
