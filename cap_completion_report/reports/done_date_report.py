@@ -10,20 +10,11 @@ class DoneDateReportXlsx(models.AbstractModel):
     _description = "Done Date Report"
 
     def _generate_report_data(self, start_date, end_date):
-        start_date = datetime.datetime.combine(start_date, datetime.time.min)
-        end_date = datetime.datetime.combine(end_date, datetime.time.max)
+        sale_order_numbers = sale_order_numbers.split(",")
+        sale_order_numbers = [so.strip() for so in sale_order_numbers]  # Clean up spaces
 
-        user_tz = self.env.user.tz or 'UTC'
-        users_tz = pytz.timezone(user_tz)
-
-        start_date = start_date.astimezone(users_tz).date()
-        end_date = end_date.astimezone(users_tz).date()
-
-        # Fetch projects based solely on Done Date
-        projects = self.env['project.project'].search([
-            ('move_to_done_stage', '>=', start_date),
-            ('move_to_done_stage', '<=', end_date)
-        ])
+        # Fetch Sale Orders based on the entered numbers
+        sale_orders = self.env['sale.order'].search([('name', 'in', sale_order_numbers)])
 
         data = []
         salesperson_groups = {}
