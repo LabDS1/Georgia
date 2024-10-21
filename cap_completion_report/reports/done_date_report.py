@@ -1,7 +1,6 @@
 import io
 import pytz
 import base64
-import datetime
 import xlsxwriter
 from odoo import models
 
@@ -9,21 +8,17 @@ class DoneDateReportXlsx(models.AbstractModel):
     _name = "done.date.report"
     _description = "Done Date Report"
 
-    def _generate_report_data(self, start_date, end_date):
-        start_date = datetime.datetime.combine(start_date, datetime.time.min)
-        end_date = datetime.datetime.combine(end_date, datetime.time.max)
+    def _generate_report_data(self, sale_order_numbers):
+        # If sale_order_numbers is a string, split it by commas, otherwise, assume it's already a list
+        if isinstance(sale_order_numbers, str):
+            # Split and clean up sale order numbers if it's a string
+            sale_order_numbers = [so.strip() for so in sale_order_numbers.split(',') if so.strip()]
 
-        user_tz = self.env.user.tz or 'UTC'
-        users_tz = pytz.timezone(user_tz)
+        # Fetch sale orders based on Sale Order numbers
+        sale_orders = self.env['sale.order'].search([('name', 'in', sale_order_numbers)])
 
-        start_date = start_date.astimezone(users_tz).date()
-        end_date = end_date.astimezone(users_tz).date()
-
-        # Fetch projects based solely on Done Date
-        projects = self.env['project.project'].search([
-            ('move_to_done_stage', '>=', start_date),
-            ('move_to_done_stage', '<=', end_date)
-        ])
+        # Now fetch projects that have these sale orders in the x_studio_sales_order field
+        projects = self.env['project.project'].search([('x_studio_sales_order', 'in', sale_orders.ids)])
 
         data = []
         salesperson_groups = {}
@@ -34,7 +29,7 @@ class DoneDateReportXlsx(models.AbstractModel):
 
             if sale_order:
                 untaxed_amount = sale_order.amount_untaxed
-                total_contract_amount = sale_order.amount_total
+                total_contract_amount = sale_order.amount_total  # Including taxes
 
                 invoices = sale_order.invoice_ids.filtered(lambda inv: inv.state not in ['cancel'])
                 inv_total = sum(invoices.mapped('amount_total_signed'))
@@ -43,7 +38,7 @@ class DoneDateReportXlsx(models.AbstractModel):
                 purchase_orders = self.env['purchase.order'].search([
                     ('x_studio_field_esSHX', '=', sale_order.id)
                 ])
-                issued_po_total = sum(po.amount_total for po in purchase_orders)
+                issued_po_total = sum(po.amount_total for po in purchase_orders)  # Sum the total amounts of the associated purchase orders
             else:
                 untaxed_amount = 0
                 total_contract_amount = 0
@@ -93,17 +88,15 @@ class DoneDateReportXlsx(models.AbstractModel):
 
         return grouped_data
 
-    def _write_report(self, start_date, end_date, grouped_data):
+    def _write_report(self, sale_order_numbers, grouped_data):
         output = io.BytesIO()
         workbook = xlsxwriter.Workbook(output, {'in_memory': True})
         sheet = workbook.add_worksheet()
 
-        # Write Start and End Dates at the top
+        # Write Sale Order Numbers at the top
         date_format = workbook.add_format({'bold': True, 'align': 'left'})
-        sheet.write('A1', 'Start Date', date_format)
-        sheet.write('B1', str(start_date), date_format)
-        sheet.write('A2', 'End Date', date_format)
-        sheet.write('B2', str(end_date), date_format)
+        sheet.write('A1', 'Sale Orders', date_format)
+        sheet.write('B1', ''.join(sale_order_numbers), date_format)
 
         # Write headers
         headers = ['Sales Rep', 'SO Number', 'Customer', 'Project Name', 'Untaxed Contract Amount', 'Total Contract Amount',
@@ -133,7 +126,7 @@ class DoneDateReportXlsx(models.AbstractModel):
                 sheet.write(row, 9, order['vendor_bill_total'], currency_format)
                 sheet.write(row, 10, order['actual_margin'], currency_format)
                 sheet.write(row, 11, order['actual_margin_percentage'] / 100, percent_format)
-                sheet.write(row, 12, order['issued_po_total'], currency_format)
+                sheet.write(row, 12, order['issued_po_total'], currency_format)  # Write the fetched PO total amount
 
                 # Apply Conditional Formatting per row
                 if order['actual_margin_percentage'] >= order['projected_margin_percentage']:
@@ -143,11 +136,26 @@ class DoneDateReportXlsx(models.AbstractModel):
 
                 row += 1
 
+        # Adjust column widths to fit content
+        sheet.set_column('A:A', 15)  # Sales Rep
+        sheet.set_column('B:B', 12)  # SO Number
+        sheet.set_column('C:C', 25)  # Customer
+        sheet.set_column('D:D', 30)  # Project Name
+        sheet.set_column('E:E', 18)  # Untaxed Contract Amount
+        sheet.set_column('F:F', 18)  # Total Contract Amount
+        sheet.set_column('G:G', 15)  # Invoice Total
+        sheet.set_column('H:H', 15)  # Projected Margin
+        sheet.set_column('I:I', 18)  # Projected Margin %
+        sheet.set_column('J:J', 15)  # Vendor Bill Total
+        sheet.set_column('K:K', 15)  # Actual Margin
+        sheet.set_column('L:L', 18)  # Actual Margin %
+        sheet.set_column('M:M', 18)  # Issued PO Total
+
         workbook.close()
         return output.getvalue()
 
-    def _generate_report(self, start_date, end_date):
-        grouped_data = self._generate_report_data(start_date, end_date)
-        file_content = self._write_report(start_date, end_date, grouped_data)
+    def _generate_report(self, sale_order_numbers):
+        grouped_data = self._generate_report_data(sale_order_numbers)
+        file_content = self._write_report(sale_order_numbers, grouped_data)
         file_base64 = base64.b64encode(file_content)
-        return file_base64, f'Done Date Report {start_date} - {end_date}.xlsx'
+        return file_base64, f'Done Date Report for Sale Orders {"".join(sale_order_numbers)}.xlsx'

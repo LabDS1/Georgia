@@ -7,8 +7,7 @@
             <form string="Done Date Report">
                 <sheet>
                     <group>
-                        <field name="start_date" required="True"/>
-                        <field name="end_date" required="True"/>
+                        <field name="sale_order_numbers" placeholder="Enter Sale Order numbers separated by commas"/>
                     </group>
                 </sheet>
                 <footer>
@@ -27,7 +26,7 @@
     </record>
 
     <menuitem id="menu_done_date_report_wizard"
-              sequence="98"
+              sequence="100"
               parent="project.menu_project_report"
               name="Done Date Report"
               action="action_view_done_date_report_wizard"/>

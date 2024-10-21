@@ -4,17 +4,16 @@ class DoneDateReportWizard(models.TransientModel):
     _name = 'done.date.report.wizard'
     _description = 'Done Date Report Wizard'
 
-    start_date = fields.Date(string="Start Date", required=True)
-    end_date = fields.Date(string="End Date", required=True)
+    sale_order_numbers = fields.Char(string="Sale Orders", help="Enter Sale Order numbers separated by commas.")
     xlsx_output = fields.Binary(string='Excel Output', readonly=True)
 
     def generate_xls_report(self):
         """
-        @public - Generate and download the report
+        @public - Generate and download the report based on Sale Order numbers.
         """
-        file, report_name = self.env['done.date.report']._generate_report(self.start_date, self.end_date)
+        file, report_name = self.env['done.date.report']._generate_report(self.sale_order_numbers)
         self.update({'xlsx_output': file})
-        # Download Excel report
+        # download excel report
         return {
             'type': 'ir.actions.act_url',
             'name': 'Done Date Report',
