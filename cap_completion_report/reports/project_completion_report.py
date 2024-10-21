@@ -144,6 +144,20 @@ class ProjectCompletionReportXlsx(models.AbstractModel):
 
                 row += 1
 
+        # Set column widths (adjust as needed based on the expected data size)
+        sheet.set_column(0, 0, 15)  # Sales Rep
+        sheet.set_column(1, 1, 12)  # SO Number
+        sheet.set_column(2, 2, 30)  # Customer
+        sheet.set_column(3, 3, 25)  # Project Name
+        sheet.set_column(4, 5, 18)  # Untaxed Contract Amount, Total Contract Amount
+        sheet.set_column(6, 6, 18)  # Invoice Total
+        sheet.set_column(7, 7, 18)  # Projected Margin
+        sheet.set_column(8, 8, 12)  # Projected Margin %
+        sheet.set_column(9, 9, 18)  # Vendor Bill Total
+        sheet.set_column(10, 10, 18)  # Actual Margin
+        sheet.set_column(11, 11, 12)  # Actual Margin %
+        sheet.set_column(12, 12, 18)  # Issued PO Total
+
         workbook.close()
         return output.getvalue()
 
