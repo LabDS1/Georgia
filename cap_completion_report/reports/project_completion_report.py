@@ -143,6 +143,20 @@ class ProjectCompletionReportXlsx(models.AbstractModel):
                     sheet.write(row, 11, order['actual_margin_percentage'] / 100, workbook.add_format({'bg_color': '#FFC7CE', 'font_color': '#9C0006', 'num_format': '0%'}))  # Red
 
                 row += 1
+        # Adjust column widths to fit content
+        sheet.set_column('A:A', 15)  # Sales Rep
+        sheet.set_column('B:B', 12)  # SO Number
+        sheet.set_column('C:C', 25)  # Customer
+        sheet.set_column('D:D', 30)  # Project Name
+        sheet.set_column('E:E', 18)  # Untaxed Contract Amount
+        sheet.set_column('F:F', 18)  # Total Contract Amount
+        sheet.set_column('G:G', 15)  # Invoice Total
+        sheet.set_column('H:H', 15)  # Projected Margin
+        sheet.set_column('I:I', 18)  # Projected Margin %
+        sheet.set_column('J:J', 15)  # Vendor Bill Total
+        sheet.set_column('K:K', 15)  # Actual Margin
+        sheet.set_column('L:L', 18)  # Actual Margin %
+        sheet.set_column('M:M', 18)  # Issued PO Total
 
         workbook.close()
         return output.getvalue()
