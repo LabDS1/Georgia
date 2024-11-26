@@ -4,6 +4,7 @@ import base64
 import xlsxwriter
 from odoo import models
 
+
 class DoneDateReportXlsx(models.AbstractModel):
     _name = "done.date.report"
     _description = "Done Date Report"
@@ -11,7 +12,6 @@ class DoneDateReportXlsx(models.AbstractModel):
     def _generate_report_data(self, sale_order_numbers):
         # If sale_order_numbers is a string, split it by commas, otherwise, assume it's already a list
         if isinstance(sale_order_numbers, str):
-            # Split and clean up sale order numbers if it's a string
             sale_order_numbers = [so.strip() for so in sale_order_numbers.split(',') if so.strip()]
 
         # Fetch sale orders based on Sale Order numbers
@@ -39,11 +39,18 @@ class DoneDateReportXlsx(models.AbstractModel):
                     ('x_studio_field_esSHX', '=', sale_order.id)
                 ])
                 issued_po_total = sum(po.amount_total for po in purchase_orders)  # Sum the total amounts of the associated purchase orders
+
+                # Fetch withholdings related to the customer and match them with the sale order
+                partner_withholdings = project.partner_id.withholding_ids.filtered(
+                    lambda wh: wh.sale_order_id == sale_order
+                )
+                total_withholding_amount = sum(wh.amount for wh in partner_withholdings)
             else:
                 untaxed_amount = 0
                 total_contract_amount = 0
                 inv_total = 0
                 issued_po_total = 0
+                total_withholding_amount = 0
 
             if sales_rep not in salesperson_groups:
                 salesperson_groups[sales_rep] = []
@@ -70,6 +77,7 @@ class DoneDateReportXlsx(models.AbstractModel):
                 'untaxed_amount': untaxed_amount,
                 'total_contract_amount': total_contract_amount,
                 'invoice_total': inv_total,
+                'withholding_amount': total_withholding_amount,  # Add withholding amount next to invoice total
                 'projected_margin': project.x_studio_projected_margin,
                 'vendor_bill_total': bill_total,
                 'actual_margin': actual_margin,
@@ -99,13 +107,20 @@ class DoneDateReportXlsx(models.AbstractModel):
         sheet.write('B1', ''.join(sale_order_numbers), date_format)
 
         # Write headers
-        headers = ['Sales Rep', 'SO Number', 'Customer', 'Project Name', 'Untaxed Contract Amount', 'Total Contract Amount',
-                   'Invoice Total', 'Projected Margin', 'Projected Margin %', 'Vendor Bill Total', 
-                   'Actual Margin', 'Actual Margin %', 'Issued PO Total']
+        headers = [
+            'Sales Rep', 'SO Number', 'Customer', 'Project Name', 'Untaxed Contract Amount',
+            'Total Contract Amount', 'Invoice Total', 'Withholding Amount', 'Projected Margin',
+            'Projected Margin %', 'Vendor Bill Total', 'Actual Margin', 'Actual Margin %', 'Issued PO Total'
+        ]
 
         header_format = workbook.add_format({'bold': True, 'align': 'center', 'border': 1})
         for col_num, header in enumerate(headers):
             sheet.write(3, col_num, header, header_format)
+
+        # Adjust column widths to fit content
+        column_widths = [15, 12, 25, 30, 20, 20, 15, 15, 15, 20, 20, 15, 20, 15]
+        for col_num, width in enumerate(column_widths):
+            sheet.set_column(col_num, col_num, width)
 
         currency_format = workbook.add_format({'num_format': '$#,##0.00'})
         percent_format = workbook.add_format({'num_format': '0%'})
@@ -121,35 +136,23 @@ class DoneDateReportXlsx(models.AbstractModel):
                 sheet.write(row, 4, order['untaxed_amount'], currency_format)
                 sheet.write(row, 5, order['total_contract_amount'], currency_format)
                 sheet.write(row, 6, order['invoice_total'], currency_format)
-                sheet.write(row, 7, order['projected_margin'], currency_format)
-                sheet.write(row, 8, order['projected_margin_percentage'] / 100, percent_format)
-                sheet.write(row, 9, order['vendor_bill_total'], currency_format)
-                sheet.write(row, 10, order['actual_margin'], currency_format)
-                sheet.write(row, 11, order['actual_margin_percentage'] / 100, percent_format)
-                sheet.write(row, 12, order['issued_po_total'], currency_format)  # Write the fetched PO total amount
+                sheet.write(row, 7, order['withholding_amount'], currency_format)  # Withholding amount added here
+                sheet.write(row, 8, order['projected_margin'], currency_format)
+                sheet.write(row, 9, order['projected_margin_percentage'] / 100, percent_format)
+                sheet.write(row, 10, order['vendor_bill_total'], currency_format)
+                sheet.write(row, 11, order['actual_margin'], currency_format)
+                sheet.write(row, 12, order['actual_margin_percentage'] / 100, percent_format)
+                sheet.write(row, 13, order['issued_po_total'], currency_format)
 
                 # Apply Conditional Formatting per row
                 if order['actual_margin_percentage'] >= order['projected_margin_percentage']:
-                    sheet.write(row, 11, order['actual_margin_percentage'] / 100, workbook.add_format({'bg_color': '#C6EFCE', 'font_color': '#006100', 'num_format': '0%'}))  # Green
+                    sheet.write(row, 12, order['actual_margin_percentage'] / 100,
+                                workbook.add_format({'bg_color': '#C6EFCE', 'font_color': '#006100', 'num_format': '0%'}))
                 else:
-                    sheet.write(row, 11, order['actual_margin_percentage'] / 100, workbook.add_format({'bg_color': '#FFC7CE', 'font_color': '#9C0006', 'num_format': '0%'}))  # Red
+                    sheet.write(row, 12, order['actual_margin_percentage'] / 100,
+                                workbook.add_format({'bg_color': '#FFC7CE', 'font_color': '#9C0006', 'num_format': '0%'}))
 
                 row += 1
-
-        # Adjust column widths to fit content
-        sheet.set_column('A:A', 15)  # Sales Rep
-        sheet.set_column('B:B', 12)  # SO Number
-        sheet.set_column('C:C', 25)  # Customer
-        sheet.set_column('D:D', 30)  # Project Name
-        sheet.set_column('E:E', 18)  # Untaxed Contract Amount
-        sheet.set_column('F:F', 18)  # Total Contract Amount
-        sheet.set_column('G:G', 15)  # Invoice Total
-        sheet.set_column('H:H', 15)  # Projected Margin
-        sheet.set_column('I:I', 18)  # Projected Margin %
-        sheet.set_column('J:J', 15)  # Vendor Bill Total
-        sheet.set_column('K:K', 15)  # Actual Margin
-        sheet.set_column('L:L', 18)  # Actual Margin %
-        sheet.set_column('M:M', 18)  # Issued PO Total
 
         workbook.close()
         return output.getvalue()

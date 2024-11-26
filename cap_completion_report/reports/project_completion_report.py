@@ -45,11 +45,18 @@ class ProjectCompletionReportXlsx(models.AbstractModel):
                     ('x_studio_field_esSHX', '=', sale_order.id)
                 ])
                 issued_po_total = sum(po.amount_total for po in purchase_orders)  # Sum the total amounts of the associated purchase orders
+
+                # Fetch withholdings related to the customer and match them with the sale order
+                partner_withholdings = project.partner_id.withholding_ids.filtered(
+                    lambda wh: wh.sale_order_id == sale_order
+                )
+                total_withholding_amount = sum(wh.amount for wh in partner_withholdings)
             else:
                 untaxed_amount = 0
                 total_contract_amount = 0
                 inv_total = 0
                 issued_po_total = 0
+                total_withholding_amount = 0
 
             if sales_rep not in salesperson_groups:
                 salesperson_groups[sales_rep] = []
@@ -76,12 +83,13 @@ class ProjectCompletionReportXlsx(models.AbstractModel):
                 'untaxed_amount': untaxed_amount,
                 'total_contract_amount': total_contract_amount,
                 'invoice_total': inv_total,
+                'withholding_amount': total_withholding_amount,  # Add withholding amount next to invoice total
                 'projected_margin': project.x_studio_projected_margin,
                 'vendor_bill_total': bill_total,
                 'actual_margin': actual_margin,
                 'projected_margin_percentage': projected_margin_percentage,
                 'actual_margin_percentage': actual_margin_percentage,
-                'issued_po_total': issued_po_total,  # Correctly fetching the total PO amount
+                'issued_po_total': issued_po_total,
             })
 
         # Group by salesperson
@@ -107,13 +115,20 @@ class ProjectCompletionReportXlsx(models.AbstractModel):
         sheet.write('B2', str(end_date), date_format)
 
         # Write headers
-        headers = ['Sales Rep', 'SO Number', 'Customer', 'Project Name', 'Untaxed Contract Amount', 'Total Contract Amount',
-                   'Invoice Total', 'Projected Margin', 'Projected Margin %', 'Vendor Bill Total', 
-                   'Actual Margin', 'Actual Margin %', 'Issued PO Total']
+        headers = [
+            'Sales Rep', 'SO Number', 'Customer', 'Project Name', 'Untaxed Contract Amount',
+            'Total Contract Amount', 'Invoice Total', 'Withholding Amount', 'Projected Margin',
+            'Projected Margin %', 'Vendor Bill Total', 'Actual Margin', 'Actual Margin %', 'Issued PO Total'
+        ]
 
         header_format = workbook.add_format({'bold': True, 'align': 'center', 'border': 1})
         for col_num, header in enumerate(headers):
             sheet.write(3, col_num, header, header_format)
+
+        # Adjust column widths to fit contents
+        column_widths = [15, 12, 25, 30, 20, 20, 15, 15, 15, 20, 20, 15, 20, 15]
+        for col_num, width in enumerate(column_widths):
+            sheet.set_column(col_num, col_num, width)
 
         currency_format = workbook.add_format({'num_format': '$#,##0.00'})
         percent_format = workbook.add_format({'num_format': '0%'})
@@ -129,23 +144,27 @@ class ProjectCompletionReportXlsx(models.AbstractModel):
                 sheet.write(row, 4, order['untaxed_amount'], currency_format)
                 sheet.write(row, 5, order['total_contract_amount'], currency_format)
                 sheet.write(row, 6, order['invoice_total'], currency_format)
-                sheet.write(row, 7, order['projected_margin'], currency_format)
-                sheet.write(row, 8, order['projected_margin_percentage'] / 100, percent_format)
-                sheet.write(row, 9, order['vendor_bill_total'], currency_format)
-                sheet.write(row, 10, order['actual_margin'], currency_format)
-                sheet.write(row, 11, order['actual_margin_percentage'] / 100, percent_format)
-                sheet.write(row, 12, order['issued_po_total'], currency_format)  # Write the fetched PO total amount
+                sheet.write(row, 7, order['withholding_amount'], currency_format)
+                sheet.write(row, 8, order['projected_margin'], currency_format)
+                sheet.write(row, 9, order['projected_margin_percentage'] / 100, percent_format)
+                sheet.write(row, 10, order['vendor_bill_total'], currency_format)
+                sheet.write(row, 11, order['actual_margin'], currency_format)
+                sheet.write(row, 12, order['actual_margin_percentage'] / 100, percent_format)
+                sheet.write(row, 13, order['issued_po_total'], currency_format)
 
                 # Apply Conditional Formatting per row
                 if order['actual_margin_percentage'] >= order['projected_margin_percentage']:
-                    sheet.write(row, 11, order['actual_margin_percentage'] / 100, workbook.add_format({'bg_color': '#C6EFCE', 'font_color': '#006100', 'num_format': '0%'}))  # Green
+                    sheet.write(row, 12, order['actual_margin_percentage'] / 100,
+                                workbook.add_format({'bg_color': '#C6EFCE', 'font_color': '#006100', 'num_format': '0%'}))
                 else:
-                    sheet.write(row, 11, order['actual_margin_percentage'] / 100, workbook.add_format({'bg_color': '#FFC7CE', 'font_color': '#9C0006', 'num_format': '0%'}))  # Red
+                    sheet.write(row, 12, order['actual_margin_percentage'] / 100,
+                                workbook.add_format({'bg_color': '#FFC7CE', 'font_color': '#9C0006', 'num_format': '0%'}))
 
                 row += 1
 
         workbook.close()
         return output.getvalue()
+
 
     def _generate_report(self, start_date, end_date):
         grouped_data = self._generate_report_data(start_date, end_date)
