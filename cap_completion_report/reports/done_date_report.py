@@ -109,7 +109,7 @@ class DoneDateReportXlsx(models.AbstractModel):
         # Write headers
         headers = [
             'Sales Rep', 'SO Number', 'Customer', 'Project Name', 'Untaxed Contract Amount',
-            'Total Contract Amount', 'Invoice Total', 'Withholding Amount', 'Projected Margin',
+            'Total Contract Amount', 'Invoice Total', 'Retainage Amount', 'Projected Margin',
             'Projected Margin %', 'Vendor Bill Total', 'Actual Margin', 'Actual Margin %', 'Issued PO Total'
         ]
 
