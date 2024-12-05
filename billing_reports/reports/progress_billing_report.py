@@ -75,7 +75,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                         rec.update({
                             'inv_date': datetime.datetime.strftime(inv.invoice_date, '%m-%d-%Y'),
                             'inv_no': inv.name,
-                            'inv_amount':  round(inv.amount_total_signed, 2),
+                            'inv_amount':  round(inv.amount_untaxed, 2),
                         })
                         inv_count += 1
                     else:
@@ -92,7 +92,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                             'total_revenue': '',
                             'inv_date': datetime.datetime.strftime(inv.invoice_date, '%m-%d-%Y'),
                             'inv_no': inv.name,
-                            'inv_amount':  round(inv.amount_total_signed, 2),
+                            'inv_amount':  round(inv.amount_untaxed, 2),
                             'bill_no': '',
                             'bill_total': '',
                             'bill_date': '',
