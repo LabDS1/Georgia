@@ -7,7 +7,7 @@
             <form string="Done Date Report">
                 <sheet>
                     <group>
-                        <field name="sale_order_numbers" placeholder="Enter Sale Order numbers separated by commas"/>
+                        <field name="sale_order_numbers" placeholder="Enter Sale Order numbers with SO at the beginning and separate each order with commas"/>
                     </group>
                 </sheet>
                 <footer>
