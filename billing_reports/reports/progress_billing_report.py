@@ -43,7 +43,13 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                 main_rec = {'type': 'main', 'title': so['name']}
                 data.append(main_rec)
                 count += 1
-                inv_total = round(sum(filtered_invoices.mapped('amount_untaxed')), 2) if filtered_invoices else 0
+                inv_total = round(
+                    sum(
+                        inv.amount_untaxed if inv.amount_total_signed >= 0 else -inv.amount_untaxed
+                        for inv in filtered_invoices
+                    ),
+                    2
+                ) if filtered_invoices else 0
                 bill_total = round(sum(filtered_bills.mapped('amount_total')), 2) if filtered_bills else 0
                 total_budget_cost = so['amount_untaxed'] - so['margin']
                 complete = round(bill_total/total_budget_cost, 2) if total_budget_cost != 0 else 0
@@ -92,7 +98,7 @@ class ProgressBillingReportXlsx(models.AbstractModel):
                             'total_revenue': '',
                             'inv_date': datetime.datetime.strftime(inv.invoice_date, '%m-%d-%Y'),
                             'inv_no': inv.name,
-                            'inv_amount':  round(inv.amount_untaxed, 2),
+                            'inv_amount': round(inv.amount_untaxed if inv.amount_total_signed >= 0 else -inv.amount_untaxed, 2),
                             'bill_no': '',
                             'bill_total': '',
                             'bill_date': '',
