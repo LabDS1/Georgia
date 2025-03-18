@@ -124,11 +124,13 @@ class InvoiceMove(models.Model):
                 'is_withholding': True,
             })
             self.write({'retainage_amount': abs(move_line.amount_currency)})
+            ar_line = self.line_ids.filtered(lambda line: line.account_id.code == '403000')
+            if ar_line:
+                ar_line.write({'debit': ar_line.debit - abs(amount)})
         self.write({'is_withholding': True})
         return True
 
     def action_post(self):
-        res = super(InvoiceMove, self).action_post()
         WithholdingLine = self.env['withholding.line']
 
         for inv in self:
@@ -144,4 +146,5 @@ class InvoiceMove(models.Model):
                             'invoice_id': inv.id,
                         })
                         line.with_context(check_move_validity=False).withholding_id = wh_line.id
+        res = super(InvoiceMove, self).action_post()
         return res
