@@ -117,7 +117,7 @@ class InvoiceMove(models.Model):
                 'product_uom_id': product_id.uom_id.id,
                 'product_id': product_id.id,
                 'move_id': invoice.id,
-                'tax_ids': [(6, 0, taxes_ids)],
+                'tax_ids': [(6, 0, [])],
                 'is_withholding': True,
                 'currency_id': invoice.currency_id.id,
                 'amount_currency': amount,
