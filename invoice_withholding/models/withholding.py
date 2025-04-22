@@ -168,6 +168,7 @@ class InvoiceMove(models.Model):
 
         for move in self:
             for line in move.line_ids:
+                # Fix currency balance mismatch
                 if (
                     line.currency_id == move.company_currency_id
                     and round(line.balance - (line.amount_currency or 0.0), 2) != 0
@@ -176,15 +177,17 @@ class InvoiceMove(models.Model):
                         'amount_currency': line.balance
                     })
 
+                # Clear taxes + tax base from withholding lines
                 if (
                     withholding_product
                     and line.product_id.id == withholding_product.id
-                    and line.tax_ids
                 ):
                     line.with_context(check_move_validity=False).write({
-                        'tax_ids': [(6, 0, [])]
+                        'tax_ids': [(6, 0, [])],
+                        'tax_base_amount': 0.0
                     })
 
         return super()._post(soft=soft)
+
 
 
