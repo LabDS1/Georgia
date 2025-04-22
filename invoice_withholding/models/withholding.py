@@ -126,7 +126,7 @@ class InvoiceMove(models.Model):
             })
     
             # Update retainage amount
-            self.write({'retainage_amount': abs(move_line.amount_currency)})
+            self.write({'retainage_amount': abs(move_line.balance)})
     
             # Find and update the A/R (403000) account line
             ar_line = self.line_ids.filtered(lambda line: line.account_id.code == '403000')
