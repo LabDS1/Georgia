@@ -93,26 +93,27 @@ class InvoiceMove(models.Model):
         product_id = self.env.user.company_id.withholding_product_id
         if not product_id:
             raise UserError(_('Please set Withholding product in General Settings first.'))
-
-        # Remove Witholding line first
+    
+        # Remove existing withholding line
         self._withholding_unset()
-
+    
         account_id = product_id.property_account_income_id.id
         if not account_id:
-            raise UserError(_('PLease Set income account on witholding product first.'))
-
+            raise UserError(_('Please Set income account on withholding product first.'))
+    
         for invoice in self:
             # Apply fiscal position
             taxes = product_id.taxes_id.filtered(lambda t: t.company_id.id == invoice.company_id.id)
             taxes_ids = taxes.ids
             if invoice.partner_id and self.fiscal_position_id:
                 taxes_ids = self.fiscal_position_id.map_tax(taxes).ids
-
-            amount = -(invoice.amount_total * invoice.withholding_percentage)/100
-
-            # Create the Invoice line
+    
+            # Compute withholding amount
+            amount = -(invoice.amount_total * invoice.withholding_percentage) / 100
+    
+            # Create the withholding invoice line
             move_line = self.env['account.move.line'].with_context(check_move_validity=False).create({
-                'name':  str(invoice.withholding_percentage) + '% Withholding of Invoice',
+                'name': str(invoice.withholding_percentage) + '% Withholding of Invoice',
                 'price_unit': amount,
                 'account_id': account_id,
                 'quantity': 1.0,
@@ -123,19 +124,27 @@ class InvoiceMove(models.Model):
                 'tax_ids': [(6, 0, taxes_ids)],
                 'is_withholding': True,
             })
+    
+            # Update retainage amount
             self.write({'retainage_amount': abs(move_line.amount_currency)})
+    
+            # Find and update the A/R (403000) account line
+            ar_line = self.line_ids.filtered(lambda line: line.account_id.code == '403000')
+            if ar_line:
+                ar_line.write({'debit': ar_line.debit - abs(amount)})
+    
         self.write({'is_withholding': True})
         return True
 
-    def action_post(self):
-        res = super(InvoiceMove, self).action_post()
-        WithholdingLine = self.env['withholding.line']
 
+    def action_post(self):
+        WithholdingLine = self.env['withholding.line']
+    
         for inv in self:
             if inv.add_withholding:
                 for line in inv.invoice_line_ids:
                     if self.env.user.company_id.withholding_product_id and (line.product_id.id == self.env.user.company_id.withholding_product_id.id):
-                        #Create witholding line
+                        # Create withholding line before taxes finalize
                         wh_line = WithholdingLine.create({
                             'name': line.name,
                             'product_id': line.product_id.id,
@@ -144,4 +153,7 @@ class InvoiceMove(models.Model):
                             'invoice_id': inv.id,
                         })
                         line.with_context(check_move_validity=False).withholding_id = wh_line.id
+    
+        # Now post the invoice after withholding is added
+        res = super(InvoiceMove, self).action_post()
         return res
