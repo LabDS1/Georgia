@@ -94,23 +94,20 @@ class InvoiceMove(models.Model):
         if not product_id:
             raise UserError(_('Please set Withholding product in General Settings first.'))
 
-        self._withholding_unset()  # Remove any existing withholding lines
+        self._withholding_unset()  # Clear existing lines
 
         account_id = product_id.property_account_income_id.id
         if not account_id:
             raise UserError(_('Please Set income account on withholding product first.'))
 
         for invoice in self:
-            # Apply taxes through fiscal position
             taxes = product_id.taxes_id.filtered(lambda t: t.company_id.id == invoice.company_id.id)
             taxes_ids = taxes.ids
             if invoice.partner_id and invoice.fiscal_position_id:
                 taxes_ids = invoice.fiscal_position_id.map_tax(taxes).ids
 
-            # Compute withholding amount (always negative for proper accounting)
             amount = -(invoice.amount_total * invoice.withholding_percentage) / 100
 
-            # Build move line values
             move_line_vals = {
                 'name': f"{invoice.withholding_percentage}% Withholding of Invoice",
                 'price_unit': amount,
@@ -122,34 +119,25 @@ class InvoiceMove(models.Model):
                 'move_id': invoice.id,
                 'tax_ids': [(6, 0, taxes_ids)],
                 'is_withholding': True,
+                'currency_id': invoice.currency_id.id,      
+                'amount_currency': amount                   
             }
 
-            
-            if invoice.currency_id != invoice.company_id.currency_id:
-                move_line_vals.update({
-                    'currency_id': invoice.currency_id.id,
-                    'amount_currency': amount,
-                })
-            else:
-                move_line_vals['currency_id'] = False  
-
-            # Create the move line
             move_line = self.env['account.move.line'].with_context(check_move_validity=False).create(move_line_vals)
 
-            
             invoice.write({'retainage_amount': abs(move_line.balance)})
 
-            # Adjust the A/R line to reflect reduced amount
-            ar_line = invoice.line_ids.filtered(lambda line: line.account_id.code == '403000')
+            ar_line = invoice.line_ids.filtered(lambda line: line.account_id.user_type_id.type == 'receivable')
             if ar_line:
-                new_debit = ar_line.debit - abs(move_line.balance)
                 ar_line.with_context(check_move_validity=False).write({
-                    'debit': new_debit,
-                    'currency_id': False,  
+                    'debit': ar_line.debit - abs(move_line.balance),
+                    'currency_id': invoice.currency_id.id,              
+                    'amount_currency': ar_line.balance - abs(move_line.balance),  
                 })
 
         self.write({'is_withholding': True})
         return True
+
     
     def action_post(self):
         WithholdingLine = self.env['withholding.line']
