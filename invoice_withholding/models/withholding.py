@@ -141,7 +141,7 @@ class InvoiceMove(models.Model):
     
     def action_post(self):
         WithholdingLine = self.env['withholding.line']
-    
+
         for inv in self:
             if inv.add_withholding:
                 for line in inv.invoice_line_ids:
@@ -155,7 +155,17 @@ class InvoiceMove(models.Model):
                             'invoice_id': inv.id,
                         })
                         line.with_context(check_move_validity=False).withholding_id = wh_line.id
-    
-        # Now post the invoice after withholding is added
-        res = super(InvoiceMove, self).action_post()
-        return res
+
+                
+                for line in inv.line_ids:
+                    if (
+                        line.currency_id == inv.company_currency_id
+                        and round(line.balance - (line.amount_currency or 0.0), 2) != 0
+                    ):
+                        line.with_context(check_move_validity=False).write({
+                            'amount_currency': line.balance
+                        })
+
+        # ✅ Post invoice after all corrections are in place
+        return super(InvoiceMove, self).action_post()
+
