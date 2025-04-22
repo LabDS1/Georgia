@@ -148,6 +148,10 @@ class InvoiceMove(models.Model):
                         self.env.user.company_id.withholding_product_id
                         and line.product_id.id == self.env.user.company_id.withholding_product_id.id
                     ):
+                         # Ensure tax is cleared on withholding line
+                        line.with_context(check_move_validity=False).write({
+                            'tax_ids': [(6, 0, [])]
+                        })
                         wh_line = WithholdingLine.create({
                             'name': line.name,
                             'product_id': line.product_id.id,
