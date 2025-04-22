@@ -94,11 +94,11 @@ class InvoiceMove(models.Model):
         if not product_id:
             raise UserError(_('Please set Withholding product in General Settings first.'))
 
-        self._withholding_unset()  # Clear existing lines
+        self._withholding_unset()
 
         account_id = product_id.property_account_income_id.id
         if not account_id:
-            raise UserError(_('Please Set income account on withholding product first.'))
+            raise UserError(_('Please set an income account on the withholding product first.'))
 
         for invoice in self:
             taxes = product_id.taxes_id.filtered(lambda t: t.company_id.id == invoice.company_id.id)
@@ -119,8 +119,8 @@ class InvoiceMove(models.Model):
                 'move_id': invoice.id,
                 'tax_ids': [(6, 0, taxes_ids)],
                 'is_withholding': True,
-                'currency_id': invoice.currency_id.id,      
-                'amount_currency': amount                   
+                'currency_id': invoice.currency_id.id,
+                'amount_currency': amount,
             }
 
             move_line = self.env['account.move.line'].with_context(check_move_validity=False).create(move_line_vals)
@@ -131,22 +131,23 @@ class InvoiceMove(models.Model):
             if ar_line:
                 ar_line.with_context(check_move_validity=False).write({
                     'debit': ar_line.debit - abs(move_line.balance),
-                    'currency_id': invoice.currency_id.id,              
-                    'amount_currency': ar_line.balance - abs(move_line.balance),  
+                    'currency_id': invoice.currency_id.id,
+                    'amount_currency': ar_line.balance - abs(move_line.balance),
                 })
 
         self.write({'is_withholding': True})
         return True
 
-    
     def action_post(self):
         WithholdingLine = self.env['withholding.line']
 
         for inv in self:
             if inv.add_withholding:
                 for line in inv.invoice_line_ids:
-                    if self.env.user.company_id.withholding_product_id and (line.product_id.id == self.env.user.company_id.withholding_product_id.id):
-                        # Create withholding line before taxes finalize
+                    if (
+                        self.env.user.company_id.withholding_product_id
+                        and line.product_id.id == self.env.user.company_id.withholding_product_id.id
+                    ):
                         wh_line = WithholdingLine.create({
                             'name': line.name,
                             'product_id': line.product_id.id,
@@ -156,16 +157,17 @@ class InvoiceMove(models.Model):
                         })
                         line.with_context(check_move_validity=False).withholding_id = wh_line.id
 
-                
-                for line in inv.line_ids:
-                    if (
-                        line.currency_id == inv.company_currency_id
-                        and round(line.balance - (line.amount_currency or 0.0), 2) != 0
-                    ):
-                        line.with_context(check_move_validity=False).write({
-                            'amount_currency': line.balance
-                        })
+        return super().action_post()
 
-        # ✅ Post invoice after all corrections are in place
-        return super(InvoiceMove, self).action_post()
+    def _post(self, soft=True):
+        for move in self:
+            for line in move.line_ids:
+                if (
+                    line.currency_id == move.company_currency_id
+                    and round(line.balance - (line.amount_currency or 0.0), 2) != 0
+                ):
+                    line.with_context(check_move_validity=False).write({
+                        'amount_currency': line.balance
+                    })
+        return super()._post(soft=soft)
 
