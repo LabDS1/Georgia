@@ -8,13 +8,13 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     def _compute_avalara_taxes(self, commit):
-        # Step 1: Get Avalara taxes
+        # Step 1: Get Avalara tax data
         mapped_taxes, summary = self._map_avatax(commit)
 
         if commit:
             return
 
-        # Step 2: Update tax_ids and totals
+        # Step 2: Apply Avalara-calculated tax_ids and totals
         for line, detail in mapped_taxes.items():
             line.tax_ids = detail['tax_ids']
             line.price_total = detail['tax_amount'] + detail['total']
@@ -24,9 +24,13 @@ class AccountMove(models.Model):
         if not summary:
             return
 
-        # Step 3: Correct only if add_withholding is True
+        # Step 3: Correct mismatches unless custom withholding is applied
         for record in self:
-            if not record.add_withholding:
+            if record.add_withholding:
+                _logger.warning(
+                    "[AVALARA SYNC] Skipping tax correction on move %s due to withholding logic.",
+                    record.name or record.id
+                )
                 continue
 
             for tax, avatax_amount in summary[record].items():
@@ -41,7 +45,7 @@ class AccountMove(models.Model):
                     correction = avatax_amount_currency - total_amt_cur
                     _logger.warning(
                         "[AVALARA SYNC] Tax mismatch on tax %s (move: %s). Expected: %s, Found: %s. Applying correction: %s",
-                        tax.name, record.name, avatax_amount_currency, total_amt_cur, correction,
+                        tax.name, record.name or record.id, avatax_amount_currency, total_amt_cur, correction,
                     )
 
                     for line in tax_lines:
@@ -52,12 +56,11 @@ class AccountMove(models.Model):
                         if line.currency_id == line.company_currency_id:
                             new_balance = new_amt_currency
                         else:
-                            new_balance = line.currency_id._convert(
+                            new_balance = line.balance + line.currency_id._convert(
                                 line_correction, line.company_currency_id,
                                 line.company_id, line.date
-                            ) + line.balance
+                            )
 
-                        # Update line with corrections
                         line.with_context(check_move_validity=False).write({
                             'amount_currency': new_amt_currency,
                             'balance': new_balance,
