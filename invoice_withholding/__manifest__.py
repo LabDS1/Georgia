@@ -33,7 +33,7 @@
     Retainage
     Retainage on project
     """,
-    'depends': ['account', 'project'],
+    'depends': ['account', 'project', 'account_avatax'],
     'data': [
         'security/ir.model.access.csv',
         'views/withholding_view.xml',
