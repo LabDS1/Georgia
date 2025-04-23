@@ -164,8 +164,6 @@ class InvoiceMove(models.Model):
         return super().action_post()
 
     def _post(self, soft=True):
-        withholding_product = self.env.user.company_id.withholding_product_id
-
         for move in self:
             for line in move.line_ids:
                 if (
@@ -175,18 +173,14 @@ class InvoiceMove(models.Model):
                     line.with_context(check_move_validity=False).write({
                         'amount_currency': line.balance
                     })
-
-                if (
-                    move.add_withholding
-                    and withholding_product
-                    and line.product_id.id == withholding_product.id
-                ):
+                if move.add_withholding and line.is_withholding:
                     line.with_context(check_move_validity=False).write({
                         'tax_ids': [(6, 0, [])],
                         'tax_base_amount': 0.0
                     })
 
         return super()._post(soft=soft)
+
 
 
 
