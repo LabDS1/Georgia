@@ -165,6 +165,8 @@ class InvoiceMove(models.Model):
 
     def _post(self, soft=True):
         for move in self:
+            if not move.add_withholding:
+                continue
             for line in move.line_ids:
                 if (
                     line.currency_id == move.company_currency_id
