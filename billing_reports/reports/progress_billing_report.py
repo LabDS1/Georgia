@@ -30,11 +30,13 @@ class ProgressBillingReportXlsx(models.AbstractModel):
         for so in orders:
 
             invoices = self.env['account.move'].browse(so['invoice_ids'])
+            invoices = invoices.filtered(lambda x: x.state == 'posted')
             filtered_invoices = invoices.filtered(lambda item: item.invoice_date and item.invoice_date <= end_date)
             check_invoices = invoices.filtered(lambda item: item.invoice_date and start_date <= item.invoice_date <= end_date)
 
             bills = self.env['account.move'].search(
                 [('move_type', '=', 'in_invoice'), ('x_studio_related_so', '=', so['id'])], order='invoice_date asc')
+            bills = bills.filtered(lambda x: x.state == 'posted')
             filtered_bills = bills.filtered(lambda item: item.invoice_date and item.invoice_date <= end_date)
             check_bills = bills.filtered(lambda item: item.invoice_date and start_date <= item.invoice_date <= end_date)
 
