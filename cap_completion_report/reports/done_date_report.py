@@ -4,6 +4,7 @@ import base64
 import xlsxwriter
 from odoo import models
 
+
 class DoneDateReportXlsx(models.AbstractModel):
     _name = "done.date.report"
     _description = "Done Date Report"
@@ -33,16 +34,19 @@ class DoneDateReportXlsx(models.AbstractModel):
 
                 invoices = sale_order.invoice_ids.filtered(lambda inv: inv.state not in ['cancel'])
                 inv_total = sum(invoices.mapped('amount_total_signed'))
+                inv_tax_total = sum(invoices.mapped('amount_tax'))
 
                 # Fetch all purchase orders related to this sale order via x_studio_field_esSHX
                 purchase_orders = self.env['purchase.order'].search([
                     ('x_studio_field_esSHX', '=', sale_order.id)
                 ])
-                issued_po_total = sum(po.amount_total for po in purchase_orders)  # Sum the total amounts of the associated purchase orders
+                issued_po_total = sum(po.amount_total for po in
+                                      purchase_orders)  # Sum the total amounts of the associated purchase orders
             else:
                 untaxed_amount = 0
                 total_contract_amount = 0
                 inv_total = 0
+                inv_tax_total = 0
                 issued_po_total = 0
 
             if sales_rep not in salesperson_groups:
@@ -54,7 +58,8 @@ class DoneDateReportXlsx(models.AbstractModel):
             actual_margin = inv_total - bill_total
 
             # Calculate percentages based on untaxed amount
-            projected_margin_percentage = (project.x_studio_projected_margin / untaxed_amount) * 100 if untaxed_amount else 0
+            projected_margin_percentage = (
+                                                      project.x_studio_projected_margin / untaxed_amount) * 100 if untaxed_amount else 0
             actual_margin_percentage = (actual_margin / untaxed_amount) * 100 if untaxed_amount else 0
 
             # Modify customer name to include company if available
@@ -70,6 +75,7 @@ class DoneDateReportXlsx(models.AbstractModel):
                 'untaxed_amount': untaxed_amount,
                 'total_contract_amount': total_contract_amount,
                 'invoice_total': inv_total,
+                'inv_tax_total': inv_tax_total,
                 'projected_margin': project.x_studio_projected_margin,
                 'vendor_bill_total': bill_total,
                 'actual_margin': actual_margin,
@@ -99,8 +105,9 @@ class DoneDateReportXlsx(models.AbstractModel):
         sheet.write('B1', ''.join(sale_order_numbers), date_format)
 
         # Write headers
-        headers = ['Sales Rep', 'SO Number', 'Customer', 'Project Name', 'Untaxed Contract Amount', 'Total Contract Amount',
-                   'Invoice Total', 'Projected Margin', 'Projected Margin %', 'Vendor Bill Total', 
+        headers = ['Sales Rep', 'SO Number', 'Customer', 'Project Name', 'Untaxed Contract Amount',
+                   'Total Contract Amount',
+                   'Invoice Total', 'Projected Margin', 'Projected Margin %', 'Vendor Bill Total',
                    'Actual Margin', 'Actual Margin %', 'Issued PO Total']
 
         header_format = workbook.add_format({'bold': True, 'align': 'center', 'border': 1})
@@ -120,7 +127,7 @@ class DoneDateReportXlsx(models.AbstractModel):
                 sheet.write(row, 3, order['project_name'])
                 sheet.write(row, 4, order['untaxed_amount'], currency_format)
                 sheet.write(row, 5, order['total_contract_amount'], currency_format)
-                sheet.write(row, 6, order['invoice_total'], currency_format)
+                sheet.write(row, 6, order['invoice_total'] - order['inv_tax_total'], currency_format)
                 sheet.write(row, 7, order['projected_margin'], currency_format)
                 sheet.write(row, 8, order['projected_margin_percentage'] / 100, percent_format)
                 sheet.write(row, 9, order['vendor_bill_total'], currency_format)
@@ -130,9 +137,11 @@ class DoneDateReportXlsx(models.AbstractModel):
 
                 # Apply Conditional Formatting per row
                 if order['actual_margin_percentage'] >= order['projected_margin_percentage']:
-                    sheet.write(row, 11, order['actual_margin_percentage'] / 100, workbook.add_format({'bg_color': '#C6EFCE', 'font_color': '#006100', 'num_format': '0%'}))  # Green
+                    sheet.write(row, 11, order['actual_margin_percentage'] / 100, workbook.add_format(
+                        {'bg_color': '#C6EFCE', 'font_color': '#006100', 'num_format': '0%'}))  # Green
                 else:
-                    sheet.write(row, 11, order['actual_margin_percentage'] / 100, workbook.add_format({'bg_color': '#FFC7CE', 'font_color': '#9C0006', 'num_format': '0%'}))  # Red
+                    sheet.write(row, 11, order['actual_margin_percentage'] / 100, workbook.add_format(
+                        {'bg_color': '#FFC7CE', 'font_color': '#9C0006', 'num_format': '0%'}))  # Red
 
                 row += 1
 
