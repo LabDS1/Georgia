@@ -128,7 +128,7 @@ class ProjectCompletionReportXlsx(models.AbstractModel):
                 sheet.write(row, 3, order['project_name'])
                 sheet.write(row, 4, order['untaxed_amount'], currency_format)
                 sheet.write(row, 5, order['total_contract_amount'], currency_format)
-                sheet.write(row, 6, order['invoice_total'], currency_format)
+                sheet.write(row, 6, order['invoice_total'] - order['amount_tax'], currency_format)
                 sheet.write(row, 7, order['projected_margin'], currency_format)
                 sheet.write(row, 8, order['projected_margin_percentage'] / 100, percent_format)
                 sheet.write(row, 9, order['vendor_bill_total'], currency_format)
