@@ -27,6 +27,7 @@ class DoneDateReportXlsx(models.AbstractModel):
         for project in projects:
             sales_rep = project.x_studio_sales_rep
             sale_order = project.x_studio_sales_order
+            retainage = 0
 
             if sale_order:
                 untaxed_amount = sale_order.amount_untaxed
@@ -37,11 +38,14 @@ class DoneDateReportXlsx(models.AbstractModel):
                 inv_tax_total = sum(invoices.mapped('amount_tax'))
 
                 # Fetch all purchase orders related to this sale order via x_studio_field_esSHX
-                purchase_orders = self.env['purchase.order'].search([
-                    ('x_studio_field_esSHX', '=', sale_order.id)
-                ])
-                issued_po_total = sum(po.amount_total for po in
-                                      purchase_orders)  # Sum the total amounts of the associated purchase orders
+                purchase_orders = self.env['purchase.order'].search([('x_studio_field_esSHX', '=', sale_order.id)])
+                issued_po_total = sum(po.amount_total for po in purchase_orders)
+                # Sum the total amounts of the associated purchase orders
+
+                order_ids = self.env['withholding.line'].search([('sale_order_id', '=', sale_order.id)])
+                if order_ids:
+                    retainage = sum(order_ids.mapped('amount'))
+
             else:
                 untaxed_amount = 0
                 total_contract_amount = 0
@@ -55,11 +59,11 @@ class DoneDateReportXlsx(models.AbstractModel):
             vendor_bills = project.vendor_bill_ids.filtered(lambda inv: inv.move_type == 'in_invoice')
             bill_total = sum(abs(vb.amount_total_signed) for vb in vendor_bills)
 
-            actual_margin = inv_total - bill_total
+            actual_margin = (inv_total + retainage) - bill_total
 
             # Calculate percentages based on untaxed amount
             projected_margin_percentage = (
-                                                      project.x_studio_projected_margin / untaxed_amount) * 100 if untaxed_amount else 0
+                                                  project.x_studio_projected_margin / untaxed_amount) * 100 if untaxed_amount else 0
             actual_margin_percentage = (actual_margin / untaxed_amount) * 100 if untaxed_amount else 0
 
             # Modify customer name to include company if available
@@ -82,6 +86,7 @@ class DoneDateReportXlsx(models.AbstractModel):
                 'projected_margin_percentage': projected_margin_percentage,
                 'actual_margin_percentage': actual_margin_percentage,
                 'issued_po_total': issued_po_total,
+                'retainage': retainage
             })
 
         # Group by salesperson
@@ -106,9 +111,8 @@ class DoneDateReportXlsx(models.AbstractModel):
 
         # Write headers
         headers = ['Sales Rep', 'SO Number', 'Customer', 'Project Name', 'Untaxed Contract Amount',
-                   'Total Contract Amount',
-                   'Invoice Total', 'Projected Margin', 'Projected Margin %', 'Vendor Bill Total',
-                   'Actual Margin', 'Actual Margin %', 'Issued PO Total']
+                   'Total Contract Amount', 'Invoice Total', 'Retainage', 'Retainage + Inv Total', 'Projected Margin',
+                   'Projected Margin %', 'Vendor Bill Total', 'Actual Margin', 'Actual Margin %', 'Issued PO Total']
 
         header_format = workbook.add_format({'bold': True, 'align': 'center', 'border': 1})
         for col_num, header in enumerate(headers):
@@ -122,18 +126,21 @@ class DoneDateReportXlsx(models.AbstractModel):
             sheet.write(row, 0, sales_rep.name, header_format)
             row += 1
             for order in orders:
+                invoice_total = order['invoice_total'] - order['inv_tax_total']
                 sheet.write(row, 1, order['so_number'])
                 sheet.write(row, 2, order['customer'])
                 sheet.write(row, 3, order['project_name'])
                 sheet.write(row, 4, order['untaxed_amount'], currency_format)
                 sheet.write(row, 5, order['total_contract_amount'], currency_format)
-                sheet.write(row, 6, order['invoice_total'] - order['inv_tax_total'], currency_format)
-                sheet.write(row, 7, order['projected_margin'], currency_format)
-                sheet.write(row, 8, order['projected_margin_percentage'] / 100, percent_format)
-                sheet.write(row, 9, order['vendor_bill_total'], currency_format)
-                sheet.write(row, 10, order['actual_margin'], currency_format)
-                sheet.write(row, 11, order['actual_margin_percentage'] / 100, percent_format)
-                sheet.write(row, 12, order['issued_po_total'], currency_format)  # Write the fetched PO total amount
+                sheet.write(row, 6, invoice_total, currency_format)
+                sheet.write(row, 7, order['retainage'], currency_format)
+                sheet.write(row, 8, order['retainage'] + invoice_total, currency_format)
+                sheet.write(row, 9, order['projected_margin'], currency_format)
+                sheet.write(row, 10, order['projected_margin_percentage'] / 100, percent_format)
+                sheet.write(row, 11, order['vendor_bill_total'], currency_format)
+                sheet.write(row, 12, order['actual_margin'], currency_format)
+                sheet.write(row, 13, order['actual_margin_percentage'] / 100, percent_format)
+                sheet.write(row, 14, order['issued_po_total'], currency_format)  # Write the fetched PO total amount
 
                 # Apply Conditional Formatting per row
                 if order['actual_margin_percentage'] >= order['projected_margin_percentage']:
