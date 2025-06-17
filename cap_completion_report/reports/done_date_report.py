@@ -137,10 +137,10 @@ class DoneDateReportXlsx(models.AbstractModel):
 
                 # Apply Conditional Formatting per row
                 if order['actual_margin_percentage'] >= order['projected_margin_percentage']:
-                    sheet.write(row, 11, order['actual_margin_percentage'] / 100, workbook.add_format(
+                    sheet.write(row, 13, order['actual_margin_percentage'] / 100, workbook.add_format(
                         {'bg_color': '#C6EFCE', 'font_color': '#006100', 'num_format': '0%'}))  # Green
                 else:
-                    sheet.write(row, 11, order['actual_margin_percentage'] / 100, workbook.add_format(
+                    sheet.write(row, 13, order['actual_margin_percentage'] / 100, workbook.add_format(
                         {'bg_color': '#FFC7CE', 'font_color': '#9C0006', 'num_format': '0%'}))  # Red
 
                 row += 1
