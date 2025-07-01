@@ -22,7 +22,7 @@ class AccountMove(models.Model):
                                   string='Purchase Order',
                                   help="Auto-complete from a past purchase order.")
 
-    active = fields.Boolean(default=False)
+    active = fields.Boolean(default=True)
 
     @api.onchange('purchase_vendor_bill_id', 'purchase_id')
     def _onchange_purchase_auto_complete(self):
