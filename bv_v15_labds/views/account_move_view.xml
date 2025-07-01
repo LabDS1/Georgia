@@ -7,18 +7,13 @@
             <field name="inherit_id" ref="account.view_move_form"/>
             <field name="arch" type="xml">
                 <field name="invoice_payment_term_id" position="after">
-                    <field name="invoice_date_due"
-                           attrs="{'invisible': [('move_type', 'not in', ('out_invoice', 'out_refund', 'out_receipt'))]}"/>
+                    <field name="invoice_date_due" attrs="{'invisible': [('move_type', 'not in', ('out_invoice', 'out_refund', 'out_receipt'))]}"/>
                 </field>
                 <field name="payment_reference" position="after">
-                    <field name="customer_po"
-                           attrs="{'invisible': [('move_type', 'not in', ('out_invoice', 'out_refund','out_receipt'))]}"/>
+                    <field name="customer_po" attrs="{'invisible': [('move_type', 'not in', ('out_invoice', 'out_refund','out_receipt'))]}"/>
                     <button name="action_customer_po_update" string="Update Customer PO" type="object" invisible="1"/>
                 </field>
-                <field name="to_check" position="after">
-                    <field name="active"
-                           attrs="{'invisible': [('move_type', 'not in', ('out_invoice'))]}"/>
-                </field>
+
             </field>
         </record>
     </data>
