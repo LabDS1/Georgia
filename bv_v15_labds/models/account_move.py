@@ -22,6 +22,8 @@ class AccountMove(models.Model):
                                   string='Purchase Order',
                                   help="Auto-complete from a past purchase order.")
 
+    active = fields.Boolean(default=False)
+
     @api.onchange('purchase_vendor_bill_id', 'purchase_id')
     def _onchange_purchase_auto_complete(self):
         ''' Load from either an old purchase order, either an old vendor bill.
