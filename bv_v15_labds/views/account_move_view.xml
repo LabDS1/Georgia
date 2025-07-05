@@ -19,6 +19,11 @@
                     <field name="active"
                            attrs="{'invisible': [('move_type', 'not in', ('out_invoice'))]}"/>
                 </field>
+
+                <xpath expr="//widget[@name='web_ribbon']" position="before">
+                    <widget name="web_ribbon" title="Archived" bg_color="bg-danger"
+                            attrs="{'invisible': [('active', '=', True)]}"/>
+                </xpath>
             </field>
         </record>
     </data>
